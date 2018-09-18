@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+
+        <Button
+            android:id="@+id/btn_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="清空textview" />
+
+        <Button
+            android:id="@+id/btn_friends"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="将friend插入数据库" />
+
+        <Button
+            android:id="@+id/btn_getfriendsasync"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="异步读取好友信息(网络关闭从服务器上获得，反之从数据库获得)" />
+
+        <Button
+            android:id="@+id/btn_getfriendssync"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="同步读取好友信息(网络关闭从服务器上获得，反之从数据库获得)" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:background="@android:color/holo_red_dark"></View>
+
+        <EditText
+            android:id="@+id/et_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="查找输入李三或张四，删除输入拼音lisan,zhangsi,zhangsan" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_getonefriendasync"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="异步精确查找一个好友" />
+
+            <Button
+                android:id="@+id/btn_getonefriendsync"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="同步精确查找一个好友" />
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_mhfriendasync"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="异步模糊查找好友" />
+
+            <Button
+                android:id="@+id/btn_mhfriendsync"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="同步模糊查找好友" />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:background="@android:color/holo_green_dark"></View>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:visibility="gone"
+                android:id="@+id/btn_delonefriendasync"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="异步删除一个好友" />
+
+            <Button
+                android:id="@+id/btn_delonefriendsync"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="同步删除一个好友" />
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btn_delfriendsasync"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="异步删除所有好友" />
+
+
+    </LinearLayout>
+</ScrollView>
