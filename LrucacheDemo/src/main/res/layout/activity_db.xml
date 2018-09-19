@@ -128,6 +128,58 @@
             android:layout_weight="1"
             android:text="异步删除所有好友" />
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:background="@android:color/holo_green_dark"></View>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/btn_updateonefriendasync"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="同步更新一个好友（李三改为李三1）" />
+
+            <Button
+                android:id="@+id/btn_updatefriendssync"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="异步更新一组好友（李三-》李三2； 张四-》张四2);同步弹出Toast，看线程。" />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:background="@android:color/holo_green_dark"></View>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/btn_addeonefriendasync"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="同步添加一个好友（王五  wangwu）,用insertOrReplace" />
+
+            <Button
+                android:id="@+id/btn_addfriendssync"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="异步添加一组好友（钱六 qianliu, 高七 gaoqi）,用insertOrReplace；" />
+
+        </LinearLayout>
 
     </LinearLayout>
 </ScrollView>

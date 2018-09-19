@@ -28,7 +28,7 @@
 
         <Button
             android:id="@+id/btn_db"
-            android:text="数据库"
+            android:text="数据库GreenDao"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="5dp"

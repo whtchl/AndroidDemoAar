@@ -45,6 +45,14 @@ public class DBActivity extends AppCompatActivity {
     Button btnDelonefriendsync;
     @BindView(R.id.btn_delfriendsasync)
     Button btnDelfriendsasync;
+    @BindView(R.id.btn_updateonefriendasync)
+    Button btnUpdateonefriendasync;
+    @BindView(R.id.btn_updatefriendssync)
+    Button btnUpdatefriendssync;
+    @BindView(R.id.btn_addeonefriendasync)
+    Button btnAddeonefriendasync;
+    @BindView(R.id.btn_addfriendssync)
+    Button btnAddfriendssync;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +61,8 @@ public class DBActivity extends AppCompatActivity {
         ButterKnife.bind(this);
     }
 
-    @OnClick({R.id.btn_friends, R.id.btn_getfriendsasync, R.id.btn_getfriendssync, R.id.btn_tv, R.id.btn_getonefriendasync, R.id.btn_getonefriendsync, R.id.btn_mhfriendasync, R.id.btn_mhfriendsync,R.id.btn_delonefriendasync, R.id.btn_delonefriendsync, R.id.btn_delfriendsasync})
+    @OnClick({R.id.btn_friends, R.id.btn_getfriendsasync, R.id.btn_getfriendssync, R.id.btn_tv, R.id.btn_getonefriendasync, R.id.btn_getonefriendsync, R.id.btn_mhfriendasync, R.id.btn_mhfriendsync, R.id.btn_delonefriendasync, R.id.btn_delonefriendsync, R.id.btn_delfriendsasync, R.id.btn_updateonefriendasync, R.id.btn_updatefriendssync
+    ,R.id.btn_addeonefriendasync, R.id.btn_addfriendssync})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_friends:
@@ -64,10 +73,10 @@ public class DBActivity extends AppCompatActivity {
                 SealUserInfoManager.getInstance().getFriends(new SealUserInfoManager.ResultCallback<List<Friend>>() {
                     @Override
                     public void onSuccess(List<Friend> friendsList) {
-                  //      setText(friendsList, "");
-                        if (friendsList!=null && friendsList.size()>0){
+                        //      setText(friendsList, "");
+                        if (friendsList != null && friendsList.size() > 0) {
                             setText(friendsList, "");
-                        }else{
+                        } else {
                             setText(null, "异步获取所有好友为空");
                         }
 
@@ -84,9 +93,9 @@ public class DBActivity extends AppCompatActivity {
             case R.id.btn_getfriendssync:  //同步获取所有好友
 
                 List<Friend> list = SealUserInfoManager.getInstance().syncGetFriends();
-                if (list!=null && list.size()>0){
+                if (list != null && list.size() > 0) {
                     setText(list, "");
-                }else{
+                } else {
                     setText(null, "同步获取所有好友为空");
                 }
 
@@ -176,17 +185,51 @@ public class DBActivity extends AppCompatActivity {
             case R.id.btn_delonefriendasync:  //异步删除一个好友
                 break;
             case R.id.btn_delonefriendsync:   //同步删除一个好友
-                  //MovieCollect movieCollect;
+                //MovieCollect movieCollect;
                 //mMovieCollectDao.delete(movieCollect);
-                if(!TextUtils.isEmpty(etName.getText().toString())){
+                if (!TextUtils.isEmpty(etName.getText().toString())) {
                     SealUserInfoManager.getInstance().deleteOneFriends(etName.getText().toString());
 
-                }else{
+                } else {
                     JUtils.Toast("请输入userid");
                 }
                 break;
             case R.id.btn_delfriendsasync:    //异步删除所有好友
                 SealUserInfoManager.getInstance().deleteFriends();
+                break;
+
+            case R.id.btn_updateonefriendasync:  //同步更新一个好友
+                SealUserInfoManager.getInstance().updateOneFriend("李三");
+                break;
+            case R.id.btn_updatefriendssync:     //同步更新一组好友
+                SealUserInfoManager.getInstance().updateFriends(new SealUserInfoManager.ResultCallback<String>() {
+                    @Override
+                    public void onSuccess(String s) {
+                        JUtils.Toast(s);
+                    }
+
+                    @Override
+                    public void onError(String errString) {
+                        JUtils.Toast(errString);
+                    }
+                });
+                break;
+            case R.id.btn_addeonefriendasync:  //同步添加一个好友
+                Long l = SealUserInfoManager.getInstance().addOneFriend();
+                JUtils.Toast("同步添加一个好友后返回的行号："+l);
+                break;
+            case R.id.btn_addfriendssync:      //异步添加一组好友
+                SealUserInfoManager.getInstance().addFriendList(new SealUserInfoManager.ResultCallback<String>() {
+                    @Override
+                    public void onSuccess(String s) {
+                        JUtils.Toast(s);
+                    }
+
+                    @Override
+                    public void onError(String errString) {
+                        JUtils.Toast(errString);
+                    }
+                });
                 break;
         }
     }
