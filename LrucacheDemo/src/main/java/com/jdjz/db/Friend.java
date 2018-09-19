@@ -10,12 +10,20 @@ import android.text.TextUtils;
 import com.jdjz.common.ParcelUtils;
 import com.jdjz.model.UserInfo;
 
+import org.greenrobot.greendao.annotation.Entity;
+import org.greenrobot.greendao.annotation.Id;
+import org.greenrobot.greendao.annotation.Generated;
+
 
 /**
  * Entity mapped to table FRIEND.
  */
-public class Friend extends UserInfo {
-
+@Entity
+public class Friend  {
+    @Id
+    private String userId;
+    private String name;
+    private String portraitUri;
     private String displayName;
     private String region;
     private String phoneNumber;
@@ -24,25 +32,50 @@ public class Friend extends UserInfo {
     private String letters;
     private String nameSpelling;
     private String displayNameSpelling;
-
-    public Friend(String userId, String name, Uri portraitUri) {
-        super(userId, name, portraitUri);
-    }
-
-    public Friend(String userId, String name, Uri portraitUri, String displayName, String region, String phoneNumber, String status, Long timestamp, String nameSpelling, String displayNameSpelling, String letters) {
-        super(userId, name, portraitUri);
+    @Generated(hash = 727525608)
+    public Friend(String userId, String name, String portraitUri, String displayName, String region,
+            String phoneNumber, String status, Long timestamp, String letters, String nameSpelling,
+            String displayNameSpelling) {
+        this.userId = userId;
+        this.name = name;
+        this.portraitUri = portraitUri;
         this.displayName = displayName;
         this.region = region;
         this.phoneNumber = phoneNumber;
         this.status = status;
         this.timestamp = timestamp;
-        this.nameSpelling = nameSpelling;
-        this.displayNameSpelling = displayNameSpelling;
         this.letters = letters;
+        this.nameSpelling = nameSpelling;
+        this.displayNameSpelling = displayNameSpelling;
     }
 
-    public Friend(String userId, String name, Uri portraitUri, String displayName, String region, String phoneNumber, String status, Long timestamp, String nameSpelling, String displayNameSpelling) {
-        super(userId, name, portraitUri);
+
+
+    public Friend(String userId, String name, String portraitUri) {
+        this.userId = userId;
+        this.name = name;
+        this. portraitUri = portraitUri;
+    }
+
+//    public Friend(String userId, String name, String portraitUri, String displayName, String region, String phoneNumber, String status, Long timestamp, String nameSpelling, String displayNameSpelling, String letters) {
+//        this.userId = userId;
+//        this.name = name;
+//        this.portraitUri = portraitUri;
+//        this.displayName = displayName;
+//        this.region = region;
+//        this.phoneNumber = phoneNumber;
+//        this.status = status;
+//        this.timestamp = timestamp;
+//        this.nameSpelling = nameSpelling;
+//        this.displayNameSpelling = displayNameSpelling;
+//        this.letters = letters;
+//    }
+
+    public Friend(String userId, String name, String portraitUri, String displayName, String region, String phoneNumber, String status, Long timestamp, String nameSpelling, String displayNameSpelling) {
+        // super(userId, name, portraitUri);
+        this.userId = userId;
+        this.name = name;
+        this.portraitUri = portraitUri;
         this.displayName = displayName;
         this.region = region;
         this.phoneNumber = phoneNumber;
@@ -52,8 +85,11 @@ public class Friend extends UserInfo {
         this.displayNameSpelling = displayNameSpelling;
     }
 
-    public Friend(String userId, String name, Uri portraitUri, String displayName, String region, String phoneNumber, String status, Long timestamp) {
-        super(userId, name, portraitUri);
+    public Friend(String userId, String name, String portraitUri, String displayName, String region, String phoneNumber, String status, Long timestamp) {
+        //super(userId, name, portraitUri);
+        this.userId = userId;
+        this.name = name;
+        this.portraitUri = portraitUri;
         this.displayName = displayName;
         this.region = region;
         this.phoneNumber = phoneNumber;
@@ -61,145 +97,100 @@ public class Friend extends UserInfo {
         this.timestamp = timestamp;
     }
 
-    public Friend(String userId, String name, Uri portraitUri, String displayName, String status, Long timestamp) {
-        super(userId, name, portraitUri);
+    public Friend(String userId, String name, String portraitUri, String displayName, String status, Long timestamp) {
+        //super(userId, name, portraitUri);
+        this.userId = userId;
+        this.name = name;
+        this.portraitUri = portraitUri;
         this.displayName = displayName;
         this.status = status;
         this.timestamp = timestamp;
     }
 
-    public Friend(String userId, String name, Uri portraitUri, String phoneNumber, String displayName) {
-        super(userId, name, portraitUri);
+    public Friend(String userId, String name, String portraitUri, String phoneNumber, String displayName) {
+        this.userId = userId;
+        this.name = name;
+        this.portraitUri = portraitUri;
         this.phoneNumber = phoneNumber;
         this.displayName = displayName;
     }
 
-    public Friend(String userId, String name, Uri portraitUri, String displayName) {
-        super(userId, name, portraitUri);
+    public Friend(String userId, String name, String portraitUri, String displayName) {
+        //super(userId, name, portraitUri);
+        this.userId = userId;
+        this.name = name;
+        this.portraitUri = portraitUri;
         this.displayName = displayName;
     }
 
-    public String getDisplayName() {
-        return displayName;
+    @Generated(hash = 287143722)
+    public Friend() {
     }
-
+    public String getUserId() {
+        return this.userId;
+    }
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+    public String getName() {
+        return this.name;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+    public String getDisplayName() {
+        return this.displayName;
+    }
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
     }
-
     public String getRegion() {
-        return region;
+        return this.region;
     }
-
     public void setRegion(String region) {
         this.region = region;
     }
-
     public String getPhoneNumber() {
-        return phoneNumber;
+        return this.phoneNumber;
     }
-
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
-
     public String getStatus() {
-        return status;
+        return this.status;
     }
-
     public void setStatus(String status) {
         this.status = status;
     }
-
     public Long getTimestamp() {
-        return timestamp;
+        return this.timestamp;
     }
-
     public void setTimestamp(Long timestamp) {
         this.timestamp = timestamp;
     }
-
     public String getLetters() {
-        return letters;
+        return this.letters;
     }
-
     public void setLetters(String letters) {
         this.letters = letters;
     }
-
     public String getNameSpelling() {
-        return nameSpelling;
+        return this.nameSpelling;
     }
-
     public void setNameSpelling(String nameSpelling) {
         this.nameSpelling = nameSpelling;
     }
-
     public String getDisplayNameSpelling() {
-        return displayNameSpelling;
+        return this.displayNameSpelling;
     }
-
     public void setDisplayNameSpelling(String displayNameSpelling) {
         this.displayNameSpelling = displayNameSpelling;
     }
-
-    public Friend(Parcel in) {
-        super(in);
-        setDisplayName(ParcelUtils.readFromParcel(in));
-        setRegion(ParcelUtils.readFromParcel(in));
-        setPhoneNumber(ParcelUtils.readFromParcel(in));
-        setStatus(ParcelUtils.readFromParcel(in));
-        setTimestamp(ParcelUtils.readLongFromParcel(in));
-        setNameSpelling(ParcelUtils.readFromParcel(in));
-        setDisplayNameSpelling(ParcelUtils.readFromParcel(in));
-        setLetters(ParcelUtils.readFromParcel(in));
+    public String getPortraitUri() {
+        return this.portraitUri;
+    }
+    public void setPortraitUri(String portraitUri) {
+        this.portraitUri = portraitUri;
     }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        super.writeToParcel(dest,flags);
-        ParcelUtils.writeToParcel(dest, getDisplayName());
-        ParcelUtils.writeToParcel(dest, getRegion());
-        ParcelUtils.writeToParcel(dest, getPhoneNumber());
-        ParcelUtils.writeToParcel(dest, getStatus());
-        ParcelUtils.writeToParcel(dest, getTimestamp());
-        ParcelUtils.writeToParcel(dest, getNameSpelling());
-        ParcelUtils.writeToParcel(dest, getDisplayNameSpelling());
-        ParcelUtils.writeToParcel(dest, getLetters());
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    public static final Parcelable.Creator<Friend> CREATOR = new Parcelable.Creator<Friend>() {
-        @Override
-        public Friend createFromParcel(Parcel in) {
-            return new Friend(in);
-        }
-
-        @Override
-        public Friend[] newArray(int size) {
-            return new Friend[size];
-        }
-    };
-
-    public boolean isExitsDisplayName() {
-        return !TextUtils.isEmpty(displayName);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o != null) {
-            Friend friendInfo = (Friend) o;
-            return (getUserId() != null && getUserId().equals(friendInfo.getUserId()))
-                   && (getName() != null && getName().equals(friendInfo.getName()))
-                   && (getPortraitUri() != null && getPortraitUri().equals(friendInfo.getPortraitUri()))
-                   && (phoneNumber != null && phoneNumber.equals(friendInfo.getPhoneNumber()))
-                   && (displayName != null && displayName.equals(friendInfo.getDisplayName()));
-        } else {
-            return false;
-        }
-    }
 }

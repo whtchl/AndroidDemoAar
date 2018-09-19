@@ -14,12 +14,10 @@ import com.jdjz.db.Friend;
 import com.jdjz.db.FriendDao;
 import com.jdjz.db.response.UserRelationshipResponse;
 import com.jdjz.server.SealAction;
-import com.jdjz.server.network.async.AsyncTaskManager;
 import com.jdjz.server.network.async.OnDataListener;
 import com.jdjz.server.network.http.HttpException;
 import com.jude.utils.JUtils;
 
-import java.time.temporal.JulianFields;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -182,7 +180,7 @@ public class SealUserInfoManager implements OnDataListener {
                     Friend friend = new Friend(
                             resultEntity.getUser().getId(),
                             resultEntity.getUser().getNickname(),
-                            Uri.parse(resultEntity.getUser().getPortraitUri()),
+                            resultEntity.getUser().getPortraitUri(),
                             resultEntity.getDisplayName(),
                             null, null, null, null,
                             null, null);
@@ -343,6 +341,7 @@ public class SealUserInfoManager implements OnDataListener {
                     Friend friend = null;
                     if (mFriendDao != null) {
                         friend = mFriendDao.queryBuilder().where(FriendDao.Properties.DisplayName.eq(mDisplayName)).unique();
+                        JUtils.Toast("getFriendByName 线程 "+ Thread.currentThread().getName()+"  "+Thread.currentThread().getId());
 //                     /   mFriendDao.queryBuilder().where((FriendDao.Properties.DisplayName.like()))
                     }
                     if (callback != null) {
@@ -394,7 +393,7 @@ public class SealUserInfoManager implements OnDataListener {
                     List<Friend> friend = null;
                     if (mFriendDao != null) {
                         friend = mFriendDao.queryBuilder().where(FriendDao.Properties.DisplayName.like("%"+mDisplayName+"%")).list();
-//                     /   mFriendDao.queryBuilder().where((FriendDao.Properties.DisplayName.like()))
+                        JUtils.Toast("getMhFriendByName 线程 "+ Thread.currentThread().getName()+"  "+Thread.currentThread().getId());
                     }
                     if (callback != null) {
                         if (friend != null) {
@@ -451,28 +450,29 @@ public class SealUserInfoManager implements OnDataListener {
      * @param callback
      */
     public void updateFriends(final ResultCallback<String> callback) {
-        final Friend lisan =  getFriendByName("李三");
+        final Friend lisan =  getFriendByName("张三");
         final Friend zhangsi = getFriendByName("张四");
 
 
         if (lisan ==null || zhangsi == null) {
             if (callback != null)
-                callback.onError("没有找到李三或张四 这个好友");
+                callback.onError("没有找到张三或张四 这个好友");
         } else {
             mWorkHandler.post(new Runnable() {
                 @Override
                 public void run() {
                     List<Friend> friends = new ArrayList<>();
-                    lisan.setDisplayName("李三2");
+                    lisan.setDisplayName("张三2");
                     zhangsi.setDisplayName("张四2");
                     friends.add(lisan);
                     friends.add(zhangsi);
                     if (mFriendDao != null) {
                         mFriendDao.updateInTx(friends);
+                        JUtils.Toast("updateFriends 线程 "+ Thread.currentThread().getName()+"  "+Thread.currentThread().getId());
                        // friend = mFriendDao.queryBuilder().where(FriendDao.Properties.DisplayName.like("%"+mDisplayName+"%")).list();
                     }
                     if (callback != null) {
-                        callback.onCallback("更新成功  李三-》李三2； 张四-》张四2");
+                        callback.onCallback("更新成功  张三-》张三2； 张四-》张四2");
                     }
                 }
             });
@@ -511,6 +511,7 @@ public class SealUserInfoManager implements OnDataListener {
                     }
                 }else{
                     mFriendDao.insertOrReplaceInTx(ll);
+                    JUtils.Toast("addFriendList 线程 "+ Thread.currentThread().getName()+"  "+Thread.currentThread().getId());
                     if(callback != null){
                         callback.onSuccess("添加好友列表成功");
                     }
@@ -564,7 +565,7 @@ public class SealUserInfoManager implements OnDataListener {
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    JUtils.Toast("onCallback 线程 "+ Thread.currentThread().getName()+"  "+Thread.currentThread().getId());
+                    JUtils.Toast("onCallback post到主线程 "+ Thread.currentThread().getName()+"  "+Thread.currentThread().getId());
                     onSuccess(t);
                 }
             });
