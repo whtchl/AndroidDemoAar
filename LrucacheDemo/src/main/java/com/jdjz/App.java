@@ -2,16 +2,21 @@ package com.jdjz;
 
 import android.app.ActivityManager;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.support.multidex.MultiDexApplication;
 import android.text.TextUtils;
 
+import com.alibaba.weex.plugin.loader.WeexPluginContainer;
 import com.jdjz.testConfig.SealConst;
+import com.jdjz.weex.Component.RichText;
+import com.jdjz.weex.Component.WebViewTest;
+import com.jdjz.weex.ImageAdapter;
+import com.jdjz.weex.extend.WXEventModule;
+import com.jdjz.weex.util.AppConfig;
 import com.jude.utils.JUtils;
 import com.taobao.weex.InitConfig;
 import com.taobao.weex.WXSDKEngine;
+import com.taobao.weex.common.WXException;
 
-import java.time.temporal.JulianFields;
 
 public class App extends MultiDexApplication {
     @Override
@@ -30,10 +35,22 @@ public class App extends MultiDexApplication {
             openSealDBIfHasCachedToken();
 
             //weex
-            InitConfig config=new InitConfig.Builder().setImgAdapter(new ImageAdapter()).build();
-            WXSDKEngine.initialize(this,config);
-
-
+            /*InitConfig config=new InitConfig.Builder().setImgAdapter(new ImageAdapter()).build();
+            WXSDKEngine.initialize(this,config);*/
+            WXSDKEngine.addCustomOptions("appName", "WXSample");
+            WXSDKEngine.addCustomOptions("appGroup", "WXApp");
+            WXSDKEngine.initialize(this,
+                    new InitConfig.Builder().setImgAdapter(new ImageAdapter()).build()
+            );
+            try {
+                WXSDKEngine.registerModule("event", WXEventModule.class);
+                WXSDKEngine.registerComponent("richText", RichText.class);
+                WXSDKEngine.registerComponent("webViewTest", WebViewTest.class);
+            } catch (WXException e) {
+                e.printStackTrace();
+            }
+            AppConfig.init(this);
+            WeexPluginContainer.loadAll(this);
         }
 
     }

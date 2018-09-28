@@ -1,6 +1,7 @@
 package com.jdjz.lrucachedemo;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -8,6 +9,7 @@ import android.widget.Button;
 
 import com.jdjz.contacts.ContactsActivity;
 import com.jdjz.db.DBActivity;
+import com.jdjz.weex.WXPageActivity;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -50,6 +52,13 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(this, DBActivity.class));
                 break;
             case R.id.btn_weex:
+                Intent intent = new Intent(this, WXPageActivity.class);
+                Uri data = getIntent().getData();
+                if (data != null) {
+                    intent.setData(data);
+                }
+                intent.putExtra("from", "splash");
+                startActivity(intent);
                 break;
         }
     }
