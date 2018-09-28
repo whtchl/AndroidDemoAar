@@ -4,11 +4,13 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.support.multidex.MultiDexApplication;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.alibaba.weex.plugin.loader.WeexPluginContainer;
 import com.jdjz.testConfig.SealConst;
 import com.jdjz.weex.Component.RichText;
 import com.jdjz.weex.Component.WebViewTest;
+import com.jdjz.weex.Component.WebViewX5;
 import com.jdjz.weex.ImageAdapter;
 import com.jdjz.weex.extend.WXEventModule;
 import com.jdjz.weex.util.AppConfig;
@@ -16,6 +18,7 @@ import com.jude.utils.JUtils;
 import com.taobao.weex.InitConfig;
 import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.common.WXException;
+import com.tencent.smtt.sdk.QbSdk;
 
 
 public class App extends MultiDexApplication {
@@ -46,11 +49,32 @@ public class App extends MultiDexApplication {
                 WXSDKEngine.registerModule("event", WXEventModule.class);
                 WXSDKEngine.registerComponent("richText", RichText.class);
                 WXSDKEngine.registerComponent("webViewTest", WebViewTest.class);
+                WXSDKEngine.registerComponent("webViewX5Test", WebViewX5.class);
+
             } catch (WXException e) {
                 e.printStackTrace();
             }
             AppConfig.init(this);
             WeexPluginContainer.loadAll(this);
+
+
+            //tbs x5
+            QbSdk.PreInitCallback cb = new QbSdk.PreInitCallback() {
+
+                @Override
+                public void onViewInitFinished(boolean b) {
+                    //x5內核初始化完成的回调，为true表示x5内核加载成功，否则表示x5内核加载失败，会自动切换到系统内核。
+                    Log.d("app", " onViewInitFinished is " + b);
+                }
+
+                @Override
+                public void onCoreInitFinished() {
+                    // TODO Auto-generated method stub
+                }
+            };
+
+            //x5内核初始化接口
+            QbSdk.initX5Environment(getApplicationContext(), cb);
         }
 
     }

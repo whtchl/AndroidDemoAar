@@ -259,13 +259,13 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       "tel": "12305"
     }
   }, [_vm._v("12305")]), _c('web', {
-    ref: "webViewTest",
+    ref: "webViewX5",
     staticStyle: {
       width: "730px",
-      height: "500px"
+      height: "1000px"
     },
     attrs: {
-      "src": "https://baidu.com"
+      "src": "http://juziwalk.cn/jsbridge/demo.html"
     }
   })], 1)
 },staticRenderFns: []}
