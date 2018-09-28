@@ -8,6 +8,8 @@ import android.text.TextUtils;
 
 import com.jdjz.testConfig.SealConst;
 import com.jude.utils.JUtils;
+import com.taobao.weex.InitConfig;
+import com.taobao.weex.WXSDKEngine;
 
 import java.time.temporal.JulianFields;
 
@@ -21,9 +23,17 @@ public class App extends MultiDexApplication {
             //初始化JUtils
             JUtils.initialize(this);
             JUtils.setDebug(true, "tchl");
+
+            //db
             SealConst.setSharepreferenct();
             SealAppContext.init(this);
             openSealDBIfHasCachedToken();
+
+            //weex
+            InitConfig config=new InitConfig.Builder().setImgAdapter(new ImageAdapter()).build();
+            WXSDKEngine.initialize(this,config);
+
+
         }
 
     }

@@ -21,6 +21,8 @@ public class MainActivity extends AppCompatActivity {
     Button btnContacts;
     @BindView(R.id.btn_db)
     Button btnDb;
+    @BindView(R.id.btn_weex)
+    Button btnWeex;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    @OnClick({R.id.btn_lrucache, R.id.btn_contacts,R.id.btn_db})
+    @OnClick({R.id.btn_lrucache, R.id.btn_contacts, R.id.btn_db,R.id.btn_weex})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_lrucache:
@@ -46,6 +48,8 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case R.id.btn_db:
                 startActivity(new Intent(this, DBActivity.class));
+                break;
+            case R.id.btn_weex:
                 break;
         }
     }
