@@ -21,7 +21,7 @@ import com.jdjz.weex.hotreload.HotReloadManager;
 import com.jdjz.weex.util.Constants;
 import com.jdjz.weex.util.AppConfig;
 import com.taobao.weex.WXEnvironment;
-import com.taobao.weex.WXRenderErrorCode;
+
 import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.ui.component.NestedContainer;
@@ -31,8 +31,7 @@ import com.taobao.weex.utils.WXSoInstallMgrSdk;
 import org.json.JSONException;
 import org.json.JSONObject;
 import com.jdjz.lrucachedemo.R;
-import android.view.Menu;
-import android.view.MenuItem;
+
 public class WXPageActivity extends AbsWeexActivity implements
     WXSDKInstance.NestedInstanceInterceptor {
 
@@ -49,11 +48,15 @@ public class WXPageActivity extends AbsWeexActivity implements
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
+
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_wxpage);
     mContainer = (ViewGroup) findViewById(R.id.container);
     mProgressBar = (ProgressBar) findViewById(R.id.progress);
     mTipView = (TextView) findViewById(R.id.index_tip);
+
+
+
 
     Intent intent = getIntent();
     Uri uri = intent.getData();
@@ -164,11 +167,11 @@ public class WXPageActivity extends AbsWeexActivity implements
   public void onException(WXSDKInstance instance, String errCode, String msg) {
     mProgressBar.setVisibility(View.GONE);
     mTipView.setVisibility(View.VISIBLE);
-    if (TextUtils.equals(errCode, WXRenderErrorCode.WX_NETWORK_ERROR)) {
+   /* if (TextUtils.equals(errCode, WXRenderErrorCode.WX_NETWORK_ERROR)) {
       mTipView.setText(R.string.index_tip);
     } else {
       mTipView.setText("render error:" + errCode);
-    }
+    }*/
   }
 
   @Override
@@ -238,7 +241,8 @@ public class WXPageActivity extends AbsWeexActivity implements
       } else if (code.contains("_wx_debug")) {
         uri = Uri.parse(code);
         String debug_url = uri.getQueryParameter("_wx_debug");
-        WXSDKEngine.switchDebugModel(true, debug_url);
+      //  WXSDKEngine.switchDebugModel(true, debug_url);
+      //  WXSDKEngine.de
         finish();
       } else {
         JSONObject data = new JSONObject();

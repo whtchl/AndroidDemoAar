@@ -8,12 +8,19 @@ import android.widget.TextView;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.component.WXComponent;
-import com.taobao.weex.ui.component.WXComponentProp;
 import com.taobao.weex.ui.component.WXVContainer;
 
 public class RichText extends WXComponent<TextView> {
-
     public RichText(WXSDKInstance instance, WXDomObject dom, WXVContainer parent) {
+        super(instance, dom, parent);
+    }
+
+    public RichText(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, int type) {
+        super(instance, dom, parent, type);
+    }
+
+
+/*    public RichText(WXSDKInstance instance, WXDomObject dom, WXVContainer parent) {
         super(instance, dom, parent);
     }
 
@@ -28,5 +35,5 @@ public class RichText extends WXComponent<TextView> {
     @WXComponentProp(name = "tel")
     public void setTel(String telNumber) {
         getHostView().setText("tel: " + telNumber);
-    }
+    }*/
 }

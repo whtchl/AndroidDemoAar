@@ -9,8 +9,7 @@ import android.util.Log;
 import com.alibaba.weex.plugin.loader.WeexPluginContainer;
 import com.jdjz.testConfig.SealConst;
 import com.jdjz.weex.Component.RichText;
-import com.jdjz.weex.Component.WebViewTest;
-import com.jdjz.weex.Component.WebViewX5;
+import com.jdjz.weex.Component.WXWebJS;
 import com.jdjz.weex.ImageAdapter;
 import com.jdjz.weex.extend.WXEventModule;
 import com.jdjz.weex.util.AppConfig;
@@ -48,8 +47,8 @@ public class App extends MultiDexApplication {
             try {
                 WXSDKEngine.registerModule("event", WXEventModule.class);
                 WXSDKEngine.registerComponent("richText", RichText.class);
-                WXSDKEngine.registerComponent("webViewTest", WebViewTest.class);
-                WXSDKEngine.registerComponent("webViewX5Test", WebViewX5.class);
+                WXSDKEngine.registerComponent("wXWebJS", WXWebJS.class);
+                //WXSDKEngine.registerComponent("webViewX5Test", WebViewX5.class);
 
             } catch (WXException e) {
                 e.printStackTrace();

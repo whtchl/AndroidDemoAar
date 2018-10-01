@@ -250,16 +250,8 @@ exports.default = {
 /***/ (function(module, exports) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('div', [_c('richText', {
-    staticStyle: {
-      width: "200",
-      height: "100"
-    },
-    attrs: {
-      "tel": "12305"
-    }
-  }, [_vm._v("12305")]), _c('web', {
-    ref: "webViewX5",
+  return _c('div', [_c('web', {
+    ref: "wXWebJS",
     staticStyle: {
       width: "730px",
       height: "1000px"
@@ -267,7 +259,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     attrs: {
       "src": "http://juziwalk.cn/jsbridge/demo.html"
     }
-  })], 1)
+  })])
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 
