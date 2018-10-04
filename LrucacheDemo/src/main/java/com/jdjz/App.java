@@ -10,6 +10,7 @@ import com.alibaba.weex.plugin.loader.WeexPluginContainer;
 import com.jdjz.testConfig.SealConst;
 import com.jdjz.weex.Component.RichText;
 import com.jdjz.weex.Component.WXWebJS;
+import com.jdjz.weex.Component.WXWebJsBridge;
 import com.jdjz.weex.ImageAdapter;
 import com.jdjz.weex.extend.WXEventModule;
 import com.jdjz.weex.util.AppConfig;
@@ -48,6 +49,7 @@ public class App extends MultiDexApplication {
                 WXSDKEngine.registerModule("event", WXEventModule.class);
                 WXSDKEngine.registerComponent("richText", RichText.class);
                 WXSDKEngine.registerComponent("wXWebJS", WXWebJS.class);
+                WXSDKEngine.registerComponent("wXWebJsBridge", WXWebJsBridge.class);
                 //WXSDKEngine.registerComponent("webViewX5Test", WebViewX5.class);
 
             } catch (WXException e) {

@@ -4,8 +4,10 @@ import android.content.Context;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 
+import com.jdjz.weex.view.WXWebViewJS;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.adapter.URIAdapter;
 import com.taobao.weex.annotation.Component;
@@ -20,7 +22,7 @@ import com.taobao.weex.utils.WXUtils;
 
 import java.util.HashMap;
 import java.util.Map;
-@Component(lazyload = false)
+//@Component(lazyload = false)
 public class WXWebJS  extends WXComponent {  //activity  WXWeb
     public static final String GO_BACK = "goBack";
     public static final String GO_FORWARD = "goForward";
@@ -30,19 +32,22 @@ public class WXWebJS  extends WXComponent {  //activity  WXWeb
     @Deprecated
     public WXWebJS(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
         this(instance,dom,parent,isLazy);
+        Log.i("tchl","WXWebJS1");
     }
 
     public WXWebJS(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, boolean isLazy) {
         super(instance, dom, parent, isLazy);
         createWebView();
+        Log.i("tchl","WXWebJ2");
     }
 
     protected void  createWebView(){
-        mWebView = new WXWebView(getContext());
+        mWebView = new WXWebViewJS(getContext());
     }
 
     @Override
     protected View initComponentHostView(@NonNull Context context) {
+        Log.i("tchl","initComponentHostView");
         mWebView.setOnErrorListener(new IWebView.OnErrorListener() {
             @Override
             public void onError(String type, Object message) {
@@ -79,6 +84,7 @@ public class WXWebJS  extends WXComponent {  //activity  WXWeb
                 }
             }
         });
+        Log.i("tchl","44");
         return mWebView.getView();
     }
 

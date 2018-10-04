@@ -1,5 +1,6 @@
 package com.jdjz.weex.view;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -10,10 +11,12 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.webkit.JavascriptInterface;
 import android.webkit.JsPromptResult;
+import android.webkit.JsResult;
 import android.webkit.SslErrorHandler;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
@@ -29,6 +32,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.jdjz.weex.interf.IWebViewJS;
+import com.jude.utils.JUtils;
 import com.taobao.weex.ui.view.IWebView;
 import com.taobao.weex.ui.view.WXWebView;
 import com.taobao.weex.utils.WXLogUtils;
@@ -54,6 +58,7 @@ public class WXWebViewJS implements IWebView { //BridgeView   WXWebView
 
     @Override
     public View getView() {
+        JUtils.Log("wXWebJS");
         FrameLayout root = new FrameLayout(mContext);
         root.setBackgroundColor(Color.WHITE);
 
@@ -88,6 +93,7 @@ public class WXWebViewJS implements IWebView { //BridgeView   WXWebView
 
     @Override
     public void loadUrl(String url) {
+        Log.i("tchl","23");
         if(getWebView() == null)
             return;
         getWebView().loadUrl(url);
@@ -151,9 +157,25 @@ public class WXWebViewJS implements IWebView { //BridgeView   WXWebView
         return mWebView;
     }
 
+    @SuppressLint("JavascriptInterface")
     private void initWebView(WebView wv) {
+/*
+        setContentView(R.layout.activity_main);
+        myWebView = (WebView) findViewById(R.id.webView);
+        webSettings = myWebView.getSettings();
+        webSettings.setJavaScriptEnabled(true);
+        myWebView.addJavascriptInterface(this, "Login");
+        myWebView.setWebChromeClient(new MyWebChromeClient());
+        myWebView.loadUrl("file:///android_asset/assess.html");*/
+
+
+
         WebSettings settings = wv.getSettings();
         settings.setJavaScriptEnabled(true);
+
+      //  wv.addJavascriptInterface(mContext,"Login");
+    //    wv.addJavascriptInterface(this, "Login");//
+
         settings.setAppCacheEnabled(true);
         settings.setUseWideViewPort(true);
         settings.setDomStorageEnabled(true);
@@ -213,6 +235,13 @@ public class WXWebViewJS implements IWebView { //BridgeView   WXWebView
 
         });
         wv.setWebChromeClient(new WebChromeClient() {
+          //  @Override
+           // public boolean onJsAlert(WebView view, String url, String message, JsResult result) {
+          //      result.confirm();//H5页面的弹窗提示
+          //      return false;//是否显示弹窗提示
+          //  }
+
+
             @Override
             public void onProgressChanged(WebView view, int newProgress) {
                 super.onProgressChanged(view, newProgress);

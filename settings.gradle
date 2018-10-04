@@ -1,1 +1,1 @@
-include ':LrucacheDemo', ':myapplication', ':contact', ':contact', ':contact'
+include ':LrucacheDemo', ':myapplication', ':contact', ':sdk',  ':mylibrary'
