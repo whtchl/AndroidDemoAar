@@ -1,10 +1,13 @@
 package com.jdjz.weex.view;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.http.SslError;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.webkit.SslErrorHandler;
@@ -19,19 +22,35 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.jdjz.contact.ChooseModel;
+import com.jdjz.contact.ContactInfo;
+import com.jdjz.contacts.ContactEvent;
+import com.jdjz.contacts.ContactListActivity;
+import com.jdjz.contacts.ContactsActivity;
 import com.jdjz.weex.jsbridge.BridgeHandler;
 import com.jdjz.weex.jsbridge.BridgeWebView;
 import com.jdjz.weex.jsbridge.BridgeWebViewClient;
 import com.jdjz.weex.jsbridge.CallBackFunction;
 import com.jdjz.weex.jsbridge.DefaultHandler;
+import com.jdjz.weex.modle.ModleConfig;
+import com.jdjz.weex.modle.ResultContact;
+import com.jdjz.weex.modle.ResultToken;
 import com.jdjz.weex.modle.User;
 import com.jude.utils.JUtils;
 import com.taobao.weex.ui.view.IWebView;
 import com.taobao.weex.utils.WXLogUtils;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+
 public class WXWebViewJsBridge implements IWebView { //BridgeView   WXWebView
 
-    private Context mContext;
+    Context mContext;
     private BridgeWebView mWebView;  //x5
     private ProgressBar mProgressBar;
     private boolean mShowLoading = true;
@@ -39,13 +58,19 @@ public class WXWebViewJsBridge implements IWebView { //BridgeView   WXWebView
     private OnErrorListener mOnErrorListener;
     private OnPageListener mOnPageListener;
 
+
+    CallBackFunction callBackFunction;
+    //Context jsContext;
+
     public WXWebViewJsBridge(Context context) {
         mContext = context;
+
     }
 
     @Override
     public View getView() {
         JUtils.Log("1111");
+        EventBus.getDefault().register(this);
         FrameLayout root = new FrameLayout(mContext);
         root.setBackgroundColor(Color.WHITE);
 
@@ -205,6 +230,105 @@ public class WXWebViewJsBridge implements IWebView { //BridgeView   WXWebView
 
         });
 
+
+        mWebView.registerHandler("requestFromNativeTypePrivateToken", new BridgeHandler() {
+
+            @Override
+            public void handler(String data, CallBackFunction function) {
+                JUtils.Log("handler = requestFromNativeTypePrivateToken, data from web = " + data);
+
+                String str = JUtils.getSharedPreference().getString("tokenMyServer", ModleConfig.RES404);
+                ResultToken resultToken = new ResultToken();
+                if (str.equals(ModleConfig.RES404)) {
+                    resultToken.setResponseCode(ModleConfig.RES404);
+                    resultToken.setResponseResult("");
+                } else {
+                    resultToken.setResponseCode(ModleConfig.RES200);
+                    resultToken.setResponseResult(str);
+                }
+                String str2 = new Gson().toJson(resultToken);
+
+                function.onCallBack(str2);
+            }
+
+        });
+
+
+        mWebView.registerHandler("requestFromNativeTypeSetPrivateToken", new BridgeHandler() {
+
+            @Override
+            public void handler(String data, CallBackFunction function) {
+                JUtils.Log("handler = requestFromNativeTypeSetPrivateToken, data from web = " + data);
+
+
+                JUtils.getSharedPreference().edit().putString("tokenMyServer",data).apply();
+                /*ResultToken resultToken = new ResultToken();
+                if (str.equals(ModleConfig.RES404)) {
+                    resultToken.setResponseCode(ModleConfig.RES404);
+                    resultToken.setResponseResult("");
+                } else {
+                    resultToken.setResponseCode(ModleConfig.RES200);
+                    resultToken.setResponseResult(ModleConfig.RES404);
+                }
+                String str2 = new Gson().toJson(resultToken);*/
+
+                function.onCallBack("点击“获取token”按钮查看" );
+            }
+
+        });
+
+        /*Intent intent = new Intent(mContext, ContactListActivity.class);
+        intent.putExtra(ChooseModel.CHOOSEMODEL,ChooseModel.MODEL_MULTI);
+        mContext.startActivity(intent);*/
+        mWebView.registerHandler("requestFromNativeTypeContacts", new BridgeHandler() {
+
+            @Override
+            public void handler(String data, CallBackFunction function) {
+                JUtils.Log("handler = requestFromNativeTypeContacts, data from web = " + data);
+                String str2 ;//= new Gson().toJson(resultToken);
+                ResultContact resultContact = new ResultContact();
+                if(TextUtils.isEmpty(data)){
+                    JUtils.Log("404");
+                    resultContact.setResponseCode(ModleConfig.RES404);
+                    resultContact.setResponseMsg("输入参数为空");
+                    resultContact.setResponseResult(null);
+                    str2 =  new Gson().toJson(resultContact);
+                    function.onCallBack(str2);
+                   return;
+                }else if(data.equals(ModleConfig.RESMULIT)){
+                    JUtils.Log("RESMULIT");
+                    Intent intent = new Intent(mContext, ContactListActivity.class);
+                    intent.putExtra(ChooseModel.CHOOSEMODEL,ChooseModel.MODEL_MULTI);
+                    mContext.startActivity(intent);
+
+
+                }else if(data.equals(ModleConfig.RESSINGLE)){
+                    JUtils.Log("RESSINGLE");
+                    Intent intent = new Intent(mContext, ContactListActivity.class);
+                    intent.putExtra(ChooseModel.CHOOSEMODEL,ChooseModel.MODEL_SINGLE);
+                    mContext.startActivity(intent);
+                }
+
+                JUtils.Log("RESMULIT");
+                Intent intent = new Intent(mContext, ContactListActivity.class);
+                intent.putExtra(ChooseModel.CHOOSEMODEL,ChooseModel.MODEL_MULTI);
+                mContext.startActivity(intent);
+
+                /*ResultToken resultToken = new ResultToken();
+                if (str.equals(ModleConfig.RES404)) {
+                    resultToken.setResponseCode(ModleConfig.RES404);
+                    resultToken.setResponseResult("");
+                } else {
+                    resultToken.setResponseCode(ModleConfig.RES200);
+                    resultToken.setResponseResult(ModleConfig.RES404);
+                }
+                String str2 = new Gson().toJson(resultToken);*/
+                callBackFunction = function;
+                //.onCallBack("点击“获取token”按钮查看" );
+            }
+
+        });
+
         mWebView.send("hello");
     }
 
@@ -282,6 +406,26 @@ public class WXWebViewJsBridge implements IWebView { //BridgeView   WXWebView
                 Toast.makeText(mContext, data, Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEventMainThread(ContactEvent event) {
+        ArrayList<ContactInfo> contactInfos = event.getContactInfos();
+        callBackFunction.onCallBack(contactInfos.size()+" 个");
+        /*Collections.sort(contactInfos, new Comparator<ContactInfo>() {
+            @Override
+            public int compare(ContactInfo o1, ContactInfo o2) {
+                //升序排列
+                if (o1.getLetter().equals("#") || o2.getLetter().equals("#")) {
+                    return 1;
+                }
+                return o1.getLetter().compareTo(o2.getLetter());
+            }
+        });
+
+        mContactAdapter.setContactList(contactInfos);*/
     }
 
 }

@@ -1,0 +1,215 @@
+<head>
+    <meta name="referrer" content="never">
+    <meta content="text/html; charset=utf-8" http-equiv="content-type">
+    <title>
+        js调用java
+    </title>
+</head>
+
+<body>
+<p>
+    <xmp id="show">
+    </xmp>
+</p>
+<p>
+    <xmp id="init">
+    </xmp>
+</p>
+<p>
+    <input type="button" id="id_gettoken" value="获取token" onclick="getToken();"/>
+</p>
+<p>
+    <input type="text" id="token" value="token"/>
+    <input type="button" id="id_settoken" value="设置token" onclick="setToken();"/>
+</p>
+<hr style="height:1px;border:none;border-top:1px solid #FF4081;"/>
+
+<p>
+    <input type="button" id="id_multicontacts" value="获取多个联系人" onclick="getMultiContacts();"/>
+    <input type="button" id="id_singlecontact" value="获取单个联系人" onclick="getSingleContacts();"/>
+</p>
+
+
+<p>
+    <input type="text" id="text1" value="用户名(username)"/>
+</p>
+
+<p>
+    <input type="text" id="text2" value="password"/>
+</p>
+
+<p>
+    <input type="button" id="enter" value="发消息给Native" onclick="testClick();"
+    />
+</p>
+
+<p>
+    <input type="button" id="enter1" value="调用Native方法" onclick="testClick1();"
+    />
+</p>
+
+<p>
+    <input type="button" id="enter2" value="显示源代码" onclick="testDiv();"/>
+</p>
+
+<p>
+    <input type="file" id="open" value="打开文件1" onclick="onOpen();"/>
+</p><img id="pic" src="" width="100%" height="auto"/>
+
+</body>
+<script>
+
+
+       function getToken() {
+
+                   //send message to native
+                   window.WebViewJavascriptBridge.callHandler(
+                       'requestFromNativeTypePrivateToken'
+                       , {}
+                       , function(responseData) {
+                           document.getElementById("show").innerHTML = " getToken:" + responseData
+                           //alert(responseData);
+                       }
+                   );
+               }
+
+
+       function  setToken() {
+                   var　str1 =  document.getElementById("token").value;
+                   //send message to native
+                   window.WebViewJavascriptBridge.callHandler(
+                       'requestFromNativeTypeSetPrivateToken'
+                       , {'param':str1}
+                       , function(responseData) {
+                           document.getElementById("show").innerHTML = " setToken:" + responseData
+                           //alert(responseData);
+                       }
+                   );
+               }
+
+
+        function getMultiContacts() {
+            var str = 'multi'
+            //send message to native
+            window.WebViewJavascriptBridge.callHandler(
+                'requestFromNativeTypeContacts'
+                , {'param':str}
+                , function(responseData) {
+                    document.getElementById("show").innerHTML = " getMultiContacts:" + responseData
+                    //alert(responseData);
+                }
+            );
+        }
+
+         function getSingleContacts() {
+            var str = 'single'
+            //send message to native
+            window.WebViewJavascriptBridge.callHandler(
+                'requestFromNativeTypeContacts'
+                , {'param':str}
+                , function(responseData) {
+                    document.getElementById("show").innerHTML = " getSingleContacts:" + responseData
+                    //alert(responseData);
+                }
+            );
+        }
+
+
+
+        function onOpen() {
+          　var str1 = document.getElementById("text1").value;
+            var str2 = document.getElementById("text2").value;
+            var data = "name=" + str1 + ",pass=" + str2;
+            //call native method
+
+
+            window.WebViewJavascriptBridge.callHandler(
+                'functionOpen'
+                , {'param': data }
+                , function(responseData) {
+
+                    document.getElementById("show").innerHTML = "send get responseData from java, data = " + responseData;
+                  document.getElementById("pic").src = "file:///android_res/drawable/ic_action_scan.png";
+
+                }
+            );
+        }
+        function testDiv() {
+            document.getElementById("show").innerHTML = document.getElementsByTagName("html")[0].innerHTML;
+        }
+        function testClick() {
+		alert("e3232");
+            var str1 = document.getElementById("text1").value;
+            var str2 = document.getElementById("text2").value;
+            //发送消息给java本地代码
+            var data = {id: 1, content: "这是一个图片 <img src=\"a.png\"/> test\r\nhahaha"};
+            window.WebViewJavascriptBridge.send(
+                data
+                , function(responseData) {
+                    document.getElementById("show").innerHTML = "repsonseData from java, data = " + responseData
+                }
+            );
+        }
+        function testClick1() {
+            var str1 = document.getElementById("text1").value;
+            var str2 = document.getElementById("text2").value;
+            var data = "name=" + str1 + ",pass=" + str2;
+            //call native method
+            window.WebViewJavascriptBridge.callHandler(
+                'submitFromWeb'
+                , {'param': data }
+                , function(responseData) {
+                    document.getElementById("show").innerHTML = "send get responseData from java, data = " + responseData
+                }
+            );
+        }
+        function bridgeLog(logContent) {
+            document.getElementById("show").innerHTML = logContent;
+        }
+        function connectWebViewJavascriptBridge(callback) {
+            if (window.WebViewJavascriptBridge) {
+                callback(WebViewJavascriptBridge)
+            } else {
+                document.addEventListener(
+                    'WebViewJavascriptBridgeReady'
+                    , function() {
+                        callback(WebViewJavascriptBridge)
+                    },
+                    false
+                );
+            }
+        }
+       // 第一连接时初始化bridage
+        connectWebViewJavascriptBridge(function(bridge) {
+            bridge.init(function(message, responseCallback) {
+                console.log('JS got a message', message);
+                var data = {
+                    'Javascript Responds': '测试中文!'
+                };
+                console.log('JS responding with', data);
+                responseCallback(data);
+            });
+            // 注册一个"functionInJs",
+            //bridge.registerHandler("functionInJs", function(data, responseCallback) {
+
+              //  document.getElementById("show").innerHTML = ("data from Java: = " + data);
+                //var responseData = "Javascript Says  我要你的地址!";
+                // response层
+                //responseCallback(responseData);
+            //});
+        })
+        bridge.init(function(message, responseCallback) {
+        console.log('JS got a message', message);
+        var data = {
+            'Javascript Responds': 'Wee!'
+        };
+        console.log('JS responding with', data);
+        responseCallback(data);
+    });
+
+
+
+
+</script>
+
+</html>
