@@ -22,6 +22,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.jdjz.SealUserInfoManager;
 import com.jdjz.contact.ChooseModel;
 import com.jdjz.contact.ContactInfo;
 import com.jdjz.contacts.ContactEvent;
@@ -34,8 +35,11 @@ import com.jdjz.weex.jsbridge.CallBackFunction;
 import com.jdjz.weex.jsbridge.DefaultHandler;
 import com.jdjz.weex.modle.ModleConfig;
 import com.jdjz.weex.modle.ResultContact;
+import com.jdjz.weex.modle.ResultNetworkStatus;
 import com.jdjz.weex.modle.ResultToken;
 import com.jdjz.weex.modle.User;
+import com.jdjz.weex.modle.entity.NetworkStatusEntity;
+import com.jdjz.weex.util.NetUtils;
 import com.jude.utils.JUtils;
 import com.taobao.weex.ui.view.IWebView;
 import com.taobao.weex.utils.WXLogUtils;
@@ -325,6 +329,52 @@ public class WXWebViewJsBridge implements IWebView { //BridgeView   WXWebView
                 String str2 = new Gson().toJson(resultToken);*/
                 callBackFunction = function;
                 //.onCallBack("点击“获取token”按钮查看" );
+            }
+
+        });
+
+
+        //获取网络状态
+        mWebView.registerHandler("requestFromNativeNetworkStatus", new BridgeHandler() {
+
+            @Override
+            public void handler(String data, CallBackFunction function) {
+                JUtils.Log("handler = requestFromNativeNetworkStatus, data from web = " + data);
+                ResultNetworkStatus resultNetworkStatus = new ResultNetworkStatus();
+                NetworkStatusEntity networkStatusEntity = new NetworkStatusEntity();
+                boolean isNetWorkAvilable =  JUtils.isNetWorkAvilable();
+
+                resultNetworkStatus.setResponseCode(ModleConfig.RES200);
+                resultNetworkStatus.setResponseMsg(ModleConfig.RES_MSG_NETWORKSTATUS_SUC);
+
+                networkStatusEntity.setNetWorkAvilable(isNetWorkAvilable);
+
+
+                if(isNetWorkAvilable){
+
+                    networkStatusEntity.setType(NetUtils.getNetworkState(mContext));
+
+
+                }else{
+                    networkStatusEntity.setType(NetUtils.getNetworkState(mContext));
+                }
+                resultNetworkStatus.setNetworkStatusEntity(networkStatusEntity);
+
+                String str2 = new Gson().toJson(resultNetworkStatus);
+                function.onCallBack(str2);
+
+                /*String str = JUtils.getSharedPreference().getString("tokenMyServer", ModleConfig.RES404);
+                ResultToken resultToken = new ResultToken();
+                if (str.equals(ModleConfig.RES404)) {
+                    resultToken.setResponseCode(ModleConfig.RES404);
+                    resultToken.setResponseResult("");
+                } else {
+                    resultToken.setResponseCode(ModleConfig.RES200);
+                    resultToken.setResponseResult(str);
+                }
+                String str2 = new Gson().toJson(resultToken);
+
+                function.onCallBack(str2);*/
             }
 
         });

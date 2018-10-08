@@ -7,4 +7,7 @@ public class ModleConfig {
 
     public static final String RESMULIT = "multi";
     public static final String RESSINGLE = "single";
+
+    //网络状态
+    public static final String RES_MSG_NETWORKSTATUS_SUC = "SUCCESS";
 }

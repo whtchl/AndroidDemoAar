@@ -23,7 +23,9 @@
     <input type="button" id="id_settoken" value="设置token" onclick="setToken();"/>
 </p>
 <hr style="height:1px;border:none;border-top:1px solid #FF4081;"/>
+    <input type="button" id="id_getnetworkstatus" value="获取网络状态" onclick="getNetworkStatus();"/>
 
+<hr style="height:1px;border:none;border-top:1px solid #FF4081;"/>
 <p>
     <input type="button" id="id_multicontacts" value="获取多个联系人" onclick="getMultiContacts();"/>
     <input type="button" id="id_singlecontact" value="获取单个联系人" onclick="getSingleContacts();"/>
@@ -60,28 +62,41 @@
 <script>
 
 
-       function getToken() {
+        function getToken() {
+
+                    //send message to native
+                    window.WebViewJavascriptBridge.callHandler(
+                        'requestFromNativeTypePrivateToken'
+                        , {}
+                        , function(responseData) {
+                            document.getElementById("show").innerHTML = " getToken:" + responseData
+                            //alert(responseData);
+                        }
+                    );
+                }
+
+
+        function  setToken() {
+                    var　str1 =  document.getElementById("token").value;
+                    //send message to native
+                    window.WebViewJavascriptBridge.callHandler(
+                        'requestFromNativeTypeSetPrivateToken'
+                        , {'param':str1}
+                        , function(responseData) {
+                            document.getElementById("show").innerHTML = " setToken:" + responseData
+                            //alert(responseData);
+                        }
+                    );
+                }
+
+        function getNetworkStatus() {
 
                    //send message to native
                    window.WebViewJavascriptBridge.callHandler(
-                       'requestFromNativeTypePrivateToken'
+                       'requestFromNativeNetworkStatus'
                        , {}
                        , function(responseData) {
-                           document.getElementById("show").innerHTML = " getToken:" + responseData
-                           //alert(responseData);
-                       }
-                   );
-               }
-
-
-       function  setToken() {
-                   var　str1 =  document.getElementById("token").value;
-                   //send message to native
-                   window.WebViewJavascriptBridge.callHandler(
-                       'requestFromNativeTypeSetPrivateToken'
-                       , {'param':str1}
-                       , function(responseData) {
-                           document.getElementById("show").innerHTML = " setToken:" + responseData
+                           document.getElementById("show").innerHTML = " getNetworkStatus:" + responseData
                            //alert(responseData);
                        }
                    );
