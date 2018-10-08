@@ -1,11 +1,20 @@
 package com.jdjz.weex.view;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.Uri;
 import android.net.http.SslError;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
@@ -28,6 +37,7 @@ import com.jdjz.contact.ContactInfo;
 import com.jdjz.contacts.ContactEvent;
 import com.jdjz.contacts.ContactListActivity;
 import com.jdjz.contacts.ContactsActivity;
+import com.jdjz.testConfig.SealConst;
 import com.jdjz.weex.jsbridge.BridgeHandler;
 import com.jdjz.weex.jsbridge.BridgeWebView;
 import com.jdjz.weex.jsbridge.BridgeWebViewClient;
@@ -36,9 +46,12 @@ import com.jdjz.weex.jsbridge.DefaultHandler;
 import com.jdjz.weex.modle.ModleConfig;
 import com.jdjz.weex.modle.ResultContact;
 import com.jdjz.weex.modle.ResultNetworkStatus;
+import com.jdjz.weex.modle.ResultSystemInfo;
 import com.jdjz.weex.modle.ResultToken;
 import com.jdjz.weex.modle.User;
+import com.jdjz.weex.modle.entity.JSParams;
 import com.jdjz.weex.modle.entity.NetworkStatusEntity;
+import com.jdjz.weex.modle.entity.SystemInfoEntity;
 import com.jdjz.weex.util.NetUtils;
 import com.jude.utils.JUtils;
 import com.taobao.weex.ui.view.IWebView;
@@ -48,6 +61,9 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.time.temporal.JulianFields;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -263,27 +279,12 @@ public class WXWebViewJsBridge implements IWebView { //BridgeView   WXWebView
             @Override
             public void handler(String data, CallBackFunction function) {
                 JUtils.Log("handler = requestFromNativeTypeSetPrivateToken, data from web = " + data);
-
-
                 JUtils.getSharedPreference().edit().putString("tokenMyServer",data).apply();
-                /*ResultToken resultToken = new ResultToken();
-                if (str.equals(ModleConfig.RES404)) {
-                    resultToken.setResponseCode(ModleConfig.RES404);
-                    resultToken.setResponseResult("");
-                } else {
-                    resultToken.setResponseCode(ModleConfig.RES200);
-                    resultToken.setResponseResult(ModleConfig.RES404);
-                }
-                String str2 = new Gson().toJson(resultToken);*/
-
                 function.onCallBack("点击“获取token”按钮查看" );
             }
 
         });
 
-        /*Intent intent = new Intent(mContext, ContactListActivity.class);
-        intent.putExtra(ChooseModel.CHOOSEMODEL,ChooseModel.MODEL_MULTI);
-        mContext.startActivity(intent);*/
         mWebView.registerHandler("requestFromNativeTypeContacts", new BridgeHandler() {
 
             @Override
@@ -318,19 +319,8 @@ public class WXWebViewJsBridge implements IWebView { //BridgeView   WXWebView
                 intent.putExtra(ChooseModel.CHOOSEMODEL,ChooseModel.MODEL_MULTI);
                 mContext.startActivity(intent);
 
-                /*ResultToken resultToken = new ResultToken();
-                if (str.equals(ModleConfig.RES404)) {
-                    resultToken.setResponseCode(ModleConfig.RES404);
-                    resultToken.setResponseResult("");
-                } else {
-                    resultToken.setResponseCode(ModleConfig.RES200);
-                    resultToken.setResponseResult(ModleConfig.RES404);
-                }
-                String str2 = new Gson().toJson(resultToken);*/
                 callBackFunction = function;
-                //.onCallBack("点击“获取token”按钮查看" );
             }
-
         });
 
 
@@ -347,38 +337,99 @@ public class WXWebViewJsBridge implements IWebView { //BridgeView   WXWebView
                 resultNetworkStatus.setResponseCode(ModleConfig.RES200);
                 resultNetworkStatus.setResponseMsg(ModleConfig.RES_MSG_NETWORKSTATUS_SUC);
 
-                networkStatusEntity.setNetWorkAvilable(isNetWorkAvilable);
+                networkStatusEntity.setNetworkAvailable(isNetWorkAvilable);
+                String type  = "";
+                switch (JUtils.getNetworkState(mContext)){
+                    case 1:
+                        type = "WWAN";
+                        break;
+                    case 2:
+                        type = "2G";
+                        break;
 
+                    case 3:
+                        type = "3G";
+                        break;
+
+                    case 4:
+                        type = "4G";
+                        break;
+
+                    default:
+                        type = "UNKNOWN ";
+                        break;
+                }
+
+                if(TextUtils.isEmpty(isNetWorkReachable(mContext))){
+                    type = "NOTREACHABLE ";
+                }
+               /* if(!JUtils.checkOnlineState(mContext)){
+                    type = "NOTREACHABLE";
+                }*/
 
                 if(isNetWorkAvilable){
-
-                    networkStatusEntity.setType(NetUtils.getNetworkState(mContext));
-
-
+                    networkStatusEntity.setType(type);
                 }else{
-                    networkStatusEntity.setType(NetUtils.getNetworkState(mContext));
+                    networkStatusEntity.setType(type);
                 }
                 resultNetworkStatus.setNetworkStatusEntity(networkStatusEntity);
 
                 String str2 = new Gson().toJson(resultNetworkStatus);
+                JUtils.Log("call back");
                 function.onCallBack(str2);
-
-                /*String str = JUtils.getSharedPreference().getString("tokenMyServer", ModleConfig.RES404);
-                ResultToken resultToken = new ResultToken();
-                if (str.equals(ModleConfig.RES404)) {
-                    resultToken.setResponseCode(ModleConfig.RES404);
-                    resultToken.setResponseResult("");
-                } else {
-                    resultToken.setResponseCode(ModleConfig.RES200);
-                    resultToken.setResponseResult(str);
-                }
-                String str2 = new Gson().toJson(resultToken);
-
-                function.onCallBack(str2);*/
             }
 
         });
 
+
+        //获取网络状态
+        mWebView.registerHandler("requestFromNativeMakePhoneCall", new BridgeHandler() {
+
+            @Override
+            public void handler(String data, CallBackFunction function) {
+                JUtils.Log("handler = requestFromNativeMakePhoneCall, data from web = " + data);
+                JSParams jsParams = new Gson().fromJson(data,JSParams.class);
+                Intent intent = new Intent();
+                intent.setAction("android.intent.action.CALL");
+                intent.setData(Uri.parse("tel:" + jsParams.getParam()));
+                mContext.startActivity(intent);
+            }
+        });
+
+        //获取设备信息
+
+        //获取网络状态
+        mWebView.registerHandler("requestFromNativeSystemInfo", new BridgeHandler() {
+
+            @Override
+            public void handler(String data, CallBackFunction function) {
+                JUtils.Log("handler = requestFromNativeSystemInfo, data from web = " + data);
+                ResultSystemInfo resultSystemInfo = new ResultSystemInfo();
+                SystemInfoEntity systemInfoEntity = new SystemInfoEntity();
+                systemInfoEntity.setModel(JUtils.getSystemModel());
+                systemInfoEntity.setPixelRatio(0);
+                systemInfoEntity.setWindowHeight(JUtils.getWindowHeight(mContext));
+                systemInfoEntity.setWindowWidth(JUtils.getWindowWidth(mContext));
+                systemInfoEntity.setLanguage(JUtils.getSystemLanguage());
+                systemInfoEntity.setVersion(JUtils.getAppVersionCode()+"");
+                systemInfoEntity.setStorage(JUtils.readSystemStorage()+"KB");
+                systemInfoEntity.setCurrentBattery(JUtils.getSharedPreference().getString(SealConst.BATTYER_LEVEL,""));
+                systemInfoEntity.setSystem(JUtils.getSystemVersion());
+                systemInfoEntity.setPlatform("Android");
+
+                systemInfoEntity.setScreenHeight(JUtils.getScreenHeight());
+                systemInfoEntity.setScreeWidth(JUtils.getScreenWidth());
+                systemInfoEntity.setBrand(JUtils.getDeviceBrand());
+                systemInfoEntity.setFontSizeSetting(JUtils.getFontSize());
+
+
+                resultSystemInfo.setSystemInfoEntity(systemInfoEntity);
+                String str2 = new Gson().toJson(resultSystemInfo);
+                function.onCallBack(str2);
+
+            }
+
+        });
         mWebView.send("hello");
     }
 
@@ -476,6 +527,43 @@ public class WXWebViewJsBridge implements IWebView { //BridgeView   WXWebView
         });
 
         mContactAdapter.setContactList(contactInfos);*/
+    }
+
+    //判断网络是否可达
+    public  String  isNetWorkReachable(Context context) {
+        String netAddress = null;
+        try
+        {
+            netAddress = new NetTask().execute("www.baidu.com").get();//"http://www.fsa111f.com/"
+        }
+        catch (Exception e1)
+        {
+            e1.printStackTrace();
+        }
+        JUtils.Log("百度的IP:"+netAddress);
+        return netAddress;
+    }
+
+
+    public class NetTask extends AsyncTask<String, Integer, String>
+    {
+        @Override
+        protected String doInBackground(String... params)
+        {
+            InetAddress addr = null;
+            try
+            {
+                addr = InetAddress.getByName(params[0]);
+            }
+            catch (UnknownHostException e)
+            {
+                e.printStackTrace();
+            }
+            if(addr != null){
+              return  addr.getHostAddress();
+            }
+            return "" ;
+        }
     }
 
 }

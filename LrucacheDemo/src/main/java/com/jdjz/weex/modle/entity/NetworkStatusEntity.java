@@ -2,22 +2,24 @@ package com.jdjz.weex.modle.entity;
 
 public class NetworkStatusEntity {
 
-    private int type;
-    private boolean isNetWorkAvilable;
-    public boolean isNetWorkAvilable() {
-        return isNetWorkAvilable;
-    }
-
-    public void setNetWorkAvilable(boolean netWorkAvilable) {
-        isNetWorkAvilable = netWorkAvilable;
-    }
-
-
-    public int getType() {
+    private String type;
+    private boolean networkAvailable;
+    public String getType() {
         return type;
     }
 
-    public void setType(int type) {
+    public void setType(String type) {
         this.type = type;
     }
+
+    public boolean isNetworkAvailable() {
+        return networkAvailable;
+    }
+
+    public void setNetworkAvailable(boolean networkAvailable) {
+        this.networkAvailable = networkAvailable;
+    }
+
+
+
 }

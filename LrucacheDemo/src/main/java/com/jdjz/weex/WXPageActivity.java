@@ -1,5 +1,6 @@
 package com.jdjz.weex;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -126,6 +127,8 @@ public class WXPageActivity extends AbsWeexActivity implements
     }
     url= "file://assets/dist/index.js";
     loadUrl(url);
+
+    //getWindow().addContentView();
   }
 
   private String getUrl(Uri uri) {

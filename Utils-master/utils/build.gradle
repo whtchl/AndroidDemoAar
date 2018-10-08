@@ -1,0 +1,51 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 26
+    buildToolsVersion "26.0.0"
+
+    defaultConfig {
+        minSdkVersion 21
+        targetSdkVersion 26
+        versionCode 1
+        versionName "1.0"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+}
+
+ext {
+    package_repo = 'maven' // bintray上的仓库名，一般为maven
+    package_type = 'aar'  // 输出类型
+    package_group = 'com.jude' // JCenter的GroupId
+    package_artifact = 'utils' // JCenter的ArtifactId
+    package_version = '1.2.2'  // JCenter的VersionId
+    package_description = 'A tool for Android'
+
+    // 以下选填
+
+    siteUrl = 'https://github.com/Jude95/utils'
+    gitUrl = 'https://github.com/Jude95/utils'
+
+    //开发者信息
+    developerId = ''
+    developerName = ''
+    developerEmail = ''
+
+    //开源协议
+    licenseName = 'The Apache Software License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    allLicenses = ["Apache-2.0"]
+}
+//apply from:'https://cdn.rawgit.com/Jude95/JCenter/v2/bintray.gradle'

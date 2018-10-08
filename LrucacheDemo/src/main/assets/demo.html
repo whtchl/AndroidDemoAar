@@ -26,6 +26,20 @@
     <input type="button" id="id_getnetworkstatus" value="获取网络状态" onclick="getNetworkStatus();"/>
 
 <hr style="height:1px;border:none;border-top:1px solid #FF4081;"/>
+
+<p>
+    <input type="number" id="phoneNumber" value="输入电话号码"/>
+    <input type="button" id="id_makephonecall" value="拨打电话" onclick="makePhoneCall();"/>
+</p>
+
+
+<hr style="height:1px;border:none;border-top:1px solid #FF4081;"/>
+     <input type="button" id="id_getSystemInfo" value="获取设备信息" onclick="getSystemInfo();"/>
+<hr style="height:1px;border:none;border-top:1px solid #FF4081;"/>
+
+<hr style="height:1px;border:none;border-top:1px solid #FF4081;"/>
+
+<hr style="height:1px;border:none;border-top:1px solid #FF4081;"/>
 <p>
     <input type="button" id="id_multicontacts" value="获取多个联系人" onclick="getMultiContacts();"/>
     <input type="button" id="id_singlecontact" value="获取单个联系人" onclick="getSingleContacts();"/>
@@ -94,6 +108,31 @@
                    //send message to native
                    window.WebViewJavascriptBridge.callHandler(
                        'requestFromNativeNetworkStatus'
+                       , {}
+                       , function(responseData) {
+                           document.getElementById("show").innerHTML = " getNetworkStatus:" + responseData
+                           //alert(responseData);
+                       }
+                   );
+               }
+
+        function makePhoneCall() {
+                   var　str1 =  document.getElementById("phoneNumber").value;
+                   //send message to native
+                   window.WebViewJavascriptBridge.callHandler(
+                       'requestFromNativeMakePhoneCall'
+                       , {'param':str1}
+                       , function(responseData) {
+                           //document.getElementById("show").innerHTML = " getNetworkStatus:" + responseData
+                           //alert(responseData);
+                       }
+                   );
+               }
+
+        function getSystemInfo() {
+                   //send message to native
+                   window.WebViewJavascriptBridge.callHandler(
+                       'requestFromNativeSystemInfo'
                        , {}
                        , function(responseData) {
                            document.getElementById("show").innerHTML = " getNetworkStatus:" + responseData
