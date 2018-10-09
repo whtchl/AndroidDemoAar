@@ -23,7 +23,7 @@
     <input type="button" id="id_settoken" value="设置token" onclick="setToken();"/>
 </p>
 <hr style="height:1px;border:none;border-top:1px solid #FF4081;"/>
-    <input type="button" id="id_getnetworkstatus" value="获取网络状态" onclick="getNetworkStatus();"/>
+<input type="button" id="id_getnetworkstatus" value="获取网络状态" onclick="getNetworkStatus();"/>
 
 <hr style="height:1px;border:none;border-top:1px solid #FF4081;"/>
 
@@ -34,8 +34,28 @@
 
 
 <hr style="height:1px;border:none;border-top:1px solid #FF4081;"/>
-     <input type="button" id="id_getSystemInfo" value="获取设备信息" onclick="getSystemInfo();"/>
+<input type="button" id="id_getSystemInfo" value="获取设备信息" onclick="getSystemInfo();"/>
 <hr style="height:1px;border:none;border-top:1px solid #FF4081;"/>
+<p>
+    输入日期格式：1. yyyy-MM-zz（默认） 2. HH:mm 3. yyyy-MM-zz HH:mm<br>
+    <input type="text" id="format" hint="输入日期格式：1.	yyyy-MM-zz（默认） 2. HH:mm 3. yyyy-MM-zz HH:mm"
+           value=""/>
+</p>
+<p>
+    初始选择的日期时间（输入日期格式同“第一个的text一样”），默认当前时间<br>
+    <input type="text" id="currentDate"/>
+</p>
+<p>
+    最小日期时间（只输入年月日，输入日期格式同“第一个的text一样”）<br>
+    <input type="text" id="startDate"/>
+</p>
+<p>
+    最大日期时间（只输入年月日，输入日期格式同“第一个的text一样”）<br>
+    <input type="text" id="enzzate"/>
+</p>
+<p>
+    <input type="button" id="id_datepicker" value="选择日期时间" onclick="datePicker1()"/>
+</p>
 
 <hr style="height:1px;border:none;border-top:1px solid #FF4081;"/>
 
@@ -136,6 +156,22 @@
                        , {}
                        , function(responseData) {
                            document.getElementById("show").innerHTML = " getNetworkStatus:" + responseData
+                           //alert(responseData);
+                       }
+                   );
+               }
+
+        function datePicker1() {
+                   var　format =  document.getElementById("format").value;
+                   var　currentDate =  document.getElementById("currentDate").value;
+                   var　startDate =  document.getElementById("startDate").value;
+                   var　enzzate =  document.getElementById("enzzate").value;
+                   //send message to native
+                   window.WebViewJavascriptBridge.callHandler(
+                       'requestFromNativeTypeTimeDialog'
+                       , {'format':format,'currentDate':currentDate,'startDate':startDate,'enzzate':enzzate}
+                       , function(responseData) {
+                           document.getElementById("show").innerHTML = " datePicker:" + responseData
                            //alert(responseData);
                        }
                    );
@@ -260,6 +296,7 @@
         console.log('JS responding with', data);
         responseCallback(data);
     });
+
 
 
 

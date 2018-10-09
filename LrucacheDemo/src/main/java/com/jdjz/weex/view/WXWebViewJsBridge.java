@@ -19,6 +19,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.view.Window;
 import android.webkit.SslErrorHandler;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
@@ -37,6 +38,7 @@ import com.jdjz.contact.ContactInfo;
 import com.jdjz.contacts.ContactEvent;
 import com.jdjz.contacts.ContactListActivity;
 import com.jdjz.contacts.ContactsActivity;
+import com.jdjz.date.DateDialog;
 import com.jdjz.testConfig.SealConst;
 import com.jdjz.weex.jsbridge.BridgeHandler;
 import com.jdjz.weex.jsbridge.BridgeWebView;
@@ -45,10 +47,12 @@ import com.jdjz.weex.jsbridge.CallBackFunction;
 import com.jdjz.weex.jsbridge.DefaultHandler;
 import com.jdjz.weex.modle.ModleConfig;
 import com.jdjz.weex.modle.ResultContact;
+import com.jdjz.weex.modle.ResultDate;
 import com.jdjz.weex.modle.ResultNetworkStatus;
 import com.jdjz.weex.modle.ResultSystemInfo;
 import com.jdjz.weex.modle.ResultToken;
 import com.jdjz.weex.modle.User;
+import com.jdjz.weex.modle.entity.DateEntity;
 import com.jdjz.weex.modle.entity.JSParams;
 import com.jdjz.weex.modle.entity.NetworkStatusEntity;
 import com.jdjz.weex.modle.entity.SystemInfoEntity;
@@ -60,6 +64,7 @@ import com.taobao.weex.utils.WXLogUtils;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+import org.json.JSONException;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -397,8 +402,6 @@ public class WXWebViewJsBridge implements IWebView { //BridgeView   WXWebView
         });
 
         //获取设备信息
-
-        //获取网络状态
         mWebView.registerHandler("requestFromNativeSystemInfo", new BridgeHandler() {
 
             @Override
@@ -430,6 +433,57 @@ public class WXWebViewJsBridge implements IWebView { //BridgeView   WXWebView
             }
 
         });
+
+
+        //获取日期时间
+        mWebView.registerHandler("requestFromNativeTypeTimeDialog", new BridgeHandler() {
+
+            @Override
+            public void handler(String data, CallBackFunction function) {
+                JUtils.Log("handler = requestFromNativeTypeTimeDialog, data from web = " + data);
+                DateEntity dateEntity = new Gson().fromJson(data,DateEntity.class);
+
+                //final CallBackFunction f = function;
+                int mode=DateDialog.MODE_2;
+                if(dateEntity.getFormat().equalsIgnoreCase("yyyy-MM-zz")){
+                    mode = DateDialog.MODE_2;
+                }else if(dateEntity.getFormat().equalsIgnoreCase("HH:mm")){
+                    mode = DateDialog.MODE_3;
+                }else if(dateEntity.getFormat().equalsIgnoreCase("yyyy-MM-zz HH:mm")){
+                    mode = DateDialog.MODE_1;
+                }else{
+                    mode = DateDialog.MODE_2;
+                }
+                JUtils.Log("currentDate:"+dateEntity.getCurrentDate());
+                final CallBackFunction f = function;
+               final  ResultDate resultDate = new ResultDate();
+                DateDialog dateDialog = new DateDialog(mContext, "时间日期", mode, dateEntity.getCurrentDate(), dateEntity.getStartDate(), dateEntity.getEnzzate(),
+                        new DateDialog.InterfaceDateDialog() {
+                            @Override
+                            public void getTime(String dateTime) throws JSONException {
+                                if (TextUtils.isEmpty(dateTime)) {
+                                    resultDate.setResponseCode(ModleConfig.RES404);
+
+                                    resultDate.setResponseMsg(ModleConfig.RES_FAIL);
+                                    resultDate.setTime("");
+                                } else {
+
+                                    resultDate.setResponseCode(ModleConfig.RES200);
+
+                                    resultDate.setResponseMsg(ModleConfig.RES_SUCCESS);
+                                    resultDate.setTime(dateTime);
+                                }
+                                String str2 = new Gson().toJson(resultDate);
+                                // final JSONObject jsresult = new JSONObject(new Gson().toJson(result));
+                                f.onCallBack(str2);
+                            }
+                        });
+                dateDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                dateDialog.show();
+                //function.onCallBack("datapicker");
+            }
+        });
+
         mWebView.send("hello");
     }
 
