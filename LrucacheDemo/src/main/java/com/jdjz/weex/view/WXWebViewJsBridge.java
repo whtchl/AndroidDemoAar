@@ -387,7 +387,7 @@ public class WXWebViewJsBridge implements IWebView { //BridgeView   WXWebView
         });
 
 
-        //获取网络状态
+        //打电话
         mWebView.registerHandler("requestFromNativeMakePhoneCall", new BridgeHandler() {
 
             @Override
@@ -427,6 +427,8 @@ public class WXWebViewJsBridge implements IWebView { //BridgeView   WXWebView
 
 
                 resultSystemInfo.setSystemInfoEntity(systemInfoEntity);
+                resultSystemInfo.setResponseCode(ModleConfig.RES200);
+                resultSystemInfo.setResponseMsg(ModleConfig.RES_SUCCESS);
                 String str2 = new Gson().toJson(resultSystemInfo);
                 function.onCallBack(str2);
 
