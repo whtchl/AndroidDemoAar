@@ -407,7 +407,7 @@ public class WXWebViewJsBridge implements IWebView { //BridgeView   WXWebView
                 ResultSystemInfo resultSystemInfo = new ResultSystemInfo();
                 SystemInfoEntity systemInfoEntity = new SystemInfoEntity();
                 systemInfoEntity.setModel(JUtils.getSystemModel());
-                systemInfoEntity.setPixelRatio(0);
+                systemInfoEntity.setPixelRatio(JUtils.getPixelRatio());
                 systemInfoEntity.setWindowHeight(JUtils.getWindowHeight(mContext));
                 systemInfoEntity.setWindowWidth(JUtils.getWindowWidth(mContext));
                 systemInfoEntity.setLanguage(JUtils.getSystemLanguage());
@@ -420,7 +420,7 @@ public class WXWebViewJsBridge implements IWebView { //BridgeView   WXWebView
                 systemInfoEntity.setScreenHeight(JUtils.getScreenHeight());
                 systemInfoEntity.setScreeWidth(JUtils.getScreenWidth());
                 systemInfoEntity.setBrand(JUtils.getDeviceBrand());
-                systemInfoEntity.setFontSizeSetting(JUtils.getFontSize());
+                systemInfoEntity.setFontSizeSetting(JUtils.getFontSize(mContext));
 
 
                 resultSystemInfo.setSystemInfoEntity(systemInfoEntity);

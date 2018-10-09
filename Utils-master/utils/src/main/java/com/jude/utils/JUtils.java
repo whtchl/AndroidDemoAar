@@ -201,6 +201,16 @@ public class JUtils {
 		return result;
 	}
 
+	/**
+	 * 获取设备像素比： 设备像素（物理像素）除以 设备独立像素
+	 * 设备像素：即是分辨率 720*1080
+	 * 在Android上，设备独立像素==设备像素
+	 */
+	public static int getPixelRatio(){
+		//DisplayMetrics dm = mApplicationContent.getResources().getDisplayMetrics();
+		//dm.widthPixels/dm.widthPixels
+		return 1;
+	}
 
 	/**
 	 * 取状态栏高度
@@ -464,8 +474,8 @@ public class JUtils {
 	 * 获取系统字体大小
 	 * @return
 	 */
-	public static float getFontSize() {
-		Configuration mCurConfig = new Configuration();
+	public static float getFontSize(Context context) {
+		Configuration mCurConfig = context.getResources().getConfiguration();//new Configuration();
 		JUtils.Log("getFontSize(), Font size is " + mCurConfig.fontScale);
 		return mCurConfig.fontScale;
 
