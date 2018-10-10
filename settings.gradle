@@ -1,2 +1,2 @@
-include ':LrucacheDemo', ':myapplication', ':contact', ':sdk', ':mylibrary', ':utils'
+include ':LrucacheDemo',':contact', ':sdk', ':qrcodelib', ':utils', ':common'
 project(':utils').projectDir = new File('Utils-master/utils')

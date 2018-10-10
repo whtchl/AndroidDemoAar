@@ -1,6 +1,6 @@
-package com.jdjz.weex.modle.entity;
+package com.jdjz.weex.modle.RequestScanParams;
 
-public class DateEntity {
+public class ReuquestDateParams {
     private String format;
     private String currentDate;
     private String startDate;

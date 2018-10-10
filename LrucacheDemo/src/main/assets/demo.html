@@ -23,10 +23,11 @@
     <input type="button" id="id_settoken" value="设置token" onclick="setToken();"/>
 </p>
 <hr style="height:1px;border:none;border-top:1px solid #FF4081;"/>
+<br>
 <input type="button" id="id_getnetworkstatus" value="获取网络状态" onclick="getNetworkStatus();"/>
 
 <hr style="height:1px;border:none;border-top:1px solid #FF4081;"/>
-
+<br>
 <p>
     <input type="number" id="phoneNumber" value="输入电话号码"/>
     <input type="button" id="id_makephonecall" value="拨打电话" onclick="makePhoneCall();"/>
@@ -34,8 +35,10 @@
 
 
 <hr style="height:1px;border:none;border-top:1px solid #FF4081;"/>
+<br>
 <input type="button" id="id_getSystemInfo" value="获取设备信息" onclick="getSystemInfo();"/>
 <hr style="height:1px;border:none;border-top:1px solid #FF4081;"/>
+<br>
 <p>
     输入日期格式：1. yyyy-MM-zz（默认） 2. HH:mm 3. yyyy-MM-zz HH:mm<br>
     <input type="text" id="format" hint="输入日期格式：1.	yyyy-MM-zz（默认） 2. HH:mm 3. yyyy-MM-zz HH:mm"
@@ -57,6 +60,29 @@
     <input type="button" id="id_datepicker" value="选择日期时间" onclick="datePicker1()"/>
 </p>
 
+<hr style="height:1px;border:none;border-top:1px solid #FF4081;"/>
+<br>
+
+<p>
+    扫码样式(默认 qr) qr:样式为二维码扫码框; bar:样式为条形码扫码框<br>
+    <input type="text" id="barqcode"/>
+    <input type="button" id="id_scanbarqcode" value="二维码和条码扫描" onclick="scanBarQcode()"/>
+
+</p>
+
+<hr style="height:1px;border:none;border-top:1px solid #FF4081;"/>
+    <br>
+    持续定位：startAutoLBS()->stopAutoLBS()<br>
+    输入持续定位参数：wgs84是gps坐标，gcj02是火星坐标<br>
+    <input type="text" id="lbs_type" hint="wgs84/gcj02"/>
+    <input type="button" id="id_startautolbs" value="开始持续定位" onclick="startAutoLBS()"/>
+    <input type="button" id="id_stopautolbs" value="关闭持续定位" onclick="stopAutoLBS()"/>
+     <br>
+     <br>
+
+    type  0：默认，获取经纬度；>0国家，省 市 区县 >1:streetNumber; >2:pois <br>
+    <input type="text" id="type" /><br>
+     <input type="button" id="id_getlocation" value="获取一次地理位置信息" onclick="getLocation()"/>
 <hr style="height:1px;border:none;border-top:1px solid #FF4081;"/>
 
 <hr style="height:1px;border:none;border-top:1px solid #FF4081;"/>
@@ -176,6 +202,34 @@
                        }
                    );
                }
+
+        function scanBarQcode() {
+                   var　barqcode =  document.getElementById("barqcode").value;
+                   //send message to native
+                   window.WebViewJavascriptBridge.callHandler(
+                       'requestFromNativeTypeScan'
+                       , {'type':barqcode}
+                       , function(responseData) {
+                           document.getElementById("show").innerHTML = "scanBarQcode:" + responseData
+                           //alert(responseData);
+                       }
+                   );
+               }
+
+        function getLocation() {
+                   var　type =  document.getElementById("type").value;
+                   //send message to native
+                   window.WebViewJavascriptBridge.callHandler(
+                       'requestFromNativeTypeGetLocationOnce'
+                       , {'type':type}
+                       , function(responseData) {
+                           document.getElementById("show").innerHTML = "getLocation:" + responseData
+                           //alert(responseData);
+                       }
+                   );
+               }
+
+
 
 
         function getMultiContacts() {

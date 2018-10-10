@@ -16,8 +16,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.zxing.integration.android.IntentIntegrator;
-import com.google.zxing.integration.android.IntentResult;
 import com.jdjz.weex.hotreload.HotReloadManager;
 import com.jdjz.weex.util.Constants;
 import com.jdjz.weex.util.AppConfig;
@@ -212,14 +210,14 @@ public class WXPageActivity extends AbsWeexActivity implements
 
   @Override
   public void onActivityResult(int requestCode, int resultCode, Intent data) {
-    IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+    /*IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
     if (result != null) {
       if (result.getContents() == null) {
         Toast.makeText(this, "Cancelled", Toast.LENGTH_LONG).show();
       } else {
         handleDecodeInternally(result.getContents());
       }
-    }
+    }*/
     super.onActivityResult(requestCode, resultCode, data);
   }
 

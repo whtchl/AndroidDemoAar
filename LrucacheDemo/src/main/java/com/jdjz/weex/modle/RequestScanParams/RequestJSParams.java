@@ -1,6 +1,6 @@
-package com.jdjz.weex.modle.entity;
+package com.jdjz.weex.modle.RequestScanParams;
 
-public class JSParams {
+public class RequestJSParams {
    private String param;
 
     public String getParam() {
