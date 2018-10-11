@@ -70,18 +70,18 @@
 
 </p>
 
-<hr style="height:1px;border:none;border-top:1px solid #FF4081;"/>
+<hr style="height:3px;border:none;border-top:5px solid #FF4081;"/>
     <br>
-    持续定位：startAutoLBS()->stopAutoLBS()<br>
-    输入持续定位参数：wgs84是gps坐标，gcj02是火星坐标<br>
-    <input type="text" id="lbs_type" hint="wgs84/gcj02"/>
+    持续定位流程：startAutoLBS()->stopAutoLBS()<br>
+    <input type="hidden" id="lbs_type" hint="wgs84/gcj02"/>
     <input type="button" id="id_startautolbs" value="开始持续定位" onclick="startAutoLBS()"/>
     <input type="button" id="id_stopautolbs" value="关闭持续定位" onclick="stopAutoLBS()"/>
      <br>
      <br>
-
+<hr style="height:1px;border:none;border-top:1px solid #303F9F;"/>
     type  0：默认，获取经纬度；>0国家，省 市 区县 >1:streetNumber; >2:pois <br>
-    <input type="text" id="type" /><br>
+    <input type="text" id="type" /><br> <br>
+
      <input type="button" id="id_getlocation" value="获取一次地理位置信息" onclick="getLocation()"/>
 <hr style="height:1px;border:none;border-top:1px solid #FF4081;"/>
 
@@ -229,6 +229,31 @@
                    );
                }
 
+        function stopAutoLBS() {
+                   //send message to native
+                   window.WebViewJavascriptBridge.callHandler(
+                       'requestFromNativeTypeStopAutoLBS'
+                       , {}
+                       , function(responseData) {
+                           document.getElementById("show").innerHTML = "stopAutoLBS:" + responseData
+                           //alert(responseData);
+                       }
+                   );
+               }
+
+        function startAutoLBS() {
+            var　lbs_type =  document.getElementById("lbs_type").value;
+
+                   //send message to native
+                   window.WebViewJavascriptBridge.callHandler(
+                       'requestFromNativeTypeStartAutoLBS'
+                       , {'wgs84_gcj02':lbs_type}
+                       , function(responseData) {
+                           document.getElementById("show").innerHTML = "stopAutoLBS:" + responseData
+                           //alert(responseData);
+                       }
+                   );
+               }
 
 
 
@@ -334,13 +359,22 @@
                 responseCallback(data);
             });
             // 注册一个"functionInJs",
-            //bridge.registerHandler("functionInJs", function(data, responseCallback) {
+            bridge.registerHandler("functionInJs", function(data, responseCallback) {
 
-              //  document.getElementById("show").innerHTML = ("data from Java: = " + data);
-                //var responseData = "Javascript Says  我要你的地址!";
+                document.getElementById("show").innerHTML = ("data from Java: = " + data);
+                var responseData = "Javascript Says  我要你的地址!";
                 // response层
-                //responseCallback(responseData);
-            //});
+                responseCallback(responseData);
+            });
+
+            bridge.registerHandler("NativeToJSstartAutoLBS", function(data, responseCallback) {
+                var temp = document.getElementById("show").value;
+                document.getElementById("show").innerHTML = temp + data;
+
+                var responseData = "Javascript Says  我已经收到位置信息!";
+                // response层
+                responseCallback(responseData);
+            });
         })
         bridge.init(function(message, responseCallback) {
         console.log('JS got a message', message);

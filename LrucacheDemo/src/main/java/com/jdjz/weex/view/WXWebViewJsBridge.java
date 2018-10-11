@@ -27,6 +27,8 @@ import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
 import com.amap.api.location.AMapLocationListener;
+import com.amap.api.location.CoordinateConverter;
+import com.amap.api.location.DPoint;
 import com.google.gson.Gson;
 import com.jdjz.common.TransScanEntity;
 import com.jdjz.contact.ChooseModel;
@@ -42,12 +44,14 @@ import com.jdjz.weex.jsbridge.CallBackFunction;
 import com.jdjz.weex.jsbridge.DefaultHandler;
 import com.jdjz.weex.modle.ModleConfig;
 import com.jdjz.weex.modle.RequestScanParams.RequestLBSParams;
+import com.jdjz.weex.modle.RequestScanParams.RequestLBSWGS84_GCJ02Params;
 import com.jdjz.weex.modle.ResultContact;
 import com.jdjz.weex.modle.ResultDate;
 import com.jdjz.weex.modle.ResultLBS;
 import com.jdjz.weex.modle.ResultNetworkStatus;
 import com.jdjz.weex.modle.ResultScan;
 import com.jdjz.weex.modle.ResultSystemInfo;
+import com.jdjz.weex.modle.ResultTemp;
 import com.jdjz.weex.modle.ResultToken;
 import com.jdjz.weex.modle.User;
 import com.jdjz.weex.modle.RequestScanParams.ReuquestDateParams;
@@ -69,6 +73,7 @@ import org.json.JSONException;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.time.temporal.JulianFields;
 import java.util.ArrayList;
 
 import io.github.xudaojie.qrcodelib.CaptureActivity;
@@ -88,6 +93,8 @@ public class WXWebViewJsBridge implements IWebView {
     //Context jsContext;
 
     String lbs_type ="0";//默认是0，获取经纬度。lbs_type>1 需要街道级别逆地理的才会有的字段，街道门牌信息：lbs_type>2,需要POI级别逆地理的才会有的字段，定位点附近的 POI 信息
+    int responseTypeLBS=0;//0:返回给getLocation()； 1：返回给NativeToJSstartAutoLBS
+    String gs84_gcj02;//wgs84是gps坐标，gcj02是火星坐标（默认）
     //高德地图
     private AMapLocationClient locationClient = null;
     private AMapLocationClientOption locationOption = null;
@@ -177,6 +184,7 @@ public class WXWebViewJsBridge implements IWebView {
             ResultLBS resultLBS = new ResultLBS();
             LBSEntity lbsEntity = new LBSEntity();
             Street street = new Street();
+            String str2="";
             if (null != location) {
 
                 StringBuffer sb = new StringBuffer();
@@ -203,12 +211,53 @@ public class WXWebViewJsBridge implements IWebView {
                     sb.append("兴趣点    : " + location.getPoiName() + "\n");
                     //定位完成的时间
                     //sb.append("定位时间: " + Utils.formatUTC(location.getTime(), "yyyy-MM-dd HH:mm:ss") + "\n");
+
+                    resultLBS.setResponseCode(ModleConfig.RES200);
+                    resultLBS.setResponseMsg(ModleConfig.RES_SUCCESS);
+
+
+                    lbsEntity.setLongitude(location.getLongitude()+"" );  //经度
+                    lbsEntity.setLatitude(location.getLatitude()+"");  //纬度
+
+                    lbsEntity.setAccuracy(location.getAccuracy()+"");   //精确度，单位m
+                    lbsEntity.setHorizontalAccuracy("");//水平精确度，单位m   高德地图不能获得
+
+                    if(Integer.parseInt(lbs_type)>0){
+                        lbsEntity.setCountry(location.getCountry());
+                        lbsEntity.setCountryCode("");//国家码另外写代码
+                        lbsEntity.setProvince(location.getProvince());
+                        lbsEntity.setCity(location.getCity());
+                        lbsEntity.setCityAdcode(location.getCityCode());
+                        lbsEntity.setDistrict(location.getDistrict());
+                        lbsEntity.setDistrictAdcode(location.getAdCode());
+                    }
+
+                    //设置街道信息
+                    if(Integer.parseInt(lbs_type)>1) {
+                        street.setNumber(location.getStreetNum());
+                        street.setStreet(location.getStreet());
+                        lbsEntity.setStreetObject(street);
+                    }
+
+                    //设置pois
+                    if(Integer.parseInt(lbs_type)>2){
+                        lbsEntity.setPois(location.getPoiName());
+                    }
                 } else {
                     //定位失败
                     sb.append("定位失败" + "\n");
                     sb.append("错误码:" + location.getErrorCode() + "\n");
                     sb.append("错误信息:" + location.getErrorInfo() + "\n");
                     sb.append("错误描述:" + location.getLocationDetail() + "\n");
+
+                    if(responseTypeLBS==0) {  //返回给getLocation()
+                        resultLBS.setResponseCode(ModleConfig.RES404);
+                        resultLBS.setResponseMsg("[A"+location.getErrorCode()+"]" + location.getLocationDetail());
+                    }else if(responseTypeLBS==1){
+                        resultLBS.setResponseCode(ModleConfig.RES404);
+                        resultLBS.setResponseMsg("[A"+location.getErrorCode()+"]" + location.getLocationDetail());
+                        //NativeToJSstartAutoLBS();
+                    }
                 }
                 sb.append("***定位质量报告***").append("\n");
                 sb.append("* WIFI开关：").append(location.getLocationQualityReport().isWifiAble() ? "开启":"关闭").append("\n");
@@ -219,56 +268,39 @@ public class WXWebViewJsBridge implements IWebView {
                 sb.append("****************").append("\n");
                 //定位之后的回调时间
                // sb.append("回调时间: " + Utils.formatUTC(System.currentTimeMillis(), "yyyy-MM-dd HH:mm:ss") + "\n");
-
+                JUtils.Log(sb.toString());
                 //解析定位结果，
-                String result = sb.toString();
-                //tvResult.setText(result);
-                JUtils.Log(result);
-                //callBackFunction.onCallBack(str2);
+                if(responseTypeLBS==0){  //返回给getLocation()
 
-                resultLBS.setResponseCode(ModleConfig.RES200);
-                resultLBS.setResponseMsg(ModleConfig.RES_SUCCESS);
-                lbsEntity.setLongitude(location.getLongitude()+"" );  //经度
-                lbsEntity.setLatitude(location.getLatitude()+"");  //纬度
-                lbsEntity.setAccuracy(location.getAccuracy()+"");   //精确度，单位m
-
-                lbsEntity.setHorizontalAccuracy("");//水平精确度，单位m   高德地图不能获得
-
-                if(Integer.parseInt(lbs_type)>0){
-                    lbsEntity.setCountry(location.getCountry());
-                    lbsEntity.setCountryCode("");//国家码另外写代码
-                    lbsEntity.setProvince(location.getProvince());
-                    lbsEntity.setCity(location.getCity());
-                    lbsEntity.setCityAdcode(location.getCityCode());
-                    lbsEntity.setDistrict(location.getDistrict());
-                    lbsEntity.setDistrictAdcode(location.getAdCode());
-                }
-
-                //设置街道信息
-                if(Integer.parseInt(lbs_type)>1) {
-                    street.setNumber(location.getStreetNum());
-                    street.setStreet(location.getStreet());
-                    lbsEntity.setStreetObject(street);
-                }
-
-                //设置pois
-                if(Integer.parseInt(lbs_type)>2){
-                    lbsEntity.setPois(location.getPoiName());
+                    String result = sb.toString();
+                    stopLocation();
+                    resultLBS.setLbsEntity(lbsEntity);
+                    str2 = new Gson().toJson(resultLBS);
+                    callBackFunction.onCallBack(str2);
+                }else if(responseTypeLBS==1){
+                    JUtils.Log("call ativeToJSstartAutoLBS(resultLBS);");
+                    resultLBS.setLbsEntity(lbsEntity);
+                    NativeToJSstartAutoLBS(resultLBS);
                 }
 
             } else {
-
-                JUtils.Log("定位失败，loc is null");
-                resultLBS.setResponseCode(ModleConfig.RES404);
-                resultLBS.setResponseMsg("定位失败");
-                resultLBS.setLbsEntity(null);
-                String str2 = new Gson().toJson(resultLBS);
-
-                callBackFunction.onCallBack(str2);
+                if(responseTypeLBS==0) {  //返回给getLocation()
+                    stopLocation();
+                    JUtils.Log("定位失败，loc is null");
+                    resultLBS.setResponseCode(ModleConfig.RES404);
+                    resultLBS.setResponseMsg("定位失败");
+                    resultLBS.setLbsEntity(null);
+                    str2 = new Gson().toJson(resultLBS);
+                    callBackFunction.onCallBack(str2);
+                }else if(responseTypeLBS==1){
+                    resultLBS.setResponseCode(ModleConfig.RES404);
+                    resultLBS.setResponseMsg("定位失败");
+                    resultLBS.setLbsEntity(null);
+                    NativeToJSstartAutoLBS(resultLBS);
+                }
 
             }
-            stopLocation();
-            destroyLocation();
+
         }
     };
 
@@ -334,6 +366,7 @@ public class WXWebViewJsBridge implements IWebView {
     @Override
     public void destroy() {
         if (getWebView() != null) {
+            destroyLocation();
             getWebView().removeAllViews();
             getWebView().destroy();
             mWebView = null;
@@ -449,6 +482,8 @@ public class WXWebViewJsBridge implements IWebView {
 
             }
         });
+
+        //NativeToJSstartAutoLBS(10);
 
         mWebView.registerHandler("submitFromWeb", new BridgeHandler() {
 
@@ -636,7 +671,6 @@ public class WXWebViewJsBridge implements IWebView {
                 systemInfoEntity.setBrand(JUtils.getDeviceBrand());
                 systemInfoEntity.setFontSizeSetting(JUtils.getFontSize(mContext));
 
-
                 resultSystemInfo.setSystemInfoEntity(systemInfoEntity);
                 resultSystemInfo.setResponseCode(ModleConfig.RES200);
                 resultSystemInfo.setResponseMsg(ModleConfig.RES_SUCCESS);
@@ -744,51 +778,51 @@ public class WXWebViewJsBridge implements IWebView {
                 JUtils.Log("handler = requestFromNativeTypeGetLocationOnce, data from web = " + data);
                 RequestLBSParams requestLBSParams = new Gson().fromJson(data,RequestLBSParams.class);
                 ResultLBS resultLBS = new ResultLBS();
-
+                responseTypeLBS = 0;
                 lbs_type = requestLBSParams.getType();
-                if(lbs_type.equals("0") || lbs_type.equals("1") ||lbs_type.equals("2") ||lbs_type.equals("3")){
+                if(lbs_type.equals("1") ||lbs_type.equals("2") ||lbs_type.equals("3")){
                     ;
                 }else{
-                    resultLBS.setResponseCode(ModleConfig.RES404);
+                    lbs_type="0";
+                    /*resultLBS.setResponseCode(ModleConfig.RES404);
                     resultLBS.setResponseMsg("输入type参数错误");
                     resultLBS.setLbsEntity(null);
                     String str3 = new Gson().toJson(resultLBS);
                     function.onCallBack(str3);
-                    return;
+                    return;*/
                 }
-                JUtils.Log("((((((((((((((((((((99");
                 resetOption(true);
                 startLocation();
                 callBackFunction = function;
-                /*ResultSystemInfo resultSystemInfo = new ResultSystemInfo();
-                SystemInfoEntity systemInfoEntity = new SystemInfoEntity();
-                systemInfoEntity.setModel(JUtils.getSystemModel());
-                systemInfoEntity.setPixelRatio(JUtils.getPixelRatio());
-                systemInfoEntity.setWindowHeight(JUtils.getWindowHeight(mContext));
-                systemInfoEntity.setWindowWidth(JUtils.getWindowWidth(mContext));
-                systemInfoEntity.setLanguage(JUtils.getSystemLanguage());
-                systemInfoEntity.setVersion(JUtils.getAppVersionCode()+"");
-                systemInfoEntity.setStorage(JUtils.readSystemStorage()+"KB");
-                systemInfoEntity.setCurrentBattery(JUtils.getSharedPreference().getString(SealConst.BATTYER_LEVEL,""));
-                systemInfoEntity.setSystem(JUtils.getSystemVersion());
-                systemInfoEntity.setPlatform("Android");
-
-                systemInfoEntity.setScreenHeight(JUtils.getScreenHeight());
-                systemInfoEntity.setScreeWidth(JUtils.getScreenWidth());
-                systemInfoEntity.setBrand(JUtils.getDeviceBrand());
-                systemInfoEntity.setFontSizeSetting(JUtils.getFontSize(mContext));
-
-
-                resultSystemInfo.setSystemInfoEntity(systemInfoEntity);
-                resultSystemInfo.setResponseCode(ModleConfig.RES200);
-                resultSystemInfo.setResponseMsg(ModleConfig.RES_SUCCESS);
-                String str2 = new Gson().toJson(resultSystemInfo);
-                function.onCallBack(str2);*/
-
             }
 
         });
 
+
+        //停止定位。 stopAutoLBS
+        mWebView.registerHandler("requestFromNativeTypeStopAutoLBS", new BridgeHandler() {
+
+            ResultTemp resultTemp = new ResultTemp();
+            String str2 = "";
+            @Override
+            public void handler(String data, CallBackFunction function) {
+                JUtils.Log("handler = requestFromNativeTypeStopAutoLBS, data from web = " + data);
+                if(locationClient!=null){
+                    stopLocation();
+                    resultTemp.setResponseCode(ModleConfig.RES200);
+                    resultTemp.setResponseCode("停止定位成功");
+                    str2 = new Gson().toJson(resultTemp);
+                    function.onCallBack(str2);
+                }else{
+                    resultTemp.setResponseCode(ModleConfig.RES404);
+                    resultTemp.setResponseCode("停止定位前先开启定位");
+                    str2 = new Gson().toJson(resultTemp);
+                    function.onCallBack(str2);
+                }
+            }
+
+        });
+        requestFromNativeTypeStartAutoLBS();
         mWebView.send("hello");
     }
 
@@ -956,5 +990,45 @@ public class WXWebViewJsBridge implements IWebView {
             return "" ;
         }
     }
+
+    /**
+     * 回调 NativeToJSstartAutoLBS, 返回信息为html
+     */
+    public void NativeToJSstartAutoLBS(final ResultLBS resultLBS){
+        mWebView.callHandler("NativeToJSstartAutoLBS", new Gson().toJson(resultLBS), new CallBackFunction() {
+            @Override
+            public void onCallBack(String data) {
+
+                //Toast.makeText(mContext, "网页在获取你的位置!!!，"+ data, Toast.LENGTH_SHORT).show();
+                JUtils.Log("NativeToJSstartAutoLBS"+data);
+            }
+        });
+    }
+
+    /**
+     *开启持续定位
+     */
+    public void requestFromNativeTypeStartAutoLBS(){
+        mWebView.registerHandler("requestFromNativeTypeStartAutoLBS", new BridgeHandler() {
+
+            @Override
+            public void handler(String data, CallBackFunction function) {
+                JUtils.Log("handler = requestFromNativeTypeStartAutoLBS, data from web = " + data);
+                //NativeToJSstartAutoLBS(1);
+                //NativeToJSstartAutoLBS(2);
+                RequestLBSWGS84_GCJ02Params requestLBSWGS84_gcj02Params = new Gson().fromJson(data, RequestLBSWGS84_GCJ02Params.class);
+
+                responseTypeLBS = 1;
+                resetOption(false);
+                startLocation();
+            }
+
+        });
+
+
+    }
+
+
+
 
 }
