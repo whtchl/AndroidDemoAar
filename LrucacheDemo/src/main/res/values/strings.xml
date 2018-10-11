@@ -12,4 +12,8 @@
     </string>
     <string name="scan_qr_code" translatable="false">扫码</string>
     <string name="page_refresh" translatable="false">刷新</string>
+    <string name="portrait">头像</string>
+    <string name="nickname">昵称</string>
+    <string name="phone_number">手机号</string>
+
 </resources>

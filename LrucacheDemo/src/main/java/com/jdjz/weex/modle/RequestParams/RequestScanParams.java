@@ -1,8 +1,7 @@
-package com.jdjz.weex.modle.RequestScanParams;
+package com.jdjz.weex.modle.RequestParams;
 
-public class RequestLBSParams {
+public class RequestScanParams {
     private String type;
-
 
     public String getType() {
         return type;

@@ -27,8 +27,6 @@ import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
 import com.amap.api.location.AMapLocationListener;
-import com.amap.api.location.CoordinateConverter;
-import com.amap.api.location.DPoint;
 import com.google.gson.Gson;
 import com.jdjz.common.TransScanEntity;
 import com.jdjz.contact.ChooseModel;
@@ -37,15 +35,17 @@ import com.jdjz.contacts.ContactEvent;
 import com.jdjz.contacts.ContactListActivity;
 import com.jdjz.date.DateDialog;
 import com.jdjz.testConfig.SealConst;
+import com.jdjz.weex.activity.UserProfileActivity;
 import com.jdjz.weex.jsbridge.BridgeHandler;
 import com.jdjz.weex.jsbridge.BridgeWebView;
 import com.jdjz.weex.jsbridge.BridgeWebViewClient;
 import com.jdjz.weex.jsbridge.CallBackFunction;
 import com.jdjz.weex.jsbridge.DefaultHandler;
 import com.jdjz.weex.modle.ModleConfig;
-import com.jdjz.weex.modle.RequestScanParams.RequestEnterpriseChatParams;
-import com.jdjz.weex.modle.RequestScanParams.RequestLBSParams;
-import com.jdjz.weex.modle.RequestScanParams.RequestLBSWGS84_GCJ02Params;
+import com.jdjz.weex.modle.RequestParams.RequestEnterpriseChatParams;
+import com.jdjz.weex.modle.RequestParams.RequestLBSParams;
+import com.jdjz.weex.modle.RequestParams.RequestLBSWGS84_GCJ02Params;
+import com.jdjz.weex.modle.RequestParams.RequestUserProfileParams;
 import com.jdjz.weex.modle.ResultContact;
 import com.jdjz.weex.modle.ResultDate;
 import com.jdjz.weex.modle.ResultLBS;
@@ -54,12 +54,11 @@ import com.jdjz.weex.modle.ResultScan;
 import com.jdjz.weex.modle.ResultSystemInfo;
 import com.jdjz.weex.modle.ResultTemp;
 import com.jdjz.weex.modle.ResultToken;
-import com.jdjz.weex.modle.User;
-import com.jdjz.weex.modle.RequestScanParams.ReuquestDateParams;
-import com.jdjz.weex.modle.RequestScanParams.RequestJSParams;
+import com.jdjz.weex.modle.RequestParams.ReuquestDateParams;
+import com.jdjz.weex.modle.RequestParams.RequestJSParams;
 import com.jdjz.weex.modle.entity.LBSEntity;
 import com.jdjz.weex.modle.entity.NetworkStatusEntity;
-import com.jdjz.weex.modle.RequestScanParams.RequestScanParams;
+import com.jdjz.weex.modle.RequestParams.RequestScanParams;
 import com.jdjz.weex.modle.entity.ScanEntity;
 import com.jdjz.weex.modle.entity.Street;
 import com.jdjz.weex.modle.entity.SystemInfoEntity;
@@ -74,7 +73,6 @@ import org.json.JSONException;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.time.temporal.JulianFields;
 import java.util.ArrayList;
 
 import io.github.xudaojie.qrcodelib.CaptureActivity;
@@ -825,6 +823,7 @@ public class WXWebViewJsBridge implements IWebView {
         });
         requestFromNativeTypeStartAutoLBS();
         requestFromNativeTypeOpenEnterpriseChat();
+        requestFromNativeTypeOpenUserProfile();
         mWebView.send("hello");
     }
 
@@ -1046,6 +1045,34 @@ public class WXWebViewJsBridge implements IWebView {
 
         });
     }
+
+    /**
+     * 打开个人信息页
+     */
+    public void requestFromNativeTypeOpenUserProfile(){
+        mWebView.registerHandler("requestFromNativeTypeOpenUserProfile", new BridgeHandler() {
+
+            @Override
+            public void handler(String data, CallBackFunction function) {
+                JUtils.Log("handler = requestFromNativeTypeOpenUserProfile, data from web = " + data);
+                RequestUserProfileParams  requestUserProfileParams= new RequestUserProfileParams();
+                requestUserProfileParams = new Gson().fromJson(data,RequestUserProfileParams.class);
+               // String[] listUserIds = requestEnterpriseChatParams.getUserIds().split(";");
+                Intent intent = new Intent(mContext, UserProfileActivity.class);
+                intent.putExtra("type",requestUserProfileParams.getType());
+                intent.putExtra("userid",requestUserProfileParams.getUserid());
+                mContext.startActivity(intent);
+                ResultTemp resultTemp = new ResultTemp();
+                resultTemp.setResponseCode(ModleConfig.RES200);
+                resultTemp.setResponseMsg(ModleConfig.RES_SUCCESS);
+                function.onCallBack(new Gson().toJson(resultTemp));
+            }
+
+        });
+    }
+
+
+
 
 
 }

@@ -93,6 +93,17 @@
 
      <input type="button" id="id_openEnterprisechat" value="创建会话" onclick="openEnterpriseChat()"/>
 <hr style="height:1px;border:none;border-top:3px solid #FF4081;"/>
+     <br>
+     1表示该userid是企业成员<br>
+     <input type="text" id="type2" /><br>
+      <br>
+      可以是企业成员的id <br>
+     <input type="text" id="userid" /><br>
+      <br>
+     <input type="button" id="id_openuserprofile" value="打开个人信息页" onclick="openUserProfile()"/>
+<hr style="height:1px;border:none;border-top:3px solid #FF4081;"/>
+<hr style="height:1px;border:none;border-top:3px solid #FF4081;"/>
+<hr style="height:1px;border:none;border-top:3px solid #FF4081;"/>
 <p>
     <input type="button" id="id_multicontacts" value="获取多个联系人" onclick="getMultiContacts();"/>
     <input type="button" id="id_singlecontact" value="获取单个联系人" onclick="getSingleContacts();"/>
@@ -272,6 +283,21 @@
                        , {'userIds':userIds,'groupName':groupName}
                        , function(responseData) {
                            document.getElementById("show").innerHTML = "openEnterpriseChat:" + responseData
+                           //alert(responseData);
+                       }
+                   );
+               }
+
+        function openUserProfile() {
+            var　type =  document.getElementById("type2").value;
+            var userid = document.getElementById("userid").value;
+
+                   //send message to native
+                   window.WebViewJavascriptBridge.callHandler(
+                       'requestFromNativeTypeOpenUserProfile'
+                       , {'type':type,'userid':userid}
+                       , function(responseData) {
+                           document.getElementById("show").innerHTML = "openUserProfile:" + responseData
                            //alert(responseData);
                        }
                    );

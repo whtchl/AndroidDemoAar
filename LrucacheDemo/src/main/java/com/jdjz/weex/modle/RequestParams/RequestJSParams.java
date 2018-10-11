@@ -1,4 +1,4 @@
-package com.jdjz.weex.modle.RequestScanParams;
+package com.jdjz.weex.modle.RequestParams;
 
 public class RequestJSParams {
    private String param;
