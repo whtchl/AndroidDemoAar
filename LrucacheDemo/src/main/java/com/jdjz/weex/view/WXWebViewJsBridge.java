@@ -43,6 +43,7 @@ import com.jdjz.weex.jsbridge.BridgeWebViewClient;
 import com.jdjz.weex.jsbridge.CallBackFunction;
 import com.jdjz.weex.jsbridge.DefaultHandler;
 import com.jdjz.weex.modle.ModleConfig;
+import com.jdjz.weex.modle.RequestScanParams.RequestEnterpriseChatParams;
 import com.jdjz.weex.modle.RequestScanParams.RequestLBSParams;
 import com.jdjz.weex.modle.RequestScanParams.RequestLBSWGS84_GCJ02Params;
 import com.jdjz.weex.modle.ResultContact;
@@ -470,7 +471,7 @@ public class WXWebViewJsBridge implements IWebView {
 
 
         //模拟用户信息 获取本地位置，用户名返回给html
-        User user = new User();
+       /* User user = new User();
         user.setLocation("上海");
         user.setName("Bruce");
         // 回调 "functionInJs"
@@ -481,7 +482,7 @@ public class WXWebViewJsBridge implements IWebView {
                 Toast.makeText(mContext, "网页在获取你的位置!!!，"+ data, Toast.LENGTH_SHORT).show();
 
             }
-        });
+        });*/
 
         //NativeToJSstartAutoLBS(10);
 
@@ -823,6 +824,7 @@ public class WXWebViewJsBridge implements IWebView {
 
         });
         requestFromNativeTypeStartAutoLBS();
+        requestFromNativeTypeOpenEnterpriseChat();
         mWebView.send("hello");
     }
 
@@ -1024,11 +1026,26 @@ public class WXWebViewJsBridge implements IWebView {
             }
 
         });
-
-
     }
 
+    /**
+     * 创建会话
+     */
+    public void requestFromNativeTypeOpenEnterpriseChat(){
+        mWebView.registerHandler("requestFromNativeTypeOpenEnterpriseChat", new BridgeHandler() {
 
+            @Override
+            public void handler(String data, CallBackFunction function) {
+                JUtils.Log("handler = requestFromNativeTypeOpenEnterpriseChat, data from web = " + data);
+                RequestEnterpriseChatParams requestEnterpriseChatParams = new RequestEnterpriseChatParams();
+                requestEnterpriseChatParams = new Gson().fromJson(data,RequestEnterpriseChatParams.class);
+                String[] listUserIds = requestEnterpriseChatParams.getUserIds().split(";");
+
+                function.onCallBack("未确定用哪家的IM");
+            }
+
+        });
+    }
 
 
 }

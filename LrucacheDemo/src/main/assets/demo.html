@@ -22,11 +22,11 @@
     <input type="text" id="token" value="token"/>
     <input type="button" id="id_settoken" value="设置token" onclick="setToken();"/>
 </p>
-<hr style="height:1px;border:none;border-top:1px solid #FF4081;"/>
+<hr style="height:1px;border:none;border-top:3px solid #FF4081;"/>
 <br>
 <input type="button" id="id_getnetworkstatus" value="获取网络状态" onclick="getNetworkStatus();"/>
 
-<hr style="height:1px;border:none;border-top:1px solid #FF4081;"/>
+<hr style="height:1px;border:none;border-top:3px solid #FF4081;"/>
 <br>
 <p>
     <input type="number" id="phoneNumber" value="输入电话号码"/>
@@ -34,10 +34,10 @@
 </p>
 
 
-<hr style="height:1px;border:none;border-top:1px solid #FF4081;"/>
+<hr style="height:1px;border:none;border-top:3px solid #FF4081;"/>
 <br>
 <input type="button" id="id_getSystemInfo" value="获取设备信息" onclick="getSystemInfo();"/>
-<hr style="height:1px;border:none;border-top:1px solid #FF4081;"/>
+<hr style="height:1px;border:none;border-top:3px solid #FF4081;"/>
 <br>
 <p>
     输入日期格式：1. yyyy-MM-zz（默认） 2. HH:mm 3. yyyy-MM-zz HH:mm<br>
@@ -60,7 +60,7 @@
     <input type="button" id="id_datepicker" value="选择日期时间" onclick="datePicker1()"/>
 </p>
 
-<hr style="height:1px;border:none;border-top:1px solid #FF4081;"/>
+<hr style="height:1px;border:none;border-top:3px solid #FF4081;"/>
 <br>
 
 <p>
@@ -70,7 +70,7 @@
 
 </p>
 
-<hr style="height:3px;border:none;border-top:5px solid #FF4081;"/>
+<hr style="height:3px;border:none;border-top:3px solid #FF4081;"/>
     <br>
     持续定位流程：startAutoLBS()->stopAutoLBS()<br>
     <input type="hidden" id="lbs_type" hint="wgs84/gcj02"/>
@@ -83,9 +83,16 @@
     <input type="text" id="type" /><br> <br>
 
      <input type="button" id="id_getlocation" value="获取一次地理位置信息" onclick="getLocation()"/>
-<hr style="height:1px;border:none;border-top:1px solid #FF4081;"/>
+<hr style="height:1px;border:none;border-top:3px solid #FF4081;"/>
+     <br>
+     参与会话的企业成员列表，格式为userid1;userid2;…，用分号隔开 <br>
+     <input type="text" id="userIds"/><br>
 
-<hr style="height:1px;border:none;border-top:1px solid #FF4081;"/>
+     会话名称。单聊时该参数传入空字符串””即可 <br>
+     <input type="text" id="groupName"/><br>
+
+     <input type="button" id="id_openEnterprisechat" value="创建会话" onclick="openEnterpriseChat()"/>
+<hr style="height:1px;border:none;border-top:3px solid #FF4081;"/>
 <p>
     <input type="button" id="id_multicontacts" value="获取多个联系人" onclick="getMultiContacts();"/>
     <input type="button" id="id_singlecontact" value="获取单个联系人" onclick="getSingleContacts();"/>
@@ -255,7 +262,20 @@
                    );
                }
 
+        function openEnterpriseChat() {
+            var　userIds =  document.getElementById("userIds").value;
+            var groupName = document.getElementById("groupName").value;
 
+                   //send message to native
+                   window.WebViewJavascriptBridge.callHandler(
+                       'requestFromNativeTypeOpenEnterpriseChat'
+                       , {'userIds':userIds,'groupName':groupName}
+                       , function(responseData) {
+                           document.getElementById("show").innerHTML = "openEnterpriseChat:" + responseData
+                           //alert(responseData);
+                       }
+                   );
+               }
 
         function getMultiContacts() {
             var str = 'multi'
