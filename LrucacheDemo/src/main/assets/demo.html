@@ -102,14 +102,19 @@
       <br>
      <input type="button" id="id_openuserprofile" value="打开个人信息页" onclick="openUserProfile()"/>
 <hr style="height:1px;border:none;border-top:3px solid #FF4081;"/>
-<hr style="height:1px;border:none;border-top:3px solid #FF4081;"/>
-<hr style="height:1px;border:none;border-top:3px solid #FF4081;"/>
+
 <p>
+    <br>
+    选择模式，”single”表示单选，”multi”表示多选<br>
+    <input type="text" id="contacts" /><br>
+    <br>
+    <input type="button" id="id_contacts" value="获取联系人" onclick="getContacts();"/>
     <input type="button" id="id_multicontacts" value="获取多个联系人" onclick="getMultiContacts();"/>
     <input type="button" id="id_singlecontact" value="获取单个联系人" onclick="getSingleContacts();"/>
 </p>
 
-
+<hr style="height:1px;border:none;border-top:3px solid #FF4081;"/>
+<hr style="height:1px;border:none;border-top:3px solid #FF4081;"/>
 <p>
     <input type="text" id="text1" value="用户名(username)"/>
 </p>
@@ -302,6 +307,19 @@
                        }
                    );
                }
+
+        function getContacts() {
+            var str = document.getElementById("contacts").value;
+            //send message to native
+            window.WebViewJavascriptBridge.callHandler(
+                'requestFromNativeTypeContacts'
+                , {'contacts':str}
+                , function(responseData) {
+                    document.getElementById("show").innerHTML = " getContacts:" + responseData
+                    //alert(responseData);
+                }
+            );
+        }
 
         function getMultiContacts() {
             var str = 'multi'

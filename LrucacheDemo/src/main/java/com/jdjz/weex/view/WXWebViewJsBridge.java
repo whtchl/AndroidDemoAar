@@ -42,11 +42,13 @@ import com.jdjz.weex.jsbridge.BridgeWebViewClient;
 import com.jdjz.weex.jsbridge.CallBackFunction;
 import com.jdjz.weex.jsbridge.DefaultHandler;
 import com.jdjz.weex.modle.ModleConfig;
+import com.jdjz.weex.modle.RequestParams.RequestContactsParams;
 import com.jdjz.weex.modle.RequestParams.RequestEnterpriseChatParams;
 import com.jdjz.weex.modle.RequestParams.RequestLBSParams;
 import com.jdjz.weex.modle.RequestParams.RequestLBSWGS84_GCJ02Params;
 import com.jdjz.weex.modle.RequestParams.RequestUserProfileParams;
 import com.jdjz.weex.modle.ResultContact;
+import com.jdjz.weex.modle.ResultContacts;
 import com.jdjz.weex.modle.ResultDate;
 import com.jdjz.weex.modle.ResultLBS;
 import com.jdjz.weex.modle.ResultNetworkStatus;
@@ -535,7 +537,7 @@ public class WXWebViewJsBridge implements IWebView {
 
         });
 
-        mWebView.registerHandler("requestFromNativeTypeContacts", new BridgeHandler() {
+/*        mWebView.registerHandler("requestFromNativeTypeContacts", new BridgeHandler() {
 
             @Override
             public void handler(String data, CallBackFunction function) {
@@ -571,7 +573,7 @@ public class WXWebViewJsBridge implements IWebView {
 
                 callBackFunction = function;
             }
-        });
+        });*/
 
 
         //获取网络状态
@@ -824,6 +826,7 @@ public class WXWebViewJsBridge implements IWebView {
         requestFromNativeTypeStartAutoLBS();
         requestFromNativeTypeOpenEnterpriseChat();
         requestFromNativeTypeOpenUserProfile();
+        requestFromNativeTypeContacts();
         mWebView.send("hello");
     }
 
@@ -908,7 +911,11 @@ public class WXWebViewJsBridge implements IWebView {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(ContactEvent event) {
         ArrayList<ContactInfo> contactInfos = event.getContactInfos();
-        callBackFunction.onCallBack(contactInfos.size()+" 个");
+        ResultContacts resultContacts = new ResultContacts();
+        resultContacts.setResponseCode(ModleConfig.RES200);
+        resultContacts.setResponseMsg(ModleConfig.RES_SUCCESS);
+        resultContacts.setContactInfoArrayList(contactInfos);
+        callBackFunction.onCallBack(new Gson().toJson(resultContacts));
         /*Collections.sort(contactInfos, new Comparator<ContactInfo>() {
             @Override
             public int compare(ContactInfo o1, ContactInfo o2) {
@@ -1071,7 +1078,51 @@ public class WXWebViewJsBridge implements IWebView {
         });
     }
 
+    /**
+     * 获取联系人
+     */
+    public void requestFromNativeTypeContacts(){
+        mWebView.registerHandler("requestFromNativeTypeContacts", new BridgeHandler() {
 
+            @Override
+            public void handler(String data, CallBackFunction function) {
+                JUtils.Log("handler = requestFromNativeTypeContacts, data from web = " + data);
+                RequestContactsParams requestContactsParams = new RequestContactsParams();
+                requestContactsParams = new Gson().fromJson(data,RequestContactsParams.class);
+                String str2 ;//= new Gson().toJson(resultToken);
+                ResultContact resultContact = new ResultContact();
+                if(TextUtils.isEmpty(requestContactsParams.getContacts())){
+                    JUtils.Log("404");
+                    resultContact.setResponseCode(ModleConfig.RES404);
+                    resultContact.setResponseMsg("输入参数为空");
+                    resultContact.setResponseResult(null);
+                    str2 =  new Gson().toJson(resultContact);
+                    function.onCallBack(str2);
+                    return;
+                }else if(requestContactsParams.getContacts().equals(ModleConfig.RESMULIT)){
+                    JUtils.Log("RESMULIT");
+                    Intent intent = new Intent(mContext, ContactListActivity.class);
+                    intent.putExtra(ChooseModel.CHOOSEMODEL,ChooseModel.MODEL_MULTI);
+                    mContext.startActivity(intent);
+
+
+                }else if(requestContactsParams.getContacts().equals(ModleConfig.RESSINGLE)){
+                    JUtils.Log("RESSINGLE");
+                    Intent intent = new Intent(mContext, ContactListActivity.class);
+                    intent.putExtra(ChooseModel.CHOOSEMODEL,ChooseModel.MODEL_SINGLE);
+                    mContext.startActivity(intent);
+                }
+
+               /* JUtils.Log("RESMULIT");
+                Intent intent = new Intent(mContext, ContactListActivity.class);
+                intent.putExtra(ChooseModel.CHOOSEMODEL,ChooseModel.MODEL_MULTI);
+                mContext.startActivity(intent)*/;
+
+                callBackFunction = function;
+            }
+
+        });
+    }
 
 
 
