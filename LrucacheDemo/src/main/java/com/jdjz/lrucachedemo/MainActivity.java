@@ -18,7 +18,13 @@ import com.jdjz.contacts.ContactsActivity;
 import com.jdjz.db.DBActivity;
 import com.jdjz.testConfig.SealConst;
 import com.jdjz.weex.WXPageActivity;
+import com.jdjz.weex.modle.PreviewImagesData;
 import com.jude.utils.JUtils;
+import com.whamu2.previewimage.Preview;
+import com.whamu2.previewimage.entity.Image;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -35,6 +41,8 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.btn_weex)
     Button btnWeex;
 
+    @BindView(R.id.btn_preview_image)
+    Button btnPreviewImage;
     private BroadcastReceiver batteryLevelRcvr;
     private IntentFilter batteryLevelFilter;
     @Override
@@ -105,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    @OnClick({R.id.btn_lrucache, R.id.btn_contacts, R.id.btn_db,R.id.btn_weex})
+    @OnClick({R.id.btn_lrucache, R.id.btn_contacts, R.id.btn_db,R.id.btn_weex,R.id.btn_preview_image})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_lrucache:
@@ -125,6 +133,79 @@ public class MainActivity extends AppCompatActivity {
                 }
                 intent.putExtra("from", "splash");
                 startActivity(intent);
+                break;
+            case R.id.btn_preview_image:
+                //imageView.setImageDrawable(this.getDrawable(R.drawable.jpg));
+                List<PreviewImagesData> datas = new ArrayList<>();
+
+                PreviewImagesData previewImagesData = new PreviewImagesData();
+                previewImagesData.setOriginUrl("/sdcard/jpg.jpg");
+                previewImagesData.setThumbnailUrl("/sdcard/jpg.jpg");
+                datas.add(previewImagesData);
+
+                previewImagesData = new PreviewImagesData();
+                previewImagesData.setOriginUrl("/sdcard/jpg.jpg");
+                previewImagesData.setThumbnailUrl("/sdcard/jpg.jpg");
+                datas.add(previewImagesData);
+
+
+
+                previewImagesData = new PreviewImagesData();
+                previewImagesData.setOriginUrl("http://img6.16fan.com/attachments/wenzhang/201805/18/152660818127263ge.jpeg");
+                previewImagesData.setThumbnailUrl("http://img3.16fan.com/live/origin/201805/21/E421b24c08446.jpg");
+                datas.add(previewImagesData);
+
+                previewImagesData = new PreviewImagesData();
+                previewImagesData.setOriginUrl("http://img6.16fan.com/attachments/wenzhang/201805/18/152660818716180ge.jpeg");
+                previewImagesData.setThumbnailUrl("http://img3.16fan.com/live/origin/201805/21/4D7B35fdf082e.jpg");
+                datas.add(previewImagesData);
+
+                previewImagesData = new PreviewImagesData();
+                previewImagesData.setOriginUrl("http://img6.16fan.com/attachments/wenzhang/201805/18/152660818716180ge.jpeg");
+                previewImagesData.setThumbnailUrl("http://img3.16fan.com/live/origin/201805/21/2D02ebc5838e6.jpg");
+                datas.add(previewImagesData);
+
+                previewImagesData = new PreviewImagesData();
+                previewImagesData.setOriginUrl("http://img6.16fan.com/attachments/wenzhang/201805/18/152660818127263ge.jpeg");
+                previewImagesData.setThumbnailUrl("http://img3.16fan.com/live/origin/201805/21/14C5e483e7583.jpg");
+                datas.add(previewImagesData);
+
+              /*  data = new PreviewImagesData();
+                data.setOriginUrl("http://img6.16fan.com/attachments/wenzhang/201805/18/152660818716180ge.jpeg");
+                data.setThumbnailUrl("http://img3.16fan.com/live/origin/201805/21/A1B17c5f59b78.jpg");
+                datas.add(data);
+
+                data = new PreviewImagesData();
+                data.setOriginUrl("http://img6.16fan.com/attachments/wenzhang/201805/18/152660818127263ge.jpeg");
+                data.setThumbnailUrl("http://img3.16fan.com/live/origin/201805/21/94699b2be3cfa.jpg");
+                datas.add(data);
+
+                data = new PreviewImagesData();
+                data.setThumbnailUrl("http://img3.16fan.com/live/origin/201805/21/EB298ce595dd2.jpg");
+                datas.add(data);
+
+                data = new PreviewImagesData();
+                data.setThumbnailUrl("http://img3.16fan.com/live/origin/201805/21/264Ba4860d469.jpg");
+                datas.add(data);*/
+
+
+                List<Image> images = new ArrayList<>();
+                for (PreviewImagesData d : datas) {
+                    Image image = new Image();
+                    image.setOriginUrl(d.getOriginUrl());
+                    image.setThumbnailUrl(d.getThumbnailUrl());
+                    images.add(image);
+                }
+
+                Preview.with(MainActivity.this)
+                        .builder()
+                        .load(images)
+                        .displayCount(true)
+                        .markPosition(0)
+                        .showDownload(true)
+                        .showOriginImage(true)
+                        .downloadLocalPath("Preview")
+                        .show();
                 break;
         }
     }

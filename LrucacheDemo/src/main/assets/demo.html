@@ -103,14 +103,23 @@
      <input type="button" id="id_openuserprofile" value="打开个人信息页" onclick="openUserProfile()"/>
 <hr style="height:1px;border:none;border-top:3px solid #FF4081;"/>
 
+        current 图片 <input type="text" id="currenturl" value="http://img3.16fan.com/live/origin/201805/21/E421b24c08446.jpg"/><br>
+        第二张图片  "http://img3.16fan.com/live/origin/201805/21/14C5e483e7583.jpg" <br>
+        第三张图片  "http://img3.16fan.com/live/origin/201805/21/4D7B35fdf082e.jpg"<br>
+        第四张图片 "http://img3.16fan.com/live/origin/201805/21/2D02ebc5838e6.jpg"<br>
+        第五张图片  "/sdcard/jpg.jpg"<br><br>
+        <input type="button" id="id_reqpreviewimage" value="预览图片" onclick="reqGetImageInfo()"/>
+
+<hr style="height:1px;border:none;border-top:3px solid #FF4081;"/>
+<hr style="height:1px;border:none;border-top:3px solid #FF4081;"/>
 <p>
     <br>
     选择模式，”single”表示单选，”multi”表示多选<br>
     <input type="text" id="contacts" /><br>
     <br>
     <input type="button" id="id_contacts" value="获取联系人" onclick="getContacts();"/>
-    <input type="button" id="id_multicontacts" value="获取多个联系人" onclick="getMultiContacts();"/>
-    <input type="button" id="id_singlecontact" value="获取单个联系人" onclick="getSingleContacts();"/>
+    <input type="hidden" id="id_multicontacts" value="获取多个联系人" onclick="getMultiContacts();"/>
+    <input type="hidden" id="id_singlecontact" value="获取单个联系人" onclick="getSingleContacts();"/>
 </p>
 
 <hr style="height:1px;border:none;border-top:3px solid #FF4081;"/>
@@ -139,8 +148,10 @@
 
 <p>
     <input type="file" id="open" value="打开文件1" onclick="onOpen();"/>
-</p><img id="pic" src="" width="100%" height="auto"/>
-
+</p>
+<img id="pic_jgp" src="http://juziwalk.cn/jsbridge/jpg.jpg" width="170px" height="170px">网络图片jpg</td>
+<br>
+<img id="pic_png" src="http://juziwalk.cn/jsbridge/png.png" width="170px" height="170px">网络图片png</td>
 </body>
 <script>
 
@@ -306,6 +317,22 @@
                            //alert(responseData);
                        }
                    );
+               }
+        function reqGetImageInfo(){
+                var current  =  document.getElementById("currenturl").value;
+                //var id2 =  "http://img3.16fan.com/live/origin/201805/21/E421b24c08446.jpg";
+
+                var arraylist= new Array(current,current,current);
+                 //send message to native
+                   window.WebViewJavascriptBridge.callHandler(
+                       'reqGetImageInfo'
+                       , {'current':current}
+                       , function(responseData) {
+                           document.getElementById("show").innerHTML = "reqGetImageInfo:" + responseData
+                           //alert(responseData);
+                       }
+                   );
+
                }
 
         function getContacts() {

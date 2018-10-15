@@ -28,6 +28,7 @@ import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
 import com.amap.api.location.AMapLocationListener;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.jdjz.common.TransScanEntity;
 import com.jdjz.contact.ChooseModel;
 import com.jdjz.contact.ContactInfo;
@@ -42,16 +43,19 @@ import com.jdjz.weex.jsbridge.BridgeWebViewClient;
 import com.jdjz.weex.jsbridge.CallBackFunction;
 import com.jdjz.weex.jsbridge.DefaultHandler;
 import com.jdjz.weex.modle.ModleConfig;
+import com.jdjz.weex.modle.PreviewImagesData;
 import com.jdjz.weex.modle.RequestParams.RequestContactsParams;
 import com.jdjz.weex.modle.RequestParams.RequestEnterpriseChatParams;
 import com.jdjz.weex.modle.RequestParams.RequestLBSParams;
 import com.jdjz.weex.modle.RequestParams.RequestLBSWGS84_GCJ02Params;
+import com.jdjz.weex.modle.RequestParams.RequestPreviewImageParams;
 import com.jdjz.weex.modle.RequestParams.RequestUserProfileParams;
 import com.jdjz.weex.modle.ResultContact;
 import com.jdjz.weex.modle.ResultContacts;
 import com.jdjz.weex.modle.ResultDate;
 import com.jdjz.weex.modle.ResultLBS;
 import com.jdjz.weex.modle.ResultNetworkStatus;
+import com.jdjz.weex.modle.ResultPreviewImages;
 import com.jdjz.weex.modle.ResultScan;
 import com.jdjz.weex.modle.ResultSystemInfo;
 import com.jdjz.weex.modle.ResultTemp;
@@ -67,15 +71,17 @@ import com.jdjz.weex.modle.entity.SystemInfoEntity;
 import com.jude.utils.JUtils;
 import com.taobao.weex.ui.view.IWebView;
 import com.taobao.weex.utils.WXLogUtils;
+import com.whamu2.previewimage.Preview;
+import com.whamu2.previewimage.entity.Image;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-import org.json.JSONException;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.List;
 
 import io.github.xudaojie.qrcodelib.CaptureActivity;
 
@@ -708,7 +714,7 @@ public class WXWebViewJsBridge implements IWebView {
                 DateDialog dateDialog = new DateDialog(mContext, "时间日期", mode, dateEntity.getCurrentDate(), dateEntity.getStartDate(), dateEntity.getEnzzate(),
                         new DateDialog.InterfaceDateDialog() {
                             @Override
-                            public void getTime(String dateTime) throws JSONException {
+                            public void getTime(String dateTime)  {
                                 if (TextUtils.isEmpty(dateTime)) {
                                     resultDate.setResponseCode(ModleConfig.RES404);
 
@@ -827,6 +833,7 @@ public class WXWebViewJsBridge implements IWebView {
         requestFromNativeTypeOpenEnterpriseChat();
         requestFromNativeTypeOpenUserProfile();
         requestFromNativeTypeContacts();
+        reqGetImageInfo();
         mWebView.send("hello");
     }
 
@@ -1115,6 +1122,7 @@ public class WXWebViewJsBridge implements IWebView {
 
                /* JUtils.Log("RESMULIT");
                 Intent intent = new Intent(mContext, ContactListActivity.class);
+                Intent intent = new Intent(mContext, ContactListActivity.class);
                 intent.putExtra(ChooseModel.CHOOSEMODEL,ChooseModel.MODEL_MULTI);
                 mContext.startActivity(intent)*/;
 
@@ -1125,5 +1133,138 @@ public class WXWebViewJsBridge implements IWebView {
     }
 
 
+    /**
+     * 预览图片
+     */
+    public void reqGetImageInfo(){
+        mWebView.registerHandler("reqGetImageInfo", new BridgeHandler() {
+
+            @Override
+            public void handler(String data, CallBackFunction function) {
+                JUtils.Log("handler = reqGetImageInfo, data from web = " + data);
+
+                Gson gs = new GsonBuilder()
+                        .setPrettyPrinting()
+                        .disableHtmlEscaping()
+                        .create();
+
+                RequestPreviewImageParams requestPreviewImageParams = new RequestPreviewImageParams();
+                requestPreviewImageParams = gs.fromJson(data,RequestPreviewImageParams.class);
+
+                //JSONObject.parseObject(entry.getValue().toString());
+               /* try {
+                    JSONObject jsonObject = new JSONObject(data);
+
+                    requestPreviewImageParams =  (RequestPreviewImageParams)JSONObject.toBean(jsonObject, RequestPreviewImageParams.class);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }*/
+
+                        //new Gson().fromJson(data,RequestPreviewImageParams.class);
+
+                List<PreviewImagesData> datas = new ArrayList<>();
+
+                PreviewImagesData previewImagesData = new PreviewImagesData();
+                previewImagesData.setOriginUrl("http://img3.16fan.com/live/origin/201805/21/E421b24c08446.jpg");
+                previewImagesData.setThumbnailUrl("http://img3.16fan.com/live/origin/201805/21/E421b24c08446.jpg");
+                datas.add(previewImagesData);
+
+
+                previewImagesData = new PreviewImagesData();
+                previewImagesData.setOriginUrl("http://img3.16fan.com/live/origin/201805/21/14C5e483e7583.jpg");
+                previewImagesData.setThumbnailUrl("http://img3.16fan.com/live/origin/201805/21/14C5e483e7583.jpg");
+                datas.add(previewImagesData);
+
+                previewImagesData = new PreviewImagesData();
+                previewImagesData.setOriginUrl("http://img3.16fan.com/live/origin/201805/21/4D7B35fdf082e.jpg");
+                previewImagesData.setThumbnailUrl("http://img3.16fan.com/live/origin/201805/21/4D7B35fdf082e.jpg");
+                datas.add(previewImagesData);
+
+                previewImagesData = new PreviewImagesData();
+                previewImagesData.setOriginUrl("http://img3.16fan.com/live/origin/201805/21/2D02ebc5838e6.jpg");
+                previewImagesData.setThumbnailUrl("http://img3.16fan.com/live/origin/201805/21/2D02ebc5838e6.jpg");
+                datas.add(previewImagesData);
+
+                previewImagesData = new PreviewImagesData();
+                previewImagesData.setOriginUrl("/sdcard/jpg.jpg");
+                previewImagesData.setThumbnailUrl("/sdcard/jpg.jpg");
+                datas.add(previewImagesData);
+
+                PreviewImagesData current = new PreviewImagesData();
+                current.setOriginUrl(requestPreviewImageParams.getCurrent());
+                current.setThumbnailUrl(requestPreviewImageParams.getCurrent());
+
+
+                int i=0;
+                int currentNumber=0;
+                List<Image> images = new ArrayList<>();
+                for (PreviewImagesData d : datas) {
+                    Image image = new Image();
+                    image.setOriginUrl(d.getOriginUrl());
+                    image.setThumbnailUrl(d.getThumbnailUrl());
+                    images.add(image);
+                    i++;
+                    if(d.equals(current)){
+                        JUtils.Log("list 中找到了这个current image：是第"+i+"个");
+                        currentNumber = i-1;
+                    }
+                }
+
+                Preview.with(mContext)
+                        .builder()
+                        .load(images)
+                        .displayCount(true)
+                        .markPosition(currentNumber)
+                        .showDownload(false)
+                        .showOriginImage(false)
+                        .downloadLocalPath("Preview")
+                        .show();
+
+                /*if(datas.contains(current)){
+                    JUtils.Log("数组包含了这个current url image");
+
+                    //查找current是第几个值
+                    for(int i=0;i<datas.size();i++){
+
+                    }
+
+                    int i=0;
+                    int currentNumber=0;
+                    List<Image> images = new ArrayList<>();
+                    for (PreviewImagesData d : datas) {
+                        Image image = new Image();
+                        image.setOriginUrl(d.getOriginUrl());
+                        image.setThumbnailUrl(d.getThumbnailUrl());
+                        images.add(image);
+                        i++;
+                        if(d.equals(current)){
+                            JUtils.Log("list 中找到了这个current image：是第"+i+"个");
+                            currentNumber = i-1;
+                        }
+                    }
+
+                    Preview.with(mContext)
+                            .builder()
+                            .load(images)
+                            .displayCount(true)
+                            .markPosition(currentNumber)
+                            .showDownload(true)
+                            .showOriginImage(true)
+                            .downloadLocalPath("Preview")
+                            .show();
+
+                }else{
+                    JUtils.Log("数组没有包含这个current url image");
+                    ResultPreviewImages resultPreviewImages = new ResultPreviewImages();
+                    resultPreviewImages.setResponseCode(ModleConfig.RES404);
+                    resultPreviewImages.setResponseMsg("current 不在 urls中");
+                    function.onCallBack(new Gson().toJson(requestPreviewImageParams));
+                }*/
+
+
+            }
+
+        });
+    }
 
 }

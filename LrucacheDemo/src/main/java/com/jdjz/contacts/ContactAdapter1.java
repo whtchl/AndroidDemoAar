@@ -63,10 +63,11 @@ public class ContactAdapter1 extends RecyclerView.Adapter<ContactAdapter1.MyView
         //加载联系人头像
         Glide.with(context)
                 .load(ContactsUtils.getPhotoByte(context, contactInfo.getContactId()))
-                .transform(new GlideCircleTransform(context))
+                .into(holder.iv);
+                /*.transform(new GlideCircleTransform(context))
                 .placeholder(R.mipmap.ic_launcher)
                 .error(R.mipmap.ic_launcher)
-                .into(holder.iv);
+                .into(holder.iv);*/
     }
 
     @Override

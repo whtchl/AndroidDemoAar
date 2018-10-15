@@ -12,6 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
 import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
@@ -78,12 +79,21 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.MyViewHo
         }
 
         //加载联系人头像
-        Glide.with(context)
+        /*Glide.with(context)
                 .load(ContactsUtils.getPhotoByte(context, contactInfo.getContactId()))
                 .transform(new GlideCircleTransform(context))
                 .placeholder(R.drawable.ic_launcher)
                 .error(R.drawable.ic_launcher)
-                .into(holder.iv);
+                .into(holder.iv);*/
+        /*Glide.with(context)
+                .load(ContactsUtils.getPhotoByte(context, contactInfo.getContactId()))
+                .transform(new GlideCircleTransform(context))
+                .into(holder.iv);*/
+        /*Glide.with(context)
+                .load("http://img6.16fan.com/attachments/wenzhang/201805/18/152660818127263ge.jpeg")
+                .into(holder.iv);*/
+
+       // Glide.with(context).load("file:///mnt/sdcard/jpg.jpg").into(holder.iv);
 
         //条目点击事件
         holder.itemLayout.setOnClickListener(new View.OnClickListener() {
