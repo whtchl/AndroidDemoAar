@@ -2,9 +2,9 @@ package com.jdjz.weex.modle.RequestParams;
 
 import java.util.List;
 
-public class RequestPreviewImageParams {
+public class RequestPreviewImagesParams {
     private String current;
-
+    private List<String> urls;
 
     public String getCurrent() {
         return current;
@@ -14,4 +14,11 @@ public class RequestPreviewImageParams {
         this.current = current;
     }
 
+    public List<String> getUrls() {
+        return urls;
+    }
+
+    public void setUrls(List<String> urls) {
+        this.urls = urls;
+    }
 }

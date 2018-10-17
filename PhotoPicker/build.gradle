@@ -1,0 +1,46 @@
+apply plugin: 'com.android.library'
+
+android {
+  compileSdkVersion 28
+  buildToolsVersion '27.0.3'
+  resourcePrefix "__picker_"
+
+  dexOptions {
+    javaMaxHeapSize "4g"
+  }
+  defaultConfig {
+    minSdkVersion 14
+    targetSdkVersion 28
+  }
+  lintOptions {
+    abortOnError false
+  }
+}
+
+dependencies {
+  implementation "com.android.support:support-v4:${project.supportLibVersion}"
+  implementation "com.android.support:appcompat-v7:${project.supportLibVersion}"
+  implementation "com.android.support:design:${project.supportLibVersion}"
+  implementation "com.android.support:recyclerview-v7:${project.supportLibVersion}"
+  implementation "com.android.support:support-annotations:${project.supportLibVersion}"
+  implementation "com.github.bumptech.glide:glide:${project.glideLibVersion}"
+  //implementation 'org.greenrobot:eventbus:3.0.0'
+    compile "org.greenrobot:eventbus:${project.eventbusLibVersion}"
+
+    //鲁班压缩
+    implementation "top.zibin:Luban:${project.lubanLibVersion}"
+
+    implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
+    implementation 'io.reactivex.rxjava2:rxjava:2.1.6'
+
+}
+
+//apply plugin: 'com.novoda.bintray-release'
+//publish {
+//  userOrg = 'donglua'
+//  groupId = 'me.iwf.photopicker'
+//  artifactId = 'PhotoPicker'
+//  publishVersion = '0.9.12'
+//  desc = 'Photo Picker'
+//  website = 'https://github.com/donglua/PhotoPicker'
+//}

@@ -1,27 +1,35 @@
 package com.jdjz.lrucachedemo;
 
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.BatteryManager;
-import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.jdjz.contacts.ContactsActivity;
 import com.jdjz.db.DBActivity;
 import com.jdjz.testConfig.SealConst;
 import com.jdjz.weex.WXPageActivity;
 import com.jdjz.weex.modle.PreviewImagesData;
+import com.jdjz.weex.util.ImgUtil;
 import com.jude.utils.JUtils;
+import com.jude.utils.permission.PermissionListener;
+import com.jude.utils.permission.PermissionsUtil;
 import com.whamu2.previewimage.Preview;
 import com.whamu2.previewimage.entity.Image;
+
+import org.json.JSONArray;
+import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +37,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import me.iwf.photopicker.PhotoPicker;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -43,6 +52,11 @@ public class MainActivity extends AppCompatActivity {
 
     @BindView(R.id.btn_preview_image)
     Button btnPreviewImage;
+
+    @BindView(R.id.btn_choose_image)
+    Button btnChooseImage;
+
+
     private BroadcastReceiver batteryLevelRcvr;
     private IntentFilter batteryLevelFilter;
     @Override
@@ -113,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    @OnClick({R.id.btn_lrucache, R.id.btn_contacts, R.id.btn_db,R.id.btn_weex,R.id.btn_preview_image})
+    @OnClick({R.id.btn_lrucache, R.id.btn_contacts, R.id.btn_db,R.id.btn_weex,R.id.btn_preview_image,R.id.btn_choose_image,R.id.btn_saveimg_gallery})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_lrucache:
@@ -144,11 +158,9 @@ public class MainActivity extends AppCompatActivity {
                 datas.add(previewImagesData);
 
                 previewImagesData = new PreviewImagesData();
-                previewImagesData.setOriginUrl("/sdcard/jpg.jpg");
-                previewImagesData.setThumbnailUrl("/sdcard/jpg.jpg");
+                previewImagesData.setOriginUrl("/storage/emulated/0/jpg.jpg");
+                previewImagesData.setThumbnailUrl("/storage/emulated/0/jpg.jpg");
                 datas.add(previewImagesData);
-
-
 
                 previewImagesData = new PreviewImagesData();
                 previewImagesData.setOriginUrl("http://img6.16fan.com/attachments/wenzhang/201805/18/152660818127263ge.jpeg");
@@ -207,15 +219,53 @@ public class MainActivity extends AppCompatActivity {
                         .downloadLocalPath("Preview")
                         .show();
                 break;
+            case R.id.btn_choose_image:
+                PhotoPicker.builder()
+                        .setPhotoCount(9)
+                        .setGridColumnCount(4)
+                        .start(this);
+                break;
+            case R.id.btn_saveimg_gallery:
+              //  if(PermissionsUtil.checkReadStoragePermission(this)){
+              ///
+               // }
+                requestStorage();
+
+                break;
         }
     }
+
+
+    private void requestStorage() {
+        PermissionsUtil.requestPermission(this, new PermissionListener() {
+            @Override
+            public void permissionGranted(@NonNull String[] permissions) {
+                saveImage();
+            }
+
+            @Override
+            public void permissionDenied(@NonNull String[] permissions) {
+                Toast.makeText(MainActivity.this, "用户拒绝使用读写存储权限", Toast.LENGTH_LONG).show();
+            }
+        }, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE}, false, null);
+    }
+
+    void saveImage(){
+
+        String localPath = "/sdcard/jpg.jpg";
+        Bitmap bmp = BitmapFactory.decodeFile(localPath);
+        if(bmp!=null){
+            ImgUtil.saveImageToGallery(this,bmp);
+        }else{
+            JUtils.Log("bmp is null");
+        }
+
+    }
+
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         unregisterReceiver(batteryLevelRcvr);
     }
-
-
-
 }

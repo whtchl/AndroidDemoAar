@@ -1,14 +1,18 @@
 package com.jdjz.weex.view;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.net.http.SslError;
 import android.os.AsyncTask;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
@@ -35,6 +39,7 @@ import com.jdjz.contact.ContactInfo;
 import com.jdjz.contacts.ContactEvent;
 import com.jdjz.contacts.ContactListActivity;
 import com.jdjz.date.DateDialog;
+import com.jdjz.lrucachedemo.MainActivity;
 import com.jdjz.testConfig.SealConst;
 import com.jdjz.weex.activity.UserProfileActivity;
 import com.jdjz.weex.jsbridge.BridgeHandler;
@@ -44,31 +49,39 @@ import com.jdjz.weex.jsbridge.CallBackFunction;
 import com.jdjz.weex.jsbridge.DefaultHandler;
 import com.jdjz.weex.modle.ModleConfig;
 import com.jdjz.weex.modle.PreviewImagesData;
+import com.jdjz.weex.modle.RequestParams.RequestChooseImagesParams;
 import com.jdjz.weex.modle.RequestParams.RequestContactsParams;
 import com.jdjz.weex.modle.RequestParams.RequestEnterpriseChatParams;
 import com.jdjz.weex.modle.RequestParams.RequestLBSParams;
 import com.jdjz.weex.modle.RequestParams.RequestLBSWGS84_GCJ02Params;
-import com.jdjz.weex.modle.RequestParams.RequestPreviewImageParams;
+import com.jdjz.weex.modle.RequestParams.RequestPreviewImagesParams;
+import com.jdjz.weex.modle.RequestParams.RequestSaveImg;
 import com.jdjz.weex.modle.RequestParams.RequestUserProfileParams;
+import com.jdjz.weex.modle.ResultChooseImages;
 import com.jdjz.weex.modle.ResultContact;
 import com.jdjz.weex.modle.ResultContacts;
 import com.jdjz.weex.modle.ResultDate;
 import com.jdjz.weex.modle.ResultLBS;
 import com.jdjz.weex.modle.ResultNetworkStatus;
-import com.jdjz.weex.modle.ResultPreviewImages;
+import com.jdjz.weex.modle.ResultSaveImage;
 import com.jdjz.weex.modle.ResultScan;
 import com.jdjz.weex.modle.ResultSystemInfo;
 import com.jdjz.weex.modle.ResultTemp;
 import com.jdjz.weex.modle.ResultToken;
 import com.jdjz.weex.modle.RequestParams.ReuquestDateParams;
 import com.jdjz.weex.modle.RequestParams.RequestJSParams;
+import com.jdjz.weex.modle.entity.ChooseImagesFileInfoEntity;
 import com.jdjz.weex.modle.entity.LBSEntity;
 import com.jdjz.weex.modle.entity.NetworkStatusEntity;
 import com.jdjz.weex.modle.RequestParams.RequestScanParams;
 import com.jdjz.weex.modle.entity.ScanEntity;
 import com.jdjz.weex.modle.entity.Street;
 import com.jdjz.weex.modle.entity.SystemInfoEntity;
+import com.jdjz.weex.modle.entity.TempFile;
+import com.jdjz.weex.util.ImgUtil;
 import com.jude.utils.JUtils;
+import com.jude.utils.permission.PermissionListener;
+import com.jude.utils.permission.PermissionsUtil;
 import com.taobao.weex.ui.view.IWebView;
 import com.taobao.weex.utils.WXLogUtils;
 import com.whamu2.previewimage.Preview;
@@ -78,12 +91,14 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.io.File;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
 import io.github.xudaojie.qrcodelib.CaptureActivity;
+import me.iwf.photopicker.PhotoPicker;
 
 public class WXWebViewJsBridge implements IWebView {
 
@@ -106,6 +121,8 @@ public class WXWebViewJsBridge implements IWebView {
     private AMapLocationClient locationClient = null;
     private AMapLocationClientOption locationOption = null;
 
+    //选择照片的返回值
+    private ArrayList<String> selectedPhotos = new ArrayList<>();
     public WXWebViewJsBridge(Context context) {
         mContext = context;
 
@@ -500,8 +517,6 @@ public class WXWebViewJsBridge implements IWebView {
                 String str = "tchl 这是html返回给java的数据:" + data;
                 // 例如你可以对原始数据进行处理
                 str = str + ",Java经过处理后截取了一部分：" + str.substring(0, 5);
-                //Log.i(TAG, "handler = submitFromWeb, data from web = " + data);
-                //Toast.makeText(MainActivity.this, str, Toast.LENGTH_SHORT).show();
                 //回调返回给Js
                 function.onCallBack(str + ",Java经过处理后截取了一部分：" + str.substring(0, 5));
             }
@@ -542,45 +557,6 @@ public class WXWebViewJsBridge implements IWebView {
             }
 
         });
-
-/*        mWebView.registerHandler("requestFromNativeTypeContacts", new BridgeHandler() {
-
-            @Override
-            public void handler(String data, CallBackFunction function) {
-                JUtils.Log("handler = requestFromNativeTypeContacts, data from web = " + data);
-                String str2 ;//= new Gson().toJson(resultToken);
-                ResultContact resultContact = new ResultContact();
-                if(TextUtils.isEmpty(data)){
-                    JUtils.Log("404");
-                    resultContact.setResponseCode(ModleConfig.RES404);
-                    resultContact.setResponseMsg("输入参数为空");
-                    resultContact.setResponseResult(null);
-                    str2 =  new Gson().toJson(resultContact);
-                    function.onCallBack(str2);
-                   return;
-                }else if(data.equals(ModleConfig.RESMULIT)){
-                    JUtils.Log("RESMULIT");
-                    Intent intent = new Intent(mContext, ContactListActivity.class);
-                    intent.putExtra(ChooseModel.CHOOSEMODEL,ChooseModel.MODEL_MULTI);
-                    mContext.startActivity(intent);
-
-
-                }else if(data.equals(ModleConfig.RESSINGLE)){
-                    JUtils.Log("RESSINGLE");
-                    Intent intent = new Intent(mContext, ContactListActivity.class);
-                    intent.putExtra(ChooseModel.CHOOSEMODEL,ChooseModel.MODEL_SINGLE);
-                    mContext.startActivity(intent);
-                }
-
-                JUtils.Log("RESMULIT");
-                Intent intent = new Intent(mContext, ContactListActivity.class);
-                intent.putExtra(ChooseModel.CHOOSEMODEL,ChooseModel.MODEL_MULTI);
-                mContext.startActivity(intent);
-
-                callBackFunction = function;
-            }
-        });*/
-
 
         //获取网络状态
         mWebView.registerHandler("requestFromNativeNetworkStatus", new BridgeHandler() {
@@ -834,6 +810,8 @@ public class WXWebViewJsBridge implements IWebView {
         requestFromNativeTypeOpenUserProfile();
         requestFromNativeTypeContacts();
         reqGetImageInfo();
+        reqChooseImage();
+        reqSaveImageToPhotosAlbum();
         mWebView.send("hello");
     }
 
@@ -969,6 +947,37 @@ public class WXWebViewJsBridge implements IWebView {
         }
     }
 
+    /**
+     * 选择照片后返回值
+     * @param file
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEventMainThread(List<File> file) {
+        ResultChooseImages responseResult = new ResultChooseImages();
+        ChooseImagesFileInfoEntity chooseImagesFileInfoEntity = new ChooseImagesFileInfoEntity();
+        List<String> tempFilePaths = new ArrayList<>();
+        List<TempFile> tempFiles = new ArrayList<>();
+        for(int i=0; i<file.size();i++){
+            TempFile tempFile = new TempFile();
+            Log.i("tchl","selectedPhotos:"+file.get(i).getAbsolutePath());
+            tempFilePaths.add(file.get(i).getAbsolutePath());
+
+            tempFile.setPath(file.get(i).getAbsolutePath());
+            tempFile.setSize(file.get(i).length());
+            tempFiles.add(tempFile);
+
+        }
+        chooseImagesFileInfoEntity.setTempFilePaths(tempFilePaths);
+        chooseImagesFileInfoEntity.setTempFiles(tempFiles);
+
+        responseResult.setResponseCode(ModleConfig.RES200);
+        responseResult.setResponseMsg(ModleConfig.RES_SUCCESS);
+        responseResult.setResponseResult(chooseImagesFileInfoEntity);
+        String str2 = new Gson().toJson(responseResult);
+        callBackFunction.onCallBack(str2);
+
+    }
+
     //判断网络是否可达
     public  String  isNetWorkReachable(Context context) {
         String netAddress = null;
@@ -1032,7 +1041,6 @@ public class WXWebViewJsBridge implements IWebView {
                 //NativeToJSstartAutoLBS(1);
                 //NativeToJSstartAutoLBS(2);
                 RequestLBSWGS84_GCJ02Params requestLBSWGS84_gcj02Params = new Gson().fromJson(data, RequestLBSWGS84_GCJ02Params.class);
-
                 responseTypeLBS = 1;
                 resetOption(false);
                 startLocation();
@@ -1142,29 +1150,28 @@ public class WXWebViewJsBridge implements IWebView {
             @Override
             public void handler(String data, CallBackFunction function) {
                 JUtils.Log("handler = reqGetImageInfo, data from web = " + data);
+                RequestPreviewImagesParams requestPreviewImagesParams = new RequestPreviewImagesParams();
+                requestPreviewImagesParams = new Gson().fromJson(data,RequestPreviewImagesParams.class);
+
+
 
                 Gson gs = new GsonBuilder()
                         .setPrettyPrinting()
                         .disableHtmlEscaping()
                         .create();
 
-                RequestPreviewImageParams requestPreviewImageParams = new RequestPreviewImageParams();
-                requestPreviewImageParams = gs.fromJson(data,RequestPreviewImageParams.class);
-
-                //JSONObject.parseObject(entry.getValue().toString());
-               /* try {
-                    JSONObject jsonObject = new JSONObject(data);
-
-                    requestPreviewImageParams =  (RequestPreviewImageParams)JSONObject.toBean(jsonObject, RequestPreviewImageParams.class);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }*/
-
-                        //new Gson().fromJson(data,RequestPreviewImageParams.class);
-
                 List<PreviewImagesData> datas = new ArrayList<>();
 
-                PreviewImagesData previewImagesData = new PreviewImagesData();
+                for(int i=0;i<requestPreviewImagesParams.getUrls().size();i++){
+                    PreviewImagesData previewImagesData = new PreviewImagesData();
+                    JUtils.Log(requestPreviewImagesParams.getUrls().get(i));
+
+                    previewImagesData.setOriginUrl(requestPreviewImagesParams.getUrls().get(i));
+                    previewImagesData.setThumbnailUrl(requestPreviewImagesParams.getUrls().get(i));
+                    datas.add(previewImagesData);
+                }
+
+                /*PreviewImagesData previewImagesData = new PreviewImagesData();
                 previewImagesData.setOriginUrl("http://img3.16fan.com/live/origin/201805/21/E421b24c08446.jpg");
                 previewImagesData.setThumbnailUrl("http://img3.16fan.com/live/origin/201805/21/E421b24c08446.jpg");
                 datas.add(previewImagesData);
@@ -1186,13 +1193,13 @@ public class WXWebViewJsBridge implements IWebView {
                 datas.add(previewImagesData);
 
                 previewImagesData = new PreviewImagesData();
-                previewImagesData.setOriginUrl("/sdcard/jpg.jpg");
-                previewImagesData.setThumbnailUrl("/sdcard/jpg.jpg");
-                datas.add(previewImagesData);
+                previewImagesData.setOriginUrl("/storage/emulated/0/jpg.jpg");
+                previewImagesData.setThumbnailUrl("/storage/emulated/0/jpg.jpg");//"/sdcard/jpg.jpg"
+                datas.add(previewImagesData);*/
 
                 PreviewImagesData current = new PreviewImagesData();
-                current.setOriginUrl(requestPreviewImageParams.getCurrent());
-                current.setThumbnailUrl(requestPreviewImageParams.getCurrent());
+                current.setOriginUrl(requestPreviewImagesParams.getCurrent());
+                current.setThumbnailUrl(requestPreviewImagesParams.getCurrent());
 
 
                 int i=0;
@@ -1204,8 +1211,12 @@ public class WXWebViewJsBridge implements IWebView {
                     image.setThumbnailUrl(d.getThumbnailUrl());
                     images.add(image);
                     i++;
-                    if(d.equals(current)){
+                    /*if(d.equals(current)){
                         JUtils.Log("list 中找到了这个current image：是第"+i+"个");
+                        currentNumber = i-1;
+                    }*/
+                    if(d.getOriginUrl().equals(current.getOriginUrl())){
+                        JUtils.Log("*** list 中找到了这个current image：是第"+i+"个");
                         currentNumber = i-1;
                     }
                 }
@@ -1219,52 +1230,119 @@ public class WXWebViewJsBridge implements IWebView {
                         .showOriginImage(false)
                         .downloadLocalPath("Preview")
                         .show();
-
-                /*if(datas.contains(current)){
-                    JUtils.Log("数组包含了这个current url image");
-
-                    //查找current是第几个值
-                    for(int i=0;i<datas.size();i++){
-
-                    }
-
-                    int i=0;
-                    int currentNumber=0;
-                    List<Image> images = new ArrayList<>();
-                    for (PreviewImagesData d : datas) {
-                        Image image = new Image();
-                        image.setOriginUrl(d.getOriginUrl());
-                        image.setThumbnailUrl(d.getThumbnailUrl());
-                        images.add(image);
-                        i++;
-                        if(d.equals(current)){
-                            JUtils.Log("list 中找到了这个current image：是第"+i+"个");
-                            currentNumber = i-1;
-                        }
-                    }
-
-                    Preview.with(mContext)
-                            .builder()
-                            .load(images)
-                            .displayCount(true)
-                            .markPosition(currentNumber)
-                            .showDownload(true)
-                            .showOriginImage(true)
-                            .downloadLocalPath("Preview")
-                            .show();
-
-                }else{
-                    JUtils.Log("数组没有包含这个current url image");
-                    ResultPreviewImages resultPreviewImages = new ResultPreviewImages();
-                    resultPreviewImages.setResponseCode(ModleConfig.RES404);
-                    resultPreviewImages.setResponseMsg("current 不在 urls中");
-                    function.onCallBack(new Gson().toJson(requestPreviewImageParams));
-                }*/
-
-
             }
 
         });
+    }
+
+    /**
+     * 选择照片
+     */
+    public void reqChooseImage() {
+        mWebView.registerHandler("reqChooseImage", new BridgeHandler() {
+
+            @Override
+            public void handler(String data, CallBackFunction function) {
+                JUtils.Log("handler = reqChooseImage, data from web = " + data);
+                RequestChooseImagesParams requestChooseImagesParams = new RequestChooseImagesParams();
+                requestChooseImagesParams = new Gson().fromJson(data,RequestChooseImagesParams.class);
+
+                int mCompress = 2;//0->origin; 1->compressed; 2->两者都有
+                Boolean isCamera = true;
+                if(requestChooseImagesParams.getSourceType().size()==2){
+                    mCompress = 2;
+                    JUtils.Log("mCompress = 2");
+                }else if(requestChooseImagesParams.getSourceType().size()==1){
+                    if(requestChooseImagesParams.getSourceType().get(0).equals("original")){
+                        mCompress = 0;
+                        JUtils.Log(" mCompress = 0");
+                    }else if(requestChooseImagesParams.getSourceType().get(0).equals("compressed")){
+                        mCompress = 1;
+                        JUtils.Log("mCompress = 1");
+                    }
+                }
+
+                if(requestChooseImagesParams.getSizeType().size()==2){
+                    isCamera = true;
+                    JUtils.Log("isCamera is true 2");
+                }else if(requestChooseImagesParams.getSizeType().size()==1){
+                    if(requestChooseImagesParams.getSizeType().get(0).equals("album")){
+                        isCamera = false;
+                        JUtils.Log("isCamera is false");
+                    }else if(requestChooseImagesParams.getSizeType().get(0).equals("camera")){
+                        isCamera = true;
+                        JUtils.Log("isCamera is true");
+                    }
+                }
+
+                PhotoPicker.builder()
+                        .setPhotoCount(requestChooseImagesParams.getCount())
+                        .setGridColumnCount(4)
+                        .setCompress(mCompress)
+                        .setShowCamera(isCamera)
+                        .start(mContext);
+
+                callBackFunction = function;
+            }
+        });
+    }
+
+    /**
+     * 保存图片到相册
+     */
+    void reqSaveImageToPhotosAlbum(){
+        mWebView.registerHandler("reqSaveImageToPhotosAlbum", new BridgeHandler() {
+
+            @Override
+            public void handler(String data, CallBackFunction function) {
+                JUtils.Log("handler = reqSaveImageToPhotosAlbum, data from web = " + data);
+                RequestSaveImg requestSaveImg = new RequestSaveImg();
+                requestSaveImg = new Gson().fromJson(data,RequestSaveImg.class);
+                callBackFunction = function;
+                requestStorage(requestSaveImg.getFilePath());
+
+
+            }
+        });
+       //requestStorage();
+    }
+
+    void saveImage(String localPath){
+        ResultSaveImage resultSaveImage = new ResultSaveImage();
+
+        //String localPath = "/sdcard/jpg.jpg";
+        Bitmap bmp = BitmapFactory.decodeFile(localPath);
+        if(bmp!=null){
+            if(ImgUtil.saveImageToGallery(mContext,bmp)){
+                resultSaveImage.setResponseCode(ModleConfig.RES200);
+                resultSaveImage.setResponseMsg(ModleConfig.RES_SUCCESS);
+                resultSaveImage.setResponseResult("");
+            }
+        }else{
+            JUtils.Log("bmp is null");
+            resultSaveImage.setResponseCode(ModleConfig.RES404);
+            resultSaveImage.setResponseMsg(ModleConfig.RES_FAIL);
+            resultSaveImage.setResponseResult("文件不存在");
+        }
+        String str = new Gson().toJson(resultSaveImage);
+        callBackFunction.onCallBack(str);
+    }
+
+
+    private void requestStorage(final String path) {
+        PermissionsUtil.TipInfo tip = new PermissionsUtil.TipInfo("注意:", "获取SD卡读写权限", "禁止", "允许");
+        PermissionsUtil.requestPermission(mContext, new PermissionListener() {
+            @Override
+            public void permissionGranted(@NonNull String[] permissions) {
+                saveImage(path);
+            }
+
+            @Override
+            public void permissionDenied(@NonNull String[] permissions) {
+                //Toast.makeText(, "用户拒绝使用读写存储权限", Toast.LENGTH_LONG).show();
+                JUtils.Toast("用户拒绝使用读写存储权限");
+            }
+        }, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE}, true, tip);
     }
 
 }

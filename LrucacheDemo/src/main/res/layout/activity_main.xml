@@ -53,6 +53,25 @@
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
             android:layout_marginTop="10dp"/>
+
+        <Button
+            android:id="@+id/btn_choose_image"
+            android:text="选择照片图片"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginTop="10dp"/>
+
+        <Button
+            android:id="@+id/btn_saveimg_gallery"
+            android:text="保存图片到相册"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginTop="10dp"/>
+
     </LinearLayout>
 
 </ScrollView>

@@ -103,14 +103,27 @@
      <input type="button" id="id_openuserprofile" value="打开个人信息页" onclick="openUserProfile()"/>
 <hr style="height:1px;border:none;border-top:3px solid #FF4081;"/>
 
-        current 图片 <input type="text" id="currenturl" value="http://img3.16fan.com/live/origin/201805/21/E421b24c08446.jpg"/><br>
-        第二张图片  "http://img3.16fan.com/live/origin/201805/21/14C5e483e7583.jpg" <br>
-        第三张图片  "http://img3.16fan.com/live/origin/201805/21/4D7B35fdf082e.jpg"<br>
-        第四张图片 "http://img3.16fan.com/live/origin/201805/21/2D02ebc5838e6.jpg"<br>
-        第五张图片  "/sdcard/jpg.jpg"<br><br>
+        current 图片 <input type="text" id="currenturl" value="http://img3.16fan.com/live/origin/201805/21/4D7B35fdf082e.jpg"/><br>
+图片2<input type="text" id="url1" value="http://img3.16fan.com/live/origin/201805/21/E421b24c08446.jpg"/><br>
+图片3<input type="text" id="url2" value="http://img3.16fan.com/live/origin/201805/21/4D7B35fdf082e.jpg"/><br>
+图片4<input type="text" id="url3" value="http://img3.16fan.com/live/origin/201805/21/2D02ebc5838e6.jpg"/><br>
+图片5<input type="text" id="url4" value="/sdcard/jpg.jpg"/><br>
         <input type="button" id="id_reqpreviewimage" value="预览图片" onclick="reqGetImageInfo()"/>
 
 <hr style="height:1px;border:none;border-top:3px solid #FF4081;"/>
+      <br>
+     最多可以选择的图片张数，默认9<br>
+     <input type="text" id="imagecount" value="9"/><br><br>
+
+     album 从相册选图，camera 使用相机，默认二者都有<br>
+     输入album <input type="text" id="album" value="album" /><br>
+     输入camera  <input type="text" id="camera" value="camera" /><br><br>
+
+     original 原图，compressed 压缩图，默认二者都有<br>
+     输入original  <input type="text" id="original2" value="original" /><br>
+     输入 compressed  <input type="text" id="compressed" value="compressed" /><br>
+      <input type="button" id="id_reqchooseimage" value="选择照片图片" onclick="reqChooseImage()"/>
+
 <hr style="height:1px;border:none;border-top:3px solid #FF4081;"/>
 <p>
     <br>
@@ -123,6 +136,10 @@
 </p>
 
 <hr style="height:1px;border:none;border-top:3px solid #FF4081;"/>
+
+     保存图片到相册<br>
+     <input type="text" id="imgpath" value="/sdcard/jpg.jpg" /><br><br>
+     <input type="button" id="id_reqsaveimagetophotosalbum" value="保存图片到相册" onclick="reqSaveImageToPhotosAlbum();"/>
 <hr style="height:1px;border:none;border-top:3px solid #FF4081;"/>
 <p>
     <input type="text" id="text1" value="用户名(username)"/>
@@ -318,15 +335,19 @@
                        }
                    );
                }
+
         function reqGetImageInfo(){
                 var current  =  document.getElementById("currenturl").value;
-                //var id2 =  "http://img3.16fan.com/live/origin/201805/21/E421b24c08446.jpg";
+                var url1 =  document.getElementById("url1").value; //"http://img3.16fan.com/live/origin/201805/21/14C5e483e7583.jpg";
+                var url2 = document.getElementById("url2").value;  // "http://img3.16fan.com/live/origin/201805/21/4D7B35fdf082e.jpg";
+                var url3 =  document.getElementById("url3").value;  //"http://img3.16fan.com/live/origin/201805/21/2D02ebc5838e6.jpg";
+                var url4 =  document.getElementById("url4").value;  //"/sdcard/jpg.jpg";
 
-                var arraylist= new Array(current,current,current);
+                var arraylist= [url1,url2,url3,url4];
                  //send message to native
                    window.WebViewJavascriptBridge.callHandler(
                        'reqGetImageInfo'
-                       , {'current':current}
+                       , {'current':current,'urls':arraylist}
                        , function(responseData) {
                            document.getElementById("show").innerHTML = "reqGetImageInfo:" + responseData
                            //alert(responseData);
@@ -334,6 +355,58 @@
                    );
 
                }
+
+        function reqChooseImage(){
+                 var imagecount  =  document.getElementById("imagecount").value;
+                 var album  =  document.getElementById("album").value;
+                 var camera  =  document.getElementById("camera").value;
+                 var original  =  document.getElementById("original2").value;
+                 var compressed  =  document.getElementById("compressed").value;
+
+                 var sizeType;// =[album,camera];
+                 var sourceType;//=[original,compressed];
+                 if(album!=""&& camera!=""){
+                    sizeType = [album,camera];
+                 }else if(album!=""){
+                    sizeType = [album];
+                 }else if(camera!=""){
+                    sizeType = [camrea];
+                 }
+                 alert("sizeType"+sizeType);
+
+                 if(original!=""&& compressed!=""){
+                    sourceType = [original,compressed];
+                 }else if(original!=""){
+                    sourceType = [original];
+                 }else if(compressed!=""){
+                    sourceType = [compressed];
+                 }
+                 alert("sourceType"+sourceType);
+                 //send message to native
+                   window.WebViewJavascriptBridge.callHandler(
+                       'reqChooseImage'
+                       , {'count':imagecount,'sizeType':sizeType,'sourceType':sourceType}
+                       , function(responseData) {
+                           document.getElementById("show").innerHTML = "reqChooseImage:" + responseData
+                           //alert(responseData);
+                       }
+                   );
+               }
+
+        function reqSaveImageToPhotosAlbum() {
+            var　imgpath =  document.getElementById("imgpath").value;
+                   //send message to native
+                   window.WebViewJavascriptBridge.callHandler(
+                       'reqSaveImageToPhotosAlbum'
+                       , {'filePath':imgpath}
+                       , function(responseData) {
+                           document.getElementById("show").innerHTML = "reqSaveImageToPhotosAlbum:" + responseData
+                           //alert(responseData);
+                       }
+                   );
+               }
+
+
 
         function getContacts() {
             var str = document.getElementById("contacts").value;

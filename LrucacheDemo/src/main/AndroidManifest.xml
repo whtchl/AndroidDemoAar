@@ -45,6 +45,7 @@
     <!-- 用于申请获取蓝牙信息进行室内定位 -->
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
 
     <application
         android:name="com.jdjz.App"
@@ -87,6 +88,9 @@
             android:screenOrientation="portrait"></activity>
         <activity android:name="io.github.xudaojie.qrcodelib.CaptureActivity" />
         <activity android:name="com.jdjz.weex.activity.UserProfileActivity"></activity>
+        <activity
+            android:theme="@style/customTheme"
+            android:name="me.iwf.photopicker.PhotoPickerActivity"></activity>
     </application>
 
 </manifest>
