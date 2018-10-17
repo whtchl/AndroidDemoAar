@@ -52,6 +52,7 @@ import com.jdjz.weex.modle.PreviewImagesData;
 import com.jdjz.weex.modle.RequestParams.RequestChooseImagesParams;
 import com.jdjz.weex.modle.RequestParams.RequestContactsParams;
 import com.jdjz.weex.modle.RequestParams.RequestEnterpriseChatParams;
+import com.jdjz.weex.modle.RequestParams.RequestGetImageInfoParams;
 import com.jdjz.weex.modle.RequestParams.RequestLBSParams;
 import com.jdjz.weex.modle.RequestParams.RequestLBSWGS84_GCJ02Params;
 import com.jdjz.weex.modle.RequestParams.RequestPreviewImagesParams;
@@ -61,6 +62,7 @@ import com.jdjz.weex.modle.ResultChooseImages;
 import com.jdjz.weex.modle.ResultContact;
 import com.jdjz.weex.modle.ResultContacts;
 import com.jdjz.weex.modle.ResultDate;
+import com.jdjz.weex.modle.ResultGetImageInfo;
 import com.jdjz.weex.modle.ResultLBS;
 import com.jdjz.weex.modle.ResultNetworkStatus;
 import com.jdjz.weex.modle.ResultSaveImage;
@@ -71,6 +73,7 @@ import com.jdjz.weex.modle.ResultToken;
 import com.jdjz.weex.modle.RequestParams.ReuquestDateParams;
 import com.jdjz.weex.modle.RequestParams.RequestJSParams;
 import com.jdjz.weex.modle.entity.ChooseImagesFileInfoEntity;
+import com.jdjz.weex.modle.entity.GetImageInfoEntity;
 import com.jdjz.weex.modle.entity.LBSEntity;
 import com.jdjz.weex.modle.entity.NetworkStatusEntity;
 import com.jdjz.weex.modle.RequestParams.RequestScanParams;
@@ -79,6 +82,7 @@ import com.jdjz.weex.modle.entity.Street;
 import com.jdjz.weex.modle.entity.SystemInfoEntity;
 import com.jdjz.weex.modle.entity.TempFile;
 import com.jdjz.weex.util.ImgUtil;
+import com.jdjz.weex.util.RequestPermissonType;
 import com.jude.utils.JUtils;
 import com.jude.utils.permission.PermissionListener;
 import com.jude.utils.permission.PermissionsUtil;
@@ -94,6 +98,7 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.io.File;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.time.temporal.JulianFields;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -809,9 +814,11 @@ public class WXWebViewJsBridge implements IWebView {
         requestFromNativeTypeOpenEnterpriseChat();
         requestFromNativeTypeOpenUserProfile();
         requestFromNativeTypeContacts();
-        reqGetImageInfo();
+        reqPreviewImage();
+
         reqChooseImage();
         reqSaveImageToPhotosAlbum();
+        reqGetImageInfo();
         mWebView.send("hello");
     }
 
@@ -1144,12 +1151,12 @@ public class WXWebViewJsBridge implements IWebView {
     /**
      * 预览图片
      */
-    public void reqGetImageInfo(){
-        mWebView.registerHandler("reqGetImageInfo", new BridgeHandler() {
+    public void reqPreviewImage(){
+        mWebView.registerHandler("reqPreviewImage", new BridgeHandler() {
 
             @Override
             public void handler(String data, CallBackFunction function) {
-                JUtils.Log("handler = reqGetImageInfo, data from web = " + data);
+                JUtils.Log("handler = reqPreviewImage, data from web = " + data);
                 RequestPreviewImagesParams requestPreviewImagesParams = new RequestPreviewImagesParams();
                 requestPreviewImagesParams = new Gson().fromJson(data,RequestPreviewImagesParams.class);
 
@@ -1201,7 +1208,6 @@ public class WXWebViewJsBridge implements IWebView {
                 current.setOriginUrl(requestPreviewImagesParams.getCurrent());
                 current.setThumbnailUrl(requestPreviewImagesParams.getCurrent());
 
-
                 int i=0;
                 int currentNumber=0;
                 List<Image> images = new ArrayList<>();
@@ -1211,10 +1217,6 @@ public class WXWebViewJsBridge implements IWebView {
                     image.setThumbnailUrl(d.getThumbnailUrl());
                     images.add(image);
                     i++;
-                    /*if(d.equals(current)){
-                        JUtils.Log("list 中找到了这个current image：是第"+i+"个");
-                        currentNumber = i-1;
-                    }*/
                     if(d.getOriginUrl().equals(current.getOriginUrl())){
                         JUtils.Log("*** list 中找到了这个current image：是第"+i+"个");
                         currentNumber = i-1;
@@ -1290,7 +1292,7 @@ public class WXWebViewJsBridge implements IWebView {
     /**
      * 保存图片到相册
      */
-    void reqSaveImageToPhotosAlbum(){
+   public void reqSaveImageToPhotosAlbum(){
         mWebView.registerHandler("reqSaveImageToPhotosAlbum", new BridgeHandler() {
 
             @Override
@@ -1299,15 +1301,29 @@ public class WXWebViewJsBridge implements IWebView {
                 RequestSaveImg requestSaveImg = new RequestSaveImg();
                 requestSaveImg = new Gson().fromJson(data,RequestSaveImg.class);
                 callBackFunction = function;
-                requestStorage(requestSaveImg.getFilePath());
-
-
+                requestStorage(requestSaveImg.getFilePath(),RequestPermissonType.REQ_SAVE_IMAGE_TO_PHOTO_ALBUM);
             }
         });
-       //requestStorage();
     }
 
-    void saveImage(String localPath){
+
+
+    public void reqGetImageInfo(){
+
+        mWebView.registerHandler("reqGetImageInfo", new BridgeHandler() {
+
+            @Override
+            public void handler(String data, CallBackFunction function) {
+                JUtils.Log("handler = reqGetImageInfo, data from web = " + data);
+                RequestGetImageInfoParams requestGetImageInfoParams = new RequestGetImageInfoParams();
+                requestGetImageInfoParams = new Gson().fromJson(data,RequestGetImageInfoParams.class);
+                callBackFunction = function;
+                requestStorage(requestGetImageInfoParams.getSrc(),RequestPermissonType.REQ_GET_IMAGE_INFO);
+            }
+        });
+    }
+
+    private void saveImage(String localPath){
         ResultSaveImage resultSaveImage = new ResultSaveImage();
 
         //String localPath = "/sdcard/jpg.jpg";
@@ -1328,13 +1344,65 @@ public class WXWebViewJsBridge implements IWebView {
         callBackFunction.onCallBack(str);
     }
 
+    private  void  getImageInfo(String src){
+        ResultGetImageInfo resultGetImageInfo = new ResultGetImageInfo();
+        GetImageInfoEntity getImageInfoEntity = new GetImageInfoEntity();
+        BitmapFactory.Options options = new BitmapFactory.Options();
 
-    private void requestStorage(final String path) {
+        /**
+         * 最关键在此，把options.inJustDecodeBounds = true;
+         * 这里再decodeFile()，返回的bitmap为空，但此时调用options.outHeight时，已经包含了图片的高了
+         */
+
+        options.inJustDecodeBounds = true;
+        Bitmap bitmap = BitmapFactory.decodeFile(src, options); // 此时返回的bitmap为null
+        /**
+         *options.outHeight为原始图片的高
+         */
+        //return new String[]{String.valueOf(options.outWidth) ,String.valueOf(options.outHeight),src};
+        JUtils.Log("width:"+options.outWidth+"  height:"+ options.outHeight);
+        getImageInfoEntity.setHeight(options.outHeight);
+        getImageInfoEntity.setWidth(options.outWidth);
+        getImageInfoEntity.setPath(src);
+        resultGetImageInfo.setResponseCode(ModleConfig.RES200);
+        resultGetImageInfo.setResponseMsg(ModleConfig.RES_SUCCESS);
+        resultGetImageInfo.setResponseResult(getImageInfoEntity);
+        String str = new Gson().toJson(resultGetImageInfo);
+        callBackFunction.onCallBack(str);
+    }
+
+
+    public static int[] getImageWidthHeight(String path){
+        BitmapFactory.Options options = new BitmapFactory.Options();
+
+        /**
+         * 最关键在此，把options.inJustDecodeBounds = true;
+         * 这里再decodeFile()，返回的bitmap为空，但此时调用options.outHeight时，已经包含了图片的高了
+         */
+        options.inJustDecodeBounds = true;
+        Bitmap bitmap = BitmapFactory.decodeFile(path, options); // 此时返回的bitmap为null
+        /**
+         *options.outHeight为原始图片的高
+         */
+        return new int[]{options.outWidth,options.outHeight};
+    }
+
+    private void requestStorage(final String path, final int type) {
         PermissionsUtil.TipInfo tip = new PermissionsUtil.TipInfo("注意:", "获取SD卡读写权限", "禁止", "允许");
         PermissionsUtil.requestPermission(mContext, new PermissionListener() {
             @Override
             public void permissionGranted(@NonNull String[] permissions) {
-                saveImage(path);
+                switch (type) {
+                    case RequestPermissonType.REQ_SAVE_IMAGE_TO_PHOTO_ALBUM:
+                        saveImage(path);
+                        break;
+                    case RequestPermissonType.REQ_GET_IMAGE_INFO:
+                        getImageInfo(path);
+                        break;
+                    default:
+                        break;
+                }
+
             }
 
             @Override
@@ -1342,7 +1410,7 @@ public class WXWebViewJsBridge implements IWebView {
                 //Toast.makeText(, "用户拒绝使用读写存储权限", Toast.LENGTH_LONG).show();
                 JUtils.Toast("用户拒绝使用读写存储权限");
             }
-        }, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE}, true, tip);
+        }, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, true, tip);
     }
 
 }

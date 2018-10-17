@@ -108,7 +108,7 @@
 图片3<input type="text" id="url2" value="http://img3.16fan.com/live/origin/201805/21/4D7B35fdf082e.jpg"/><br>
 图片4<input type="text" id="url3" value="http://img3.16fan.com/live/origin/201805/21/2D02ebc5838e6.jpg"/><br>
 图片5<input type="text" id="url4" value="/sdcard/jpg.jpg"/><br>
-        <input type="button" id="id_reqpreviewimage" value="预览图片" onclick="reqGetImageInfo()"/>
+        <input type="button" id="id_reqpreviewimage" value="预览图片" onclick="reqPreviewImage()"/>
 
 <hr style="height:1px;border:none;border-top:3px solid #FF4081;"/>
       <br>
@@ -125,6 +125,17 @@
       <input type="button" id="id_reqchooseimage" value="选择照片图片" onclick="reqChooseImage()"/>
 
 <hr style="height:1px;border:none;border-top:3px solid #FF4081;"/>
+保存图片到相册<br>
+<input type="text" id="imgpath" value="/sdcard/jpg.jpg" /><br><br>
+<input type="button" id="id_reqsaveimagetophotosalbum" value="保存图片到相册" onclick="reqSaveImageToPhotosAlbum()"/>
+<hr style="height:1px;border:none;border-top:3px solid #FF4081;"/>
+  获取图片宽 高 路径<br>
+  <input type="text" id="imgpath2" value="/sdcard/jpg.jpg" /><br><br>
+
+   <input type="button" id="id_reqgetimageinfo" value="保存图片到相册" onclick="reqGetImageInfo()"/>
+
+
+<hr style="height:1px;border:none;border-top:3px solid #FF4081;"/>
 <p>
     <br>
     选择模式，”single”表示单选，”multi”表示多选<br>
@@ -137,10 +148,7 @@
 
 <hr style="height:1px;border:none;border-top:3px solid #FF4081;"/>
 
-     保存图片到相册<br>
-     <input type="text" id="imgpath" value="/sdcard/jpg.jpg" /><br><br>
-     <input type="button" id="id_reqsaveimagetophotosalbum" value="保存图片到相册" onclick="reqSaveImageToPhotosAlbum();"/>
-<hr style="height:1px;border:none;border-top:3px solid #FF4081;"/>
+
 <p>
     <input type="text" id="text1" value="用户名(username)"/>
 </p>
@@ -336,7 +344,7 @@
                    );
                }
 
-        function reqGetImageInfo(){
+        function reqPreviewImage(){
                 var current  =  document.getElementById("currenturl").value;
                 var url1 =  document.getElementById("url1").value; //"http://img3.16fan.com/live/origin/201805/21/14C5e483e7583.jpg";
                 var url2 = document.getElementById("url2").value;  // "http://img3.16fan.com/live/origin/201805/21/4D7B35fdf082e.jpg";
@@ -346,10 +354,10 @@
                 var arraylist= [url1,url2,url3,url4];
                  //send message to native
                    window.WebViewJavascriptBridge.callHandler(
-                       'reqGetImageInfo'
+                       'reqPreviewImage'
                        , {'current':current,'urls':arraylist}
                        , function(responseData) {
-                           document.getElementById("show").innerHTML = "reqGetImageInfo:" + responseData
+                           document.getElementById("show").innerHTML = "reqPreviewImage:" + responseData
                            //alert(responseData);
                        }
                    );
@@ -405,6 +413,21 @@
                        }
                    );
                }
+
+        function reqGetImageInfo() {
+            var　imgpath2 =  document.getElementById("imgpath2").value;
+                   //send message to native
+                   window.WebViewJavascriptBridge.callHandler(
+                       'reqGetImageInfo'
+                       , {'src':imgpath2}
+                       , function(responseData) {
+                           document.getElementById("show").innerHTML = "reqGetImageInfo:" + responseData
+                           //alert(responseData);
+                       }
+                   );
+               }
+
+
 
 
 
