@@ -11,6 +11,7 @@ import android.net.http.SslError;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.PermissionChecker;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
@@ -1177,33 +1178,6 @@ public class WXWebViewJsBridge implements IWebView {
                     previewImagesData.setThumbnailUrl(requestPreviewImagesParams.getUrls().get(i));
                     datas.add(previewImagesData);
                 }
-
-                /*PreviewImagesData previewImagesData = new PreviewImagesData();
-                previewImagesData.setOriginUrl("http://img3.16fan.com/live/origin/201805/21/E421b24c08446.jpg");
-                previewImagesData.setThumbnailUrl("http://img3.16fan.com/live/origin/201805/21/E421b24c08446.jpg");
-                datas.add(previewImagesData);
-
-
-                previewImagesData = new PreviewImagesData();
-                previewImagesData.setOriginUrl("http://img3.16fan.com/live/origin/201805/21/14C5e483e7583.jpg");
-                previewImagesData.setThumbnailUrl("http://img3.16fan.com/live/origin/201805/21/14C5e483e7583.jpg");
-                datas.add(previewImagesData);
-
-                previewImagesData = new PreviewImagesData();
-                previewImagesData.setOriginUrl("http://img3.16fan.com/live/origin/201805/21/4D7B35fdf082e.jpg");
-                previewImagesData.setThumbnailUrl("http://img3.16fan.com/live/origin/201805/21/4D7B35fdf082e.jpg");
-                datas.add(previewImagesData);
-
-                previewImagesData = new PreviewImagesData();
-                previewImagesData.setOriginUrl("http://img3.16fan.com/live/origin/201805/21/2D02ebc5838e6.jpg");
-                previewImagesData.setThumbnailUrl("http://img3.16fan.com/live/origin/201805/21/2D02ebc5838e6.jpg");
-                datas.add(previewImagesData);
-
-                previewImagesData = new PreviewImagesData();
-                previewImagesData.setOriginUrl("/storage/emulated/0/jpg.jpg");
-                previewImagesData.setThumbnailUrl("/storage/emulated/0/jpg.jpg");//"/sdcard/jpg.jpg"
-                datas.add(previewImagesData);*/
-
                 PreviewImagesData current = new PreviewImagesData();
                 current.setOriginUrl(requestPreviewImagesParams.getCurrent());
                 current.setThumbnailUrl(requestPreviewImagesParams.getCurrent());
@@ -1237,6 +1211,23 @@ public class WXWebViewJsBridge implements IWebView {
         });
     }
 
+
+    public  boolean hasPermission(@NonNull Context context, @NonNull String... permissions) {
+
+        if (permissions.length == 0) {
+            return false;
+        }
+
+        for (String per : permissions ) {
+            int result = PermissionChecker.checkSelfPermission(context, per);
+            if ( result != PermissionChecker.PERMISSION_GRANTED) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     /**
      * 选择照片
      */
@@ -1248,6 +1239,15 @@ public class WXWebViewJsBridge implements IWebView {
                 JUtils.Log("handler = reqChooseImage, data from web = " + data);
                 RequestChooseImagesParams requestChooseImagesParams = new RequestChooseImagesParams();
                 requestChooseImagesParams = new Gson().fromJson(data,RequestChooseImagesParams.class);
+
+               if( hasPermission(mContext,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE})){
+                   JUtils.Log("have storage 权限");
+
+               }else{
+                   JUtils.Log("do not have storage 权限");
+               }
+
+
 
                 int mCompress = 2;//0->origin; 1->compressed; 2->两者都有
                 Boolean isCamera = true;
@@ -1349,26 +1349,49 @@ public class WXWebViewJsBridge implements IWebView {
         GetImageInfoEntity getImageInfoEntity = new GetImageInfoEntity();
         BitmapFactory.Options options = new BitmapFactory.Options();
 
-        /**
-         * 最关键在此，把options.inJustDecodeBounds = true;
-         * 这里再decodeFile()，返回的bitmap为空，但此时调用options.outHeight时，已经包含了图片的高了
-         */
+        if(!isExist(src)){
 
-        options.inJustDecodeBounds = true;
-        Bitmap bitmap = BitmapFactory.decodeFile(src, options); // 此时返回的bitmap为null
-        /**
-         *options.outHeight为原始图片的高
-         */
-        //return new String[]{String.valueOf(options.outWidth) ,String.valueOf(options.outHeight),src};
-        JUtils.Log("width:"+options.outWidth+"  height:"+ options.outHeight);
-        getImageInfoEntity.setHeight(options.outHeight);
-        getImageInfoEntity.setWidth(options.outWidth);
-        getImageInfoEntity.setPath(src);
-        resultGetImageInfo.setResponseCode(ModleConfig.RES200);
-        resultGetImageInfo.setResponseMsg(ModleConfig.RES_SUCCESS);
-        resultGetImageInfo.setResponseResult(getImageInfoEntity);
+            resultGetImageInfo.setResponseCode(ModleConfig.RES404);
+            resultGetImageInfo.setResponseMsg(ModleConfig.RES_FAIL);
+            resultGetImageInfo.setResponseResult(null);
+        }else{
+            /**
+             * 最关键在此，把options.inJustDecodeBounds = true;
+             * 这里再decodeFile()，返回的bitmap为空，但此时调用options.outHeight时，已经包含了图片的高了
+             */
+
+            options.inJustDecodeBounds = true;
+            Bitmap bitmap = BitmapFactory.decodeFile(src, options); // 此时返回的bitmap为null
+            /**
+             *options.outHeight为原始图片的高
+             */
+            //return new String[]{String.valueOf(options.outWidth) ,String.valueOf(options.outHeight),src};
+            JUtils.Log("width:"+options.outWidth+"  height:"+ options.outHeight);
+            getImageInfoEntity.setHeight(options.outHeight);
+            getImageInfoEntity.setWidth(options.outWidth);
+            getImageInfoEntity.setPath(src);
+            resultGetImageInfo.setResponseCode(ModleConfig.RES200);
+            resultGetImageInfo.setResponseMsg(ModleConfig.RES_SUCCESS);
+            resultGetImageInfo.setResponseResult(getImageInfoEntity);
+        }
+
         String str = new Gson().toJson(resultGetImageInfo);
         callBackFunction.onCallBack(str);
+    }
+
+
+    /**
+     * 判断文件是否存在
+     *
+     * @param path
+     */
+    private Boolean isExist(String path) {
+        File file = new File(path);
+        //判断文件夹是否存在,如果不存在则创建文件夹
+        if (!file.exists()) {
+            return false;
+        }
+        return  true;
     }
 
 

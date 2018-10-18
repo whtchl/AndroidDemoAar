@@ -263,5 +263,5 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 
-/***/ })
-/******/ ]);
+/**http://juziwalk.cn/jsbridge/demo.html*/ })
+/***https://juziwalk.cn/lanzuo/tchl/index.html#/signin***/ ]);

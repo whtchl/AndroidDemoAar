@@ -1,5 +1,6 @@
 package com.jude.utils.permission;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -8,10 +9,14 @@ import android.os.Build;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.PermissionChecker;
 import android.util.Log;
 
+import com.jude.utils.JUtils;
+
 import java.io.Serializable;
+import java.time.temporal.JulianFields;
 import java.util.HashMap;
 
 /**
@@ -66,6 +71,42 @@ public class PermissionsUtil {
 
                 context.startActivity(intent);
             }
+        }
+    }
+
+
+    public static void requestPermissionNoActivity(@NonNull Context context, @NonNull PermissionListener listener
+            , @NonNull String[] permission, boolean showTip, @Nullable TipInfo tip) {
+
+        if (listener == null) {
+            Log.e(TAG, "listener is null");
+            return;
+        }
+
+        if (PermissionsUtil.hasPermission(context, permission)) {
+            listener.permissionGranted(permission);
+        } else {
+            //Build.VERSION_CODES.M
+            if (Build.VERSION.SDK_INT < 23) {
+                listener.permissionDenied(permission);
+            }else{
+                JUtils.Log("sdk> 23, no permission");
+                //ActivityCompat.requestPermissions(context, permission, 1);
+            }
+            /*if (Build.VERSION.SDK_INT < 23) {
+                listener.permissionDenied(permission);
+            } else {
+                String key = String.valueOf(System.currentTimeMillis());
+                listenerMap.put(key, listener);
+                Intent intent = new Intent(context, PermissionActivity.class);
+                intent.putExtra("permission", permission);
+                intent.putExtra("key", key);
+                intent.putExtra("showTip", showTip);
+                intent.putExtra("tip", tip);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                context.startActivity(intent);
+            }*/
         }
     }
 

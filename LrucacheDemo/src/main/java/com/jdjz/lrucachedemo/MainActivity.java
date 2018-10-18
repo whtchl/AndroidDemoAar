@@ -11,6 +11,8 @@ import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.PermissionChecker;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
@@ -31,6 +33,7 @@ import com.whamu2.previewimage.entity.Image;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import java.time.temporal.JulianFields;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,7 +59,11 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.btn_choose_image)
     Button btnChooseImage;
 
+    @BindView(R.id.btn_permission)
+    Button btnPermission;
 
+    @BindView(R.id.btn_permission2)
+    Button btnPermission2;
     private BroadcastReceiver batteryLevelRcvr;
     private IntentFilter batteryLevelFilter;
     @Override
@@ -127,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    @OnClick({R.id.btn_lrucache, R.id.btn_contacts, R.id.btn_db,R.id.btn_weex,R.id.btn_preview_image,R.id.btn_choose_image,R.id.btn_saveimg_gallery})
+    @OnClick({R.id.btn_lrucache, R.id.btn_contacts, R.id.btn_db,R.id.btn_weex,R.id.btn_preview_image,R.id.btn_choose_image,R.id.btn_saveimg_gallery, R.id.btn_permission, R.id.btn_permission2})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_lrucache:
@@ -149,6 +156,16 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
                 break;
             case R.id.btn_preview_image:
+
+                /*if( hasPermission(this,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE})){
+                    JUtils.Log("have storage 权限");
+
+                }else{
+                    JUtils.Log("do not have storage 权限");
+                }*/
+
+
+
                 //imageView.setImageDrawable(this.getDrawable(R.drawable.jpg));
                 List<PreviewImagesData> datas = new ArrayList<>();
 
@@ -226,15 +243,66 @@ public class MainActivity extends AppCompatActivity {
                         .start(this);
                 break;
             case R.id.btn_saveimg_gallery:
-              //  if(PermissionsUtil.checkReadStoragePermission(this)){
-              ///
-               // }
                 requestStorage();
 
                 break;
+            case R.id.btn_permission:
+               /* PermissionsUtil.requestPermissiontest(this, new PermissionListener() {
+                    @Override
+                    public void permissionGranted(@NonNull String[] permissions) {
+                       // saveImage();
+                    }
+
+                    @Override
+                    public void permissionDenied(@NonNull String[] permissions) {
+                        Toast.makeText(MainActivity.this, "用户拒绝使用读写存储权限", Toast.LENGTH_LONG).show();
+                    }
+                }, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE}, false, null);
+*/
+               // requestCemera();
+                PermissionsUtil.requestPermissionNoActivity(this, new PermissionListener() {
+                    @Override
+                    public void permissionGranted(@NonNull String[] permissions) {
+                        // saveImage();
+                        Toast.makeText(MainActivity.this, "用户同意使用读写存储权限", Toast.LENGTH_LONG).show();
+                    }
+
+                    @Override
+                    public void permissionDenied(@NonNull String[] permissions) {
+                        Toast.makeText(MainActivity.this, "用户拒绝使用读写存储权限", Toast.LENGTH_LONG).show();
+                    }
+                }, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE}, false, null);
+                break;
+            case R.id.btn_permission2:
+                if( hasPermission(this,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE})){
+                    JUtils.Log("have permission");
+
+                }else{
+                    JUtils.Log("have not permission");
+                }
+                break;
+
         }
     }
 
+
+
+
+
+
+    private void requestCemera() {
+        PermissionsUtil.requestPermission(getApplication(), new PermissionListener() {
+            @Override
+            public void permissionGranted(@NonNull String[] permissions) {
+                Toast.makeText(MainActivity.this, "访问摄像头", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void permissionDenied(@NonNull String[] permissions) {
+                Toast.makeText(MainActivity.this, "用户拒绝了访问摄像头", Toast.LENGTH_LONG).show();
+            }
+        }, Manifest.permission.CAMERA);
+    }
 
     private void requestStorage() {
         PermissionsUtil.requestPermission(this, new PermissionListener() {
@@ -268,4 +336,20 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         unregisterReceiver(batteryLevelRcvr);
     }
+    public  boolean hasPermission(@NonNull Context context, @NonNull String... permissions) {
+
+        if (permissions.length == 0) {
+            return false;
+        }
+
+        for (String per : permissions ) {
+            int result = PermissionChecker.checkSelfPermission(context, per);
+            if ( result != PermissionChecker.PERMISSION_GRANTED) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
 }
