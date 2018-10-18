@@ -3,13 +3,13 @@ package com.jdjz.weex.modle;
 import com.jdjz.weex.modle.entity.ScanEntity;
 
 public class ResultScan extends ResultTemp {
-    private ScanEntity scanEntity;
+    private ScanEntity responseResult;
 
-    public ScanEntity getScanEntity() {
-        return scanEntity;
+    public ScanEntity getResponseResult() {
+        return responseResult;
     }
 
-    public void setScanEntity(ScanEntity scanEntity) {
-        this.scanEntity = scanEntity;
+    public void setResponseResult(ScanEntity responseResult) {
+        this.responseResult = responseResult;
     }
 }

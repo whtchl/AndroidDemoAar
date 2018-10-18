@@ -16,27 +16,27 @@
     </xmp>
 </p>
 <p>
-    <input type="button" id="id_gettoken" value="获取token" onclick="getToken();"/>
+    <input type="button" id="id_gettoken" value="获取token" onclick="reqGetOpenId()"/>
 </p>
 <p>
     <input type="text" id="token" value="token"/>
-    <input type="button" id="id_settoken" value="设置token" onclick="setToken();"/>
+    <input type="button" id="id_settoken" value="设置token" onclick="setToken()"/>
 </p>
 <hr style="height:1px;border:none;border-top:3px solid #FF4081;"/>
 <br>
-<input type="button" id="id_getnetworkstatus" value="获取网络状态" onclick="getNetworkStatus();"/>
+<input type="button" id="id_getnetworkstatus" value="获取网络状态" onclick="reqGetNetworkType()"/>
 
 <hr style="height:1px;border:none;border-top:3px solid #FF4081;"/>
 <br>
 <p>
     <input type="number" id="phoneNumber" value="输入电话号码"/>
-    <input type="button" id="id_makephonecall" value="拨打电话" onclick="makePhoneCall();"/>
+    <input type="button" id="id_makephonecall" value="拨打电话" onclick="reqMakePhoneCall()"/>
 </p>
 
 
 <hr style="height:1px;border:none;border-top:3px solid #FF4081;"/>
 <br>
-<input type="button" id="id_getSystemInfo" value="获取设备信息" onclick="getSystemInfo();"/>
+<input type="button" id="id_getSystemInfo" value="获取设备信息" onclick="reqGetSystemInfo()"/>
 <hr style="height:1px;border:none;border-top:3px solid #FF4081;"/>
 <br>
 <p>
@@ -57,7 +57,7 @@
     <input type="text" id="enzzate"/>
 </p>
 <p>
-    <input type="button" id="id_datepicker" value="选择日期时间" onclick="datePicker1()"/>
+    <input type="button" id="id_datepicker" value="选择日期时间" onclick="reqDatePicker()"/>
 </p>
 
 <hr style="height:1px;border:none;border-top:3px solid #FF4081;"/>
@@ -66,7 +66,7 @@
 <p>
     扫码样式(默认 qr) qr:样式为二维码扫码框; bar:样式为条形码扫码框<br>
     <input type="text" id="barqcode"/>
-    <input type="button" id="id_scanbarqcode" value="二维码和条码扫描" onclick="scanBarQcode()"/>
+    <input type="button" id="id_scanbarqcode" value="二维码和条码扫描" onclick="reqScan()"/>
 
 </p>
 
@@ -74,15 +74,15 @@
     <br>
     持续定位流程：startAutoLBS()->stopAutoLBS()<br>
     <input type="hidden" id="lbs_type" hint="wgs84/gcj02"/>
-    <input type="button" id="id_startautolbs" value="开始持续定位" onclick="startAutoLBS()"/>
-    <input type="button" id="id_stopautolbs" value="关闭持续定位" onclick="stopAutoLBS()"/>
+    <input type="button" id="id_startautolbs" value="开始持续定位" onclick="reqStartAutoLBS()"/>
+    <input type="button" id="id_stopautolbs" value="关闭持续定位" onclick="reqStopAutoLBS()"/>
      <br>
      <br>
 <hr style="height:1px;border:none;border-top:1px solid #303F9F;"/>
     type  0：默认，获取经纬度；>0国家，省 市 区县 >1:streetNumber; >2:pois <br>
     <input type="text" id="type" /><br> <br>
 
-     <input type="button" id="id_getlocation" value="获取一次地理位置信息" onclick="getLocation()"/>
+     <input type="button" id="id_getlocation" value="获取一次地理位置信息" onclick="reqGetLocation()"/>
 <hr style="height:1px;border:none;border-top:3px solid #FF4081;"/>
      <br>
      参与会话的企业成员列表，格式为userid1;userid2;…，用分号隔开 <br>
@@ -91,7 +91,7 @@
      会话名称。单聊时该参数传入空字符串””即可 <br>
      <input type="text" id="groupName"/><br>
 
-     <input type="button" id="id_openEnterprisechat" value="创建会话" onclick="openEnterpriseChat()"/>
+     <input type="button" id="id_openEnterprisechat" value="创建会话" onclick="reqOpenEnterpriseChat()"/>
 <hr style="height:1px;border:none;border-top:3px solid #FF4081;"/>
      <br>
      1表示该userid是企业成员<br>
@@ -100,7 +100,7 @@
       可以是企业成员的id <br>
      <input type="text" id="userid" /><br>
       <br>
-     <input type="button" id="id_openuserprofile" value="打开个人信息页" onclick="openUserProfile()"/>
+     <input type="button" id="id_openuserprofile" value="打开个人信息页" onclick="reqOpenUserProfile()"/>
 <hr style="height:1px;border:none;border-top:3px solid #FF4081;"/>
 
         current 图片 <input type="text" id="currenturl" value="http://img3.16fan.com/live/origin/201805/21/4D7B35fdf082e.jpg"/><br>
@@ -141,7 +141,7 @@
     选择模式，”single”表示单选，”multi”表示多选<br>
     <input type="text" id="contacts" /><br>
     <br>
-    <input type="button" id="id_contacts" value="获取联系人" onclick="getContacts();"/>
+    <input type="button" id="id_contacts" value="获取联系人" onclick="reqSelectEnterpriseContact();"/>
     <input type="hidden" id="id_multicontacts" value="获取多个联系人" onclick="getMultiContacts();"/>
     <input type="hidden" id="id_singlecontact" value="获取单个联系人" onclick="getSingleContacts();"/>
 </p>
@@ -150,45 +150,43 @@
 
 
 <p>
-    <input type="text" id="text1" value="用户名(username)"/>
+    <input type="hidden" id="text1" value="用户名(username)"/>
 </p>
 
 <p>
-    <input type="text" id="text2" value="password"/>
+    <input type="hidden" id="text2" value="password"/>
 </p>
 
 <p>
-    <input type="button" id="enter" value="发消息给Native" onclick="testClick();"
+    <input type="hidden" id="enter" value="发消息给Native" onclick="testClick();"
     />
 </p>
 
 <p>
-    <input type="button" id="enter1" value="调用Native方法" onclick="testClick1();"
+    <input type="hidden" id="enter1" value="调用Native方法" onclick="testClick1();"
     />
 </p>
 
 <p>
-    <input type="button" id="enter2" value="显示源代码" onclick="testDiv();"/>
+    <input type="hidden" id="enter2" value="显示源代码" onclick="testDiv();"/>
 </p>
 
 <p>
-    <input type="file" id="open" value="打开文件1" onclick="onOpen();"/>
+    <input type="hidden" id="open" value="打开文件1" onclick="onOpen();"/>
 </p>
-<img id="pic_jgp" src="http://juziwalk.cn/jsbridge/jpg.jpg" width="170px" height="170px">网络图片jpg</td>
-<br>
-<img id="pic_png" src="http://juziwalk.cn/jsbridge/png.png" width="170px" height="170px">网络图片png</td>
+
 </body>
 <script>
 
 
-        function getToken() {
+        function reqGetOpenId() {
 
                     //send message to native
                     window.WebViewJavascriptBridge.callHandler(
-                        'requestFromNativeTypePrivateToken'
+                        'reqGetOpenId'
                         , {}
                         , function(responseData) {
-                            document.getElementById("show").innerHTML = " getToken:" + responseData
+                            document.getElementById("show").innerHTML = " reqGetOpenId:" + responseData
                             //alert(responseData);
                         }
                     );
@@ -208,137 +206,137 @@
                     );
                 }
 
-        function getNetworkStatus() {
+        function reqGetNetworkType() {
 
                    //send message to native
                    window.WebViewJavascriptBridge.callHandler(
-                       'requestFromNativeNetworkStatus'
+                       'reqGetNetworkType'
                        , {}
                        , function(responseData) {
-                           document.getElementById("show").innerHTML = " getNetworkStatus:" + responseData
+                           document.getElementById("show").innerHTML = " reqGetNetworkType:" + responseData
                            //alert(responseData);
                        }
                    );
                }
 
-        function makePhoneCall() {
+        function reqMakePhoneCall() {
                    var　str1 =  document.getElementById("phoneNumber").value;
                    //send message to native
                    window.WebViewJavascriptBridge.callHandler(
-                       'requestFromNativeMakePhoneCall'
+                       'reqMakePhoneCall'
                        , {'param':str1}
                        , function(responseData) {
-                           //document.getElementById("show").innerHTML = " getNetworkStatus:" + responseData
+                           //document.getElementById("show").innerHTML = " reqMakePhoneCall:" + responseData
                            //alert(responseData);
                        }
                    );
                }
 
-        function getSystemInfo() {
+        function reqGetSystemInfo() {
                    //send message to native
                    window.WebViewJavascriptBridge.callHandler(
-                       'requestFromNativeSystemInfo'
+                       'reqGetSystemInfo'
                        , {}
                        , function(responseData) {
-                           document.getElementById("show").innerHTML = " getNetworkStatus:" + responseData
+                           document.getElementById("show").innerHTML = " reqGetSystemInfo:" + responseData
                            //alert(responseData);
                        }
                    );
                }
 
-        function datePicker1() {
+        function reqDatePicker() {
                    var　format =  document.getElementById("format").value;
                    var　currentDate =  document.getElementById("currentDate").value;
                    var　startDate =  document.getElementById("startDate").value;
                    var　enzzate =  document.getElementById("enzzate").value;
                    //send message to native
                    window.WebViewJavascriptBridge.callHandler(
-                       'requestFromNativeTypeTimeDialog'
+                       'reqDatePicker'
                        , {'format':format,'currentDate':currentDate,'startDate':startDate,'enzzate':enzzate}
                        , function(responseData) {
-                           document.getElementById("show").innerHTML = " datePicker:" + responseData
+                           document.getElementById("show").innerHTML = " reqDatePicker:" + responseData
                            //alert(responseData);
                        }
                    );
                }
 
-        function scanBarQcode() {
+        function reqScan() {
                    var　barqcode =  document.getElementById("barqcode").value;
                    //send message to native
                    window.WebViewJavascriptBridge.callHandler(
-                       'requestFromNativeTypeScan'
+                       'reqScan'
                        , {'type':barqcode}
                        , function(responseData) {
-                           document.getElementById("show").innerHTML = "scanBarQcode:" + responseData
+                           document.getElementById("show").innerHTML = "reqScan:" + responseData
                            //alert(responseData);
                        }
                    );
                }
 
-        function getLocation() {
+        function reqGetLocation() {
                    var　type =  document.getElementById("type").value;
                    //send message to native
                    window.WebViewJavascriptBridge.callHandler(
-                       'requestFromNativeTypeGetLocationOnce'
+                       'reqGetLocation'
                        , {'type':type}
                        , function(responseData) {
-                           document.getElementById("show").innerHTML = "getLocation:" + responseData
+                           document.getElementById("show").innerHTML = "reqGetLocation:" + responseData
                            //alert(responseData);
                        }
                    );
                }
 
-        function stopAutoLBS() {
+        function reqStopAutoLBS() {
                    //send message to native
                    window.WebViewJavascriptBridge.callHandler(
-                       'requestFromNativeTypeStopAutoLBS'
+                       'reqStopAutoLBS'
                        , {}
                        , function(responseData) {
-                           document.getElementById("show").innerHTML = "stopAutoLBS:" + responseData
+                           document.getElementById("show").innerHTML = "reqStopAutoLBS:" + responseData
                            //alert(responseData);
                        }
                    );
                }
 
-        function startAutoLBS() {
+        function reqStartAutoLBS() {
             var　lbs_type =  document.getElementById("lbs_type").value;
 
                    //send message to native
                    window.WebViewJavascriptBridge.callHandler(
-                       'requestFromNativeTypeStartAutoLBS'
+                       'reqStartAutoLBS'
                        , {'wgs84_gcj02':lbs_type}
                        , function(responseData) {
-                           document.getElementById("show").innerHTML = "stopAutoLBS:" + responseData
+                           document.getElementById("show").innerHTML = "reqStartAutoLBS:" + responseData
                            //alert(responseData);
                        }
                    );
                }
 
-        function openEnterpriseChat() {
+        function reqOpenEnterpriseChat() {
             var　userIds =  document.getElementById("userIds").value;
             var groupName = document.getElementById("groupName").value;
 
                    //send message to native
                    window.WebViewJavascriptBridge.callHandler(
-                       'requestFromNativeTypeOpenEnterpriseChat'
+                       'reqOpenEnterpriseChat'
                        , {'userIds':userIds,'groupName':groupName}
                        , function(responseData) {
-                           document.getElementById("show").innerHTML = "openEnterpriseChat:" + responseData
+                           document.getElementById("show").innerHTML = "reqOpenEnterpriseChat:" + responseData
                            //alert(responseData);
                        }
                    );
                }
 
-        function openUserProfile() {
+        function reqOpenUserProfile() {
             var　type =  document.getElementById("type2").value;
             var userid = document.getElementById("userid").value;
 
                    //send message to native
                    window.WebViewJavascriptBridge.callHandler(
-                       'requestFromNativeTypeOpenUserProfile'
+                       'reqOpenUserProfile'
                        , {'type':type,'userid':userid}
                        , function(responseData) {
-                           document.getElementById("show").innerHTML = "openUserProfile:" + responseData
+                           document.getElementById("show").innerHTML = "reqOpenUserProfile:" + responseData
                            //alert(responseData);
                        }
                    );
@@ -380,7 +378,7 @@
                  }else if(camera!=""){
                     sizeType = [camrea];
                  }
-                 alert("sizeType"+sizeType);
+                 //alert("sizeType"+sizeType);
 
                  if(original!=""&& compressed!=""){
                     sourceType = [original,compressed];
@@ -389,7 +387,7 @@
                  }else if(compressed!=""){
                     sourceType = [compressed];
                  }
-                 alert("sourceType"+sourceType);
+                 //alert("sourceType"+sourceType);
                  //send message to native
                    window.WebViewJavascriptBridge.callHandler(
                        'reqChooseImage'
@@ -431,14 +429,14 @@
 
 
 
-        function getContacts() {
+        function reqSelectEnterpriseContact() {
             var str = document.getElementById("contacts").value;
             //send message to native
             window.WebViewJavascriptBridge.callHandler(
-                'requestFromNativeTypeContacts'
+                'reqSelectEnterpriseContact'
                 , {'contacts':str}
                 , function(responseData) {
-                    document.getElementById("show").innerHTML = " getContacts:" + responseData
+                    document.getElementById("show").innerHTML = " reqSelectEnterpriseContact:" + responseData
                     //alert(responseData);
                 }
             );
@@ -470,15 +468,11 @@
             );
         }
 
-
-
         function onOpen() {
           　var str1 = document.getElementById("text1").value;
             var str2 = document.getElementById("text2").value;
             var data = "name=" + str1 + ",pass=" + str2;
             //call native method
-
-
             window.WebViewJavascriptBridge.callHandler(
                 'functionOpen'
                 , {'param': data }

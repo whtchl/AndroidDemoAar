@@ -3,13 +3,13 @@ package com.jdjz.weex.modle;
 import com.jdjz.weex.modle.entity.NetworkStatusEntity;
 
 public class ResultNetworkStatus extends ResultTemp{
-    public NetworkStatusEntity getNetworkStatusEntity() {
-        return networkStatusEntity;
+    private NetworkStatusEntity responseResult;
+
+    public NetworkStatusEntity getResponseResult() {
+        return responseResult;
     }
 
-    public void setNetworkStatusEntity(NetworkStatusEntity networkStatusEntity) {
-        this.networkStatusEntity = networkStatusEntity;
+    public void setResponseResult(NetworkStatusEntity responseResult) {
+        this.responseResult = responseResult;
     }
-
-    private NetworkStatusEntity networkStatusEntity;
 }

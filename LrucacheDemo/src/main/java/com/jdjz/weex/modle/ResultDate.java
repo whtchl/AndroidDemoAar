@@ -1,13 +1,13 @@
 package com.jdjz.weex.modle;
 
 public class ResultDate extends ResultTemp {
-    private String  time;
+    private String  responseResult;
 
-    public String getTime() {
-        return time;
+    public String getResponseResult() {
+        return responseResult;
     }
 
-    public void setTime(String time) {
-        this.time = time;
+    public void setResponseResult(String responseResult) {
+        this.responseResult = responseResult;
     }
 }

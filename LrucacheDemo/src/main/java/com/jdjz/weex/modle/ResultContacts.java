@@ -5,13 +5,13 @@ import com.jdjz.contact.ContactInfo;
 import java.util.ArrayList;
 
 public class ResultContacts extends ResultTemp {
-    private ArrayList<ContactInfo> contactInfoArrayList;
+    private ArrayList<ContactInfo> responseResult;
 
-    public ArrayList<ContactInfo> getContactInfoArrayList() {
-        return contactInfoArrayList;
+    public ArrayList<ContactInfo> getResponseResult() {
+        return responseResult;
     }
 
-    public void setContactInfoArrayList(ArrayList<ContactInfo> contactInfoArrayList) {
-        this.contactInfoArrayList = contactInfoArrayList;
+    public void setResponseResult(ArrayList<ContactInfo> responseResult) {
+        this.responseResult = responseResult;
     }
 }

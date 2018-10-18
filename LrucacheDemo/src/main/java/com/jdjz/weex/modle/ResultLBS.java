@@ -3,13 +3,13 @@ package com.jdjz.weex.modle;
 import com.jdjz.weex.modle.entity.LBSEntity;
 
 public class ResultLBS extends ResultTemp {
-    private LBSEntity lbsEntity;
+    private LBSEntity responseResult;
 
-    public LBSEntity getLbsEntity() {
-        return lbsEntity;
+    public LBSEntity getResponseResult() {
+        return responseResult;
     }
 
-    public void setLbsEntity(LBSEntity lbsEntity) {
-        this.lbsEntity = lbsEntity;
+    public void setResponseResult(LBSEntity responseResult) {
+        this.responseResult = responseResult;
     }
 }

@@ -304,12 +304,12 @@ public class WXWebViewJsBridge implements IWebView {
 
                     String result = sb.toString();
                     stopLocation();
-                    resultLBS.setLbsEntity(lbsEntity);
+                    resultLBS.setResponseResult(lbsEntity);
                     str2 = new Gson().toJson(resultLBS);
                     callBackFunction.onCallBack(str2);
                 }else if(responseTypeLBS==1){
                     JUtils.Log("call ativeToJSstartAutoLBS(resultLBS);");
-                    resultLBS.setLbsEntity(lbsEntity);
+                    resultLBS.setResponseResult(lbsEntity);
                     NativeToJSstartAutoLBS(resultLBS);
                 }
 
@@ -319,13 +319,13 @@ public class WXWebViewJsBridge implements IWebView {
                     JUtils.Log("定位失败，loc is null");
                     resultLBS.setResponseCode(ModleConfig.RES404);
                     resultLBS.setResponseMsg("定位失败");
-                    resultLBS.setLbsEntity(null);
+                    resultLBS.setResponseResult(null);
                     str2 = new Gson().toJson(resultLBS);
                     callBackFunction.onCallBack(str2);
                 }else if(responseTypeLBS==1){
                     resultLBS.setResponseCode(ModleConfig.RES404);
                     resultLBS.setResponseMsg("定位失败");
-                    resultLBS.setLbsEntity(null);
+                    resultLBS.setResponseResult(null);
                     NativeToJSstartAutoLBS(resultLBS);
                 }
 
@@ -529,12 +529,13 @@ public class WXWebViewJsBridge implements IWebView {
 
         });
 
+        reqGetOpenId();
 
-        mWebView.registerHandler("requestFromNativeTypePrivateToken", new BridgeHandler() {
+ /*       mWebView.registerHandler("reqGetOpenId", new BridgeHandler() {
 
             @Override
             public void handler(String data, CallBackFunction function) {
-                JUtils.Log("handler = requestFromNativeTypePrivateToken, data from web = " + data);
+                JUtils.Log("handler = reqGetOpenId, data from web = " + data);
 
                 String str = JUtils.getSharedPreference().getString("tokenMyServer", ModleConfig.RES404);
                 ResultToken resultToken = new ResultToken();
@@ -550,7 +551,7 @@ public class WXWebViewJsBridge implements IWebView {
                 function.onCallBack(str2);
             }
 
-        });
+        });*/
 
 
         mWebView.registerHandler("requestFromNativeTypeSetPrivateToken", new BridgeHandler() {
@@ -559,17 +560,312 @@ public class WXWebViewJsBridge implements IWebView {
             public void handler(String data, CallBackFunction function) {
                 JUtils.Log("handler = requestFromNativeTypeSetPrivateToken, data from web = " + data);
                 JUtils.getSharedPreference().edit().putString("tokenMyServer",data).apply();
+
                 function.onCallBack("点击“获取token”按钮查看" );
             }
 
         });
 
+        reqGetNetworkType();
         //获取网络状态
-        mWebView.registerHandler("requestFromNativeNetworkStatus", new BridgeHandler() {
+/*        mWebView.registerHandler("reqGetNetworkType", new BridgeHandler() {
 
             @Override
             public void handler(String data, CallBackFunction function) {
-                JUtils.Log("handler = requestFromNativeNetworkStatus, data from web = " + data);
+                JUtils.Log("handler = reqGetNetworkType, data from web = " + data);
+                ResultNetworkStatus resultNetworkStatus = new ResultNetworkStatus();
+                NetworkStatusEntity networkStatusEntity = new NetworkStatusEntity();
+                boolean isNetWorkAvilable =  JUtils.isNetWorkAvilable();
+
+                resultNetworkStatus.setResponseCode(ModleConfig.RES200);
+                resultNetworkStatus.setResponseMsg(ModleConfig.RES_MSG_NETWORKSTATUS_SUC);
+
+                networkStatusEntity.setNetworkAvailable(isNetWorkAvilable);
+                String type  = "";
+                switch (JUtils.getNetworkState(mContext)){
+                    case 1:
+                        type = "WWAN";
+                        break;
+                    case 2:
+                        type = "2G";
+                        break;
+
+                    case 3:
+                        type = "3G";
+                        break;
+
+                    case 4:
+                        type = "4G";
+                        break;
+
+                    default:
+                        type = "UNKNOWN ";
+                        break;
+                }
+
+                if(TextUtils.isEmpty(isNetWorkReachable(mContext))){
+                    type = "NOTREACHABLE ";
+                }
+               *//* if(!JUtils.checkOnlineState(mContext)){
+                    type = "NOTREACHABLE";
+                }*//*
+
+                if(isNetWorkAvilable){
+                    networkStatusEntity.setType(type);
+                }else{
+                    networkStatusEntity.setType(type);
+                }
+                resultNetworkStatus.setNetworkStatusEntity(networkStatusEntity);
+
+                String str2 = new Gson().toJson(resultNetworkStatus);
+                JUtils.Log("call back");
+                function.onCallBack(str2);
+            }
+
+        });*/
+
+        reqMakePhoneCall();
+        reqGetSystemInfo();
+        reqDatePicker();
+        reqScan();
+        reqGetLocation();
+        reqStopAutoLBS();
+        reqStartAutoLBS();
+        reqOpenEnterpriseChat();
+        reqOpenUserProfile();
+        reqSelectEnterpriseContact();
+        reqPreviewImage();
+        reqChooseImage();
+        reqSaveImageToPhotosAlbum();
+        reqGetImageInfo();
+        mWebView.send("hello");
+    }
+
+    /**
+     * 停止定位
+     */
+    private void reqStopAutoLBS() {
+
+        //停止定位。 stopAutoLBS
+        mWebView.registerHandler("reqStopAutoLBS", new BridgeHandler() {
+
+            ResultTemp resultTemp = new ResultTemp();
+            String str2 = "";
+            @Override
+            public void handler(String data, CallBackFunction function) {
+                JUtils.Log("handler = reqStopAutoLBS, data from web = " + data);
+                if(locationClient!=null){
+                    stopLocation();
+                    resultTemp.setResponseCode(ModleConfig.RES200);
+                    resultTemp.setResponseCode("停止定位成功");
+                    str2 = new Gson().toJson(resultTemp);
+                    function.onCallBack(str2);
+                }else{
+                    resultTemp.setResponseCode(ModleConfig.RES404);
+                    resultTemp.setResponseCode("停止定位前先开启定位");
+                    str2 = new Gson().toJson(resultTemp);
+                    function.onCallBack(str2);
+                }
+            }
+
+        });
+    }
+
+    /**
+     * 获取一次地理位置信息
+     */
+    private void reqGetLocation() {
+        //获取一次地理位置信息。 getLocation
+        mWebView.registerHandler("reqGetLocation", new BridgeHandler() {
+
+            @Override
+            public void handler(String data, CallBackFunction function) {
+                JUtils.Log("handler = reqGetLocation, data from web = " + data);
+                RequestLBSParams requestLBSParams = new Gson().fromJson(data,RequestLBSParams.class);
+                ResultLBS resultLBS = new ResultLBS();
+                responseTypeLBS = 0;
+                lbs_type = requestLBSParams.getType();
+                if(lbs_type.equals("1") ||lbs_type.equals("2") ||lbs_type.equals("3")){
+                    ;
+                }else{
+                    lbs_type="0";
+                    /*resultLBS.setResponseCode(ModleConfig.RES404);
+                    resultLBS.setResponseMsg("输入type参数错误");
+                    resultLBS.setLbsEntity(null);
+                    String str3 = new Gson().toJson(resultLBS);
+                    function.onCallBack(str3);
+                    return;*/
+                }
+                resetOption(true);
+                startLocation();
+                callBackFunction = function;
+            }
+
+        });
+    }
+
+    /**
+     *  二维码 条码扫描
+     */
+    private void reqScan() {
+
+        mWebView.registerHandler("reqScan", new BridgeHandler() {
+
+            @Override
+            public void handler(String data, CallBackFunction function) {
+                JUtils.Log("handler = reqScan, data from web = " + data);
+                RequestScanParams scanEntity = new Gson().fromJson(data,RequestScanParams.class);
+
+                ResultScan resultScan = new ResultScan();
+                if(scanEntity!=null ){
+                    if(scanEntity.getType().equals("bar")){
+
+                        Intent i = new Intent(mContext, CaptureActivity.class);
+                        i.putExtra("type",false);
+                        mContext.startActivity(i);
+                        callBackFunction = function;
+
+                    }else{
+                        Intent i = new Intent(mContext, CaptureActivity.class);
+                        i.putExtra("type",true);
+                        mContext.startActivity(i);
+                        callBackFunction = function;
+                    }
+                }else{
+                    resultScan.setResponseCode(ModleConfig.RES404);
+                    resultScan.setResponseMsg("输入参数错误");
+                    resultScan.setResponseResult(null);
+                    String str2 = new Gson().toJson(resultScan);
+                    function.onCallBack(str2);
+                }
+            }
+
+        });
+
+
+    }
+
+    /**
+     * 获取日期时间
+     */
+    private void reqDatePicker() {
+        mWebView.registerHandler("reqDatePicker", new BridgeHandler() {
+
+            @Override
+            public void handler(String data, CallBackFunction function) {
+                JUtils.Log("handler = reqDatePicker, data from web = " + data);
+                ReuquestDateParams dateEntity = new Gson().fromJson(data,ReuquestDateParams.class);
+
+                //final CallBackFunction f = function;
+                int mode=DateDialog.MODE_2;
+                if(dateEntity.getFormat().equalsIgnoreCase("yyyy-MM-zz")){
+                    mode = DateDialog.MODE_2;
+                }else if(dateEntity.getFormat().equalsIgnoreCase("HH:mm")){
+                    mode = DateDialog.MODE_3;
+                }else if(dateEntity.getFormat().equalsIgnoreCase("yyyy-MM-zz HH:mm")){
+                    mode = DateDialog.MODE_1;
+                }else{
+                    mode = DateDialog.MODE_2;
+                }
+                JUtils.Log("currentDate:"+dateEntity.getCurrentDate());
+                final CallBackFunction f = function;
+                final  ResultDate resultDate = new ResultDate();
+                DateDialog dateDialog = new DateDialog(mContext, "时间日期", mode, dateEntity.getCurrentDate(), dateEntity.getStartDate(), dateEntity.getEnzzate(),
+                        new DateDialog.InterfaceDateDialog() {
+                            @Override
+                            public void getTime(String dateTime)  {
+                                if (TextUtils.isEmpty(dateTime)) {
+                                    resultDate.setResponseCode(ModleConfig.RES404);
+
+                                    resultDate.setResponseMsg(ModleConfig.RES_FAIL);
+                                    resultDate.setResponseResult("");
+                                } else {
+
+                                    resultDate.setResponseCode(ModleConfig.RES200);
+
+                                    resultDate.setResponseMsg(ModleConfig.RES_SUCCESS);
+                                    resultDate.setResponseResult(dateTime);
+                                }
+                                String str2 = new Gson().toJson(resultDate);
+                                // final JSONObject jsresult = new JSONObject(new Gson().toJson(result));
+                                f.onCallBack(str2);
+                            }
+                        });
+                dateDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                dateDialog.show();
+                //function.onCallBack("datapicker");
+            }
+        });
+    }
+
+    /**
+     *  //获取设备信息
+     */
+    private void reqGetSystemInfo() {
+
+        mWebView.registerHandler("reqGetSystemInfo", new BridgeHandler() {
+
+            @Override
+            public void handler(String data, CallBackFunction function) {
+                JUtils.Log("handler = reqGetSystemInfo, data from web = " + data);
+                ResultSystemInfo resultSystemInfo = new ResultSystemInfo();
+                SystemInfoEntity systemInfoEntity = new SystemInfoEntity();
+                systemInfoEntity.setModel(JUtils.getSystemModel());
+                systemInfoEntity.setPixelRatio(JUtils.getPixelRatio());
+                systemInfoEntity.setWindowHeight(JUtils.getWindowHeight(mContext));
+                systemInfoEntity.setWindowWidth(JUtils.getWindowWidth(mContext));
+                systemInfoEntity.setLanguage(JUtils.getSystemLanguage());
+                systemInfoEntity.setVersion(JUtils.getAppVersionCode()+"");
+                systemInfoEntity.setStorage(JUtils.readSystemStorage()+"KB");
+                systemInfoEntity.setCurrentBattery(JUtils.getSharedPreference().getString(SealConst.BATTYER_LEVEL,""));
+                systemInfoEntity.setSystem(JUtils.getSystemVersion());
+                systemInfoEntity.setPlatform("Android");
+
+                systemInfoEntity.setScreenHeight(JUtils.getScreenHeight());
+                systemInfoEntity.setScreeWidth(JUtils.getScreenWidth());
+                systemInfoEntity.setBrand(JUtils.getDeviceBrand());
+                systemInfoEntity.setFontSizeSetting(JUtils.getFontSize(mContext));
+
+                resultSystemInfo.setResponseResult(systemInfoEntity);
+                resultSystemInfo.setResponseCode(ModleConfig.RES200);
+                resultSystemInfo.setResponseMsg(ModleConfig.RES_SUCCESS);
+                String str2 = new Gson().toJson(resultSystemInfo);
+                function.onCallBack(str2);
+
+            }
+
+        });
+    }
+
+    /**
+     * 打电话
+     */
+    private void reqMakePhoneCall() {
+
+        mWebView.registerHandler("reqMakePhoneCall", new BridgeHandler() {
+
+            @Override
+            public void handler(String data, CallBackFunction function) {
+                JUtils.Log("handler = reqMakePhoneCall, data from web = " + data);
+                RequestJSParams jsParams = new Gson().fromJson(data,RequestJSParams.class);
+                Intent intent = new Intent();
+                intent.setAction("android.intent.action.CALL");
+                intent.setData(Uri.parse("tel:" + jsParams.getParam()));
+                mContext.startActivity(intent);
+            }
+        });
+    }
+
+    /**
+     * 获取网络状态
+     */
+    private void reqGetNetworkType() {
+
+        mWebView.registerHandler("reqGetNetworkType", new BridgeHandler() {
+
+            @Override
+            public void handler(String data, CallBackFunction function) {
+                JUtils.Log("handler = reqGetNetworkType, data from web = " + data);
                 ResultNetworkStatus resultNetworkStatus = new ResultNetworkStatus();
                 NetworkStatusEntity networkStatusEntity = new NetworkStatusEntity();
                 boolean isNetWorkAvilable =  JUtils.isNetWorkAvilable();
@@ -612,7 +908,7 @@ public class WXWebViewJsBridge implements IWebView {
                 }else{
                     networkStatusEntity.setType(type);
                 }
-                resultNetworkStatus.setNetworkStatusEntity(networkStatusEntity);
+                resultNetworkStatus.setResponseResult(networkStatusEntity);
 
                 String str2 = new Gson().toJson(resultNetworkStatus);
                 JUtils.Log("call back");
@@ -620,209 +916,7 @@ public class WXWebViewJsBridge implements IWebView {
             }
 
         });
-
-
-        //打电话
-        mWebView.registerHandler("requestFromNativeMakePhoneCall", new BridgeHandler() {
-
-            @Override
-            public void handler(String data, CallBackFunction function) {
-                JUtils.Log("handler = requestFromNativeMakePhoneCall, data from web = " + data);
-                RequestJSParams jsParams = new Gson().fromJson(data,RequestJSParams.class);
-                Intent intent = new Intent();
-                intent.setAction("android.intent.action.CALL");
-                intent.setData(Uri.parse("tel:" + jsParams.getParam()));
-                mContext.startActivity(intent);
-            }
-        });
-
-        //获取设备信息
-        mWebView.registerHandler("requestFromNativeSystemInfo", new BridgeHandler() {
-
-            @Override
-            public void handler(String data, CallBackFunction function) {
-                JUtils.Log("handler = requestFromNativeSystemInfo, data from web = " + data);
-                ResultSystemInfo resultSystemInfo = new ResultSystemInfo();
-                SystemInfoEntity systemInfoEntity = new SystemInfoEntity();
-                systemInfoEntity.setModel(JUtils.getSystemModel());
-                systemInfoEntity.setPixelRatio(JUtils.getPixelRatio());
-                systemInfoEntity.setWindowHeight(JUtils.getWindowHeight(mContext));
-                systemInfoEntity.setWindowWidth(JUtils.getWindowWidth(mContext));
-                systemInfoEntity.setLanguage(JUtils.getSystemLanguage());
-                systemInfoEntity.setVersion(JUtils.getAppVersionCode()+"");
-                systemInfoEntity.setStorage(JUtils.readSystemStorage()+"KB");
-                systemInfoEntity.setCurrentBattery(JUtils.getSharedPreference().getString(SealConst.BATTYER_LEVEL,""));
-                systemInfoEntity.setSystem(JUtils.getSystemVersion());
-                systemInfoEntity.setPlatform("Android");
-
-                systemInfoEntity.setScreenHeight(JUtils.getScreenHeight());
-                systemInfoEntity.setScreeWidth(JUtils.getScreenWidth());
-                systemInfoEntity.setBrand(JUtils.getDeviceBrand());
-                systemInfoEntity.setFontSizeSetting(JUtils.getFontSize(mContext));
-
-                resultSystemInfo.setSystemInfoEntity(systemInfoEntity);
-                resultSystemInfo.setResponseCode(ModleConfig.RES200);
-                resultSystemInfo.setResponseMsg(ModleConfig.RES_SUCCESS);
-                String str2 = new Gson().toJson(resultSystemInfo);
-                function.onCallBack(str2);
-
-            }
-
-        });
-
-
-        //获取日期时间
-        mWebView.registerHandler("requestFromNativeTypeTimeDialog", new BridgeHandler() {
-
-            @Override
-            public void handler(String data, CallBackFunction function) {
-                JUtils.Log("handler = requestFromNativeTypeTimeDialog, data from web = " + data);
-                ReuquestDateParams dateEntity = new Gson().fromJson(data,ReuquestDateParams.class);
-
-                //final CallBackFunction f = function;
-                int mode=DateDialog.MODE_2;
-                if(dateEntity.getFormat().equalsIgnoreCase("yyyy-MM-zz")){
-                    mode = DateDialog.MODE_2;
-                }else if(dateEntity.getFormat().equalsIgnoreCase("HH:mm")){
-                    mode = DateDialog.MODE_3;
-                }else if(dateEntity.getFormat().equalsIgnoreCase("yyyy-MM-zz HH:mm")){
-                    mode = DateDialog.MODE_1;
-                }else{
-                    mode = DateDialog.MODE_2;
-                }
-                JUtils.Log("currentDate:"+dateEntity.getCurrentDate());
-                final CallBackFunction f = function;
-               final  ResultDate resultDate = new ResultDate();
-                DateDialog dateDialog = new DateDialog(mContext, "时间日期", mode, dateEntity.getCurrentDate(), dateEntity.getStartDate(), dateEntity.getEnzzate(),
-                        new DateDialog.InterfaceDateDialog() {
-                            @Override
-                            public void getTime(String dateTime)  {
-                                if (TextUtils.isEmpty(dateTime)) {
-                                    resultDate.setResponseCode(ModleConfig.RES404);
-
-                                    resultDate.setResponseMsg(ModleConfig.RES_FAIL);
-                                    resultDate.setTime("");
-                                } else {
-
-                                    resultDate.setResponseCode(ModleConfig.RES200);
-
-                                    resultDate.setResponseMsg(ModleConfig.RES_SUCCESS);
-                                    resultDate.setTime(dateTime);
-                                }
-                                String str2 = new Gson().toJson(resultDate);
-                                // final JSONObject jsresult = new JSONObject(new Gson().toJson(result));
-                                f.onCallBack(str2);
-                            }
-                        });
-                dateDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                dateDialog.show();
-                //function.onCallBack("datapicker");
-            }
-        });
-
-
-        //二维码 条码扫描
-        mWebView.registerHandler("requestFromNativeTypeScan", new BridgeHandler() {
-
-            @Override
-            public void handler(String data, CallBackFunction function) {
-                JUtils.Log("handler = requestFromNativeTypeScan, data from web = " + data);
-                RequestScanParams scanEntity = new Gson().fromJson(data,RequestScanParams.class);
-
-                ResultScan resultScan = new ResultScan();
-                if(scanEntity!=null ){
-                    if(scanEntity.getType().equals("bar")){
-
-                        /*Intent intent = new Intent(mContext, ContactListActivity.class);
-                        intent.putExtra(ChooseModel.CHOOSEMODEL,ChooseModel.MODEL_SINGLE);
-                        mContext.startActivity(intent);*/
-
-                        Intent i = new Intent(mContext, CaptureActivity.class);
-                        i.putExtra("type",false);
-                        mContext.startActivity(i);
-                        callBackFunction = function;
-
-                    }else{
-                        Intent i = new Intent(mContext, CaptureActivity.class);
-                        i.putExtra("type",true);
-                        mContext.startActivity(i);
-                        callBackFunction = function;
-                    }
-                }else{
-                    resultScan.setResponseCode(ModleConfig.RES404);
-                    resultScan.setResponseMsg("输入参数错误");
-                    resultScan.setScanEntity(null);
-                    String str2 = new Gson().toJson(resultScan);
-                    function.onCallBack(str2);
-                }
-            }
-
-        });
-
-        //获取一次地理位置信息。 getLocation
-        mWebView.registerHandler("requestFromNativeTypeGetLocationOnce", new BridgeHandler() {
-
-            @Override
-            public void handler(String data, CallBackFunction function) {
-                JUtils.Log("handler = requestFromNativeTypeGetLocationOnce, data from web = " + data);
-                RequestLBSParams requestLBSParams = new Gson().fromJson(data,RequestLBSParams.class);
-                ResultLBS resultLBS = new ResultLBS();
-                responseTypeLBS = 0;
-                lbs_type = requestLBSParams.getType();
-                if(lbs_type.equals("1") ||lbs_type.equals("2") ||lbs_type.equals("3")){
-                    ;
-                }else{
-                    lbs_type="0";
-                    /*resultLBS.setResponseCode(ModleConfig.RES404);
-                    resultLBS.setResponseMsg("输入type参数错误");
-                    resultLBS.setLbsEntity(null);
-                    String str3 = new Gson().toJson(resultLBS);
-                    function.onCallBack(str3);
-                    return;*/
-                }
-                resetOption(true);
-                startLocation();
-                callBackFunction = function;
-            }
-
-        });
-
-
-        //停止定位。 stopAutoLBS
-        mWebView.registerHandler("requestFromNativeTypeStopAutoLBS", new BridgeHandler() {
-
-            ResultTemp resultTemp = new ResultTemp();
-            String str2 = "";
-            @Override
-            public void handler(String data, CallBackFunction function) {
-                JUtils.Log("handler = requestFromNativeTypeStopAutoLBS, data from web = " + data);
-                if(locationClient!=null){
-                    stopLocation();
-                    resultTemp.setResponseCode(ModleConfig.RES200);
-                    resultTemp.setResponseCode("停止定位成功");
-                    str2 = new Gson().toJson(resultTemp);
-                    function.onCallBack(str2);
-                }else{
-                    resultTemp.setResponseCode(ModleConfig.RES404);
-                    resultTemp.setResponseCode("停止定位前先开启定位");
-                    str2 = new Gson().toJson(resultTemp);
-                    function.onCallBack(str2);
-                }
-            }
-
-        });
-        requestFromNativeTypeStartAutoLBS();
-        requestFromNativeTypeOpenEnterpriseChat();
-        requestFromNativeTypeOpenUserProfile();
-        requestFromNativeTypeContacts();
-        reqPreviewImage();
-
-        reqChooseImage();
-        reqSaveImageToPhotosAlbum();
-        reqGetImageInfo();
-        mWebView.send("hello");
     }
-
 
 
     /**
@@ -907,7 +1001,7 @@ public class WXWebViewJsBridge implements IWebView {
         ResultContacts resultContacts = new ResultContacts();
         resultContacts.setResponseCode(ModleConfig.RES200);
         resultContacts.setResponseMsg(ModleConfig.RES_SUCCESS);
-        resultContacts.setContactInfoArrayList(contactInfos);
+        resultContacts.setResponseResult(contactInfos);
         callBackFunction.onCallBack(new Gson().toJson(resultContacts));
         /*Collections.sort(contactInfos, new Comparator<ContactInfo>() {
             @Override
@@ -931,7 +1025,7 @@ public class WXWebViewJsBridge implements IWebView {
         if(transScanEntity ==null){
             resultScan.setResponseCode(ModleConfig.RES404);
             resultScan.setResponseMsg("Scan:"+ModleConfig.RES_FAIL);
-            resultScan.setScanEntity(null);
+            resultScan.setResponseResult(null);
             String str2 = new Gson().toJson(resultScan);
             callBackFunction.onCallBack(str2);
 
@@ -942,14 +1036,14 @@ public class WXWebViewJsBridge implements IWebView {
                 scanEntity.setCode(transScanEntity.getResult());
                 scanEntity.setBarCode("");
                 scanEntity.setQrCode(transScanEntity.getResult());
-                resultScan.setScanEntity(scanEntity);
+                resultScan.setResponseResult(scanEntity);
             }else{
                 scanEntity.setCode(transScanEntity.getResult());
                 scanEntity.setBarCode(transScanEntity.getResult());
                 scanEntity.setQrCode("");
-                resultScan.setScanEntity(scanEntity);
+                resultScan.setResponseResult(scanEntity);
             }
-            resultScan.setScanEntity(scanEntity);
+            resultScan.setResponseResult(scanEntity);
             String str2 = new Gson().toJson(resultScan);
             callBackFunction.onCallBack(str2);
         }
@@ -1026,7 +1120,7 @@ public class WXWebViewJsBridge implements IWebView {
     /**
      * 回调 NativeToJSstartAutoLBS, 返回信息为html
      */
-    public void NativeToJSstartAutoLBS(final ResultLBS resultLBS){
+    private void NativeToJSstartAutoLBS(final ResultLBS resultLBS){
         mWebView.callHandler("NativeToJSstartAutoLBS", new Gson().toJson(resultLBS), new CallBackFunction() {
             @Override
             public void onCallBack(String data) {
@@ -1037,15 +1131,46 @@ public class WXWebViewJsBridge implements IWebView {
         });
     }
 
+
     /**
-     *开启持续定位
+     * 获取openid
      */
-    public void requestFromNativeTypeStartAutoLBS(){
-        mWebView.registerHandler("requestFromNativeTypeStartAutoLBS", new BridgeHandler() {
+    private void reqGetOpenId(){
+        mWebView.registerHandler("reqGetOpenId", new BridgeHandler() {
 
             @Override
             public void handler(String data, CallBackFunction function) {
-                JUtils.Log("handler = requestFromNativeTypeStartAutoLBS, data from web = " + data);
+                JUtils.Log("handler = reqGetOpenId, data from web = " + data);
+
+                String str = JUtils.getSharedPreference().getString("tokenMyServer", ModleConfig.RES404);
+                ResultToken resultToken = new ResultToken();
+                if (str.equals(ModleConfig.RES404)) {
+                    resultToken.setResponseCode(ModleConfig.RES404);
+                    resultToken.setResponseMsg(ModleConfig.RES_FAIL);
+                    resultToken.setResponseResult("");
+                } else {
+                    resultToken.setResponseCode(ModleConfig.RES200);
+                    resultToken.setResponseMsg(ModleConfig.RES_SUCCESS);
+                    JUtils.Log("get openid:"+str);
+                    resultToken.setResponseResult(str);
+                }
+                String str2 = new Gson().toJson(resultToken);
+
+                function.onCallBack(str2);
+            }
+
+        });
+    }
+
+    /**
+     *开启持续定位
+     */
+    private void reqStartAutoLBS(){
+        mWebView.registerHandler("reqStartAutoLBS", new BridgeHandler() {
+
+            @Override
+            public void handler(String data, CallBackFunction function) {
+                JUtils.Log("handler = reqStartAutoLBS, data from web = " + data);
                 //NativeToJSstartAutoLBS(1);
                 //NativeToJSstartAutoLBS(2);
                 RequestLBSWGS84_GCJ02Params requestLBSWGS84_gcj02Params = new Gson().fromJson(data, RequestLBSWGS84_GCJ02Params.class);
@@ -1060,12 +1185,12 @@ public class WXWebViewJsBridge implements IWebView {
     /**
      * 创建会话
      */
-    public void requestFromNativeTypeOpenEnterpriseChat(){
-        mWebView.registerHandler("requestFromNativeTypeOpenEnterpriseChat", new BridgeHandler() {
+    private void reqOpenEnterpriseChat(){
+        mWebView.registerHandler("reqOpenEnterpriseChat", new BridgeHandler() {
 
             @Override
             public void handler(String data, CallBackFunction function) {
-                JUtils.Log("handler = requestFromNativeTypeOpenEnterpriseChat, data from web = " + data);
+                JUtils.Log("handler = reqOpenEnterpriseChat, data from web = " + data);
                 RequestEnterpriseChatParams requestEnterpriseChatParams = new RequestEnterpriseChatParams();
                 requestEnterpriseChatParams = new Gson().fromJson(data,RequestEnterpriseChatParams.class);
                 String[] listUserIds = requestEnterpriseChatParams.getUserIds().split(";");
@@ -1079,12 +1204,12 @@ public class WXWebViewJsBridge implements IWebView {
     /**
      * 打开个人信息页
      */
-    public void requestFromNativeTypeOpenUserProfile(){
-        mWebView.registerHandler("requestFromNativeTypeOpenUserProfile", new BridgeHandler() {
+    private void reqOpenUserProfile(){
+        mWebView.registerHandler("reqOpenUserProfile", new BridgeHandler() {
 
             @Override
             public void handler(String data, CallBackFunction function) {
-                JUtils.Log("handler = requestFromNativeTypeOpenUserProfile, data from web = " + data);
+                JUtils.Log("handler = reqOpenUserProfile, data from web = " + data);
                 RequestUserProfileParams  requestUserProfileParams= new RequestUserProfileParams();
                 requestUserProfileParams = new Gson().fromJson(data,RequestUserProfileParams.class);
                // String[] listUserIds = requestEnterpriseChatParams.getUserIds().split(";");
@@ -1104,12 +1229,12 @@ public class WXWebViewJsBridge implements IWebView {
     /**
      * 获取联系人
      */
-    public void requestFromNativeTypeContacts(){
-        mWebView.registerHandler("requestFromNativeTypeContacts", new BridgeHandler() {
+    private void reqSelectEnterpriseContact(){
+        mWebView.registerHandler("reqSelectEnterpriseContact", new BridgeHandler() {
 
             @Override
             public void handler(String data, CallBackFunction function) {
-                JUtils.Log("handler = requestFromNativeTypeContacts, data from web = " + data);
+                JUtils.Log("handler = reqSelectEnterpriseContact, data from web = " + data);
                 RequestContactsParams requestContactsParams = new RequestContactsParams();
                 requestContactsParams = new Gson().fromJson(data,RequestContactsParams.class);
                 String str2 ;//= new Gson().toJson(resultToken);
@@ -1152,7 +1277,7 @@ public class WXWebViewJsBridge implements IWebView {
     /**
      * 预览图片
      */
-    public void reqPreviewImage(){
+    private void reqPreviewImage(){
         mWebView.registerHandler("reqPreviewImage", new BridgeHandler() {
 
             @Override
@@ -1231,7 +1356,7 @@ public class WXWebViewJsBridge implements IWebView {
     /**
      * 选择照片
      */
-    public void reqChooseImage() {
+    private void reqChooseImage() {
         mWebView.registerHandler("reqChooseImage", new BridgeHandler() {
 
             @Override
@@ -1292,7 +1417,7 @@ public class WXWebViewJsBridge implements IWebView {
     /**
      * 保存图片到相册
      */
-   public void reqSaveImageToPhotosAlbum(){
+    private void reqSaveImageToPhotosAlbum(){
         mWebView.registerHandler("reqSaveImageToPhotosAlbum", new BridgeHandler() {
 
             @Override
@@ -1307,8 +1432,10 @@ public class WXWebViewJsBridge implements IWebView {
     }
 
 
-
-    public void reqGetImageInfo(){
+    /**
+     * 获取图片信息
+     */
+    private void reqGetImageInfo(){
 
         mWebView.registerHandler("reqGetImageInfo", new BridgeHandler() {
 
