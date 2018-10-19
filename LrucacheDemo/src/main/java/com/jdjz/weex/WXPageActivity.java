@@ -17,8 +17,19 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.jdjz.weex.hotreload.HotReloadManager;
+import com.jdjz.weex.modle.Event.ContactsEvent;
+import com.jdjz.weex.modle.Event.GetImageInfoEvent;
+import com.jdjz.weex.modle.Event.LocationEvent;
+import com.jdjz.weex.modle.Event.PhoneEvent;
+import com.jdjz.weex.modle.Event.PreviewImageEvent;
+import com.jdjz.weex.modle.Event.SaveImageToPhotosAlbumEvent;
+import com.jdjz.weex.modle.Event.StartAutoLBSEvent;
+import com.jdjz.weex.modle.Event.StopAutoLBSEvent;
 import com.jdjz.weex.util.Constants;
 import com.jdjz.weex.util.AppConfig;
+import com.jude.utils.JUtils;
+import com.jude.utils.permission.PermissionRequestCode;
+import com.jude.utils.permission.PermissionsUtil;
 import com.taobao.weex.WXEnvironment;
 
 import com.taobao.weex.WXSDKEngine;
@@ -27,9 +38,12 @@ import com.taobao.weex.ui.component.NestedContainer;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXSoInstallMgrSdk;
 
+import org.greenrobot.eventbus.EventBus;
 import org.json.JSONException;
 import org.json.JSONObject;
 import com.jdjz.lrucachedemo.R;
+
+import java.time.temporal.JulianFields;
 
 public class WXPageActivity extends AbsWeexActivity implements
     WXSDKInstance.NestedInstanceInterceptor {
@@ -150,11 +164,68 @@ public class WXPageActivity extends AbsWeexActivity implements
   @Override
   public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
     super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    Intent intent = new Intent("requestPermission");
+    JUtils.Log("onRequestPermissionsResult:" + requestCode);
+    for(int i=0;i<permissions.length;i++){
+        JUtils.Log("permission name:"+permissions[i]+"  grantResults:"+grantResults[i]);
+    }
+
+    JUtils.Log("PermissionsUtil.isGranted:"+ PermissionsUtil.isGranted(grantResults)+"  "+PermissionsUtil.hasPermission(this, permissions));
+
+    if (requestCode == PermissionRequestCode.PERMISSION_REQUEST_CODE_PHONE && PermissionsUtil.isGranted(grantResults)
+            && PermissionsUtil.hasPermission(this, permissions)) {
+        EventBus.getDefault().post(new PhoneEvent());
+        JUtils.Toast("可以使用电话功能了了");
+    } else if (requestCode == PermissionRequestCode.PERMISSION_REQUEST_CODE_LOCATION && PermissionsUtil.isGranted(grantResults)
+            && PermissionsUtil.hasPermission(this, permissions)) {
+        EventBus.getDefault().post(new LocationEvent());
+        JUtils.Toast("可以定位了");
+    }else if (requestCode == PermissionRequestCode.PERMISSION_REQUEST_CODE_CONTACTS && PermissionsUtil.isGranted(grantResults)
+            && PermissionsUtil.hasPermission(this, permissions)) {
+        EventBus.getDefault().post(new ContactsEvent());
+        JUtils.Toast("可以使用联系人了");
+    }else if (requestCode == PermissionRequestCode.PERMISSION_REQUEST_CODE_STARTAUTO_LOCATION && PermissionsUtil.isGranted(grantResults)
+            && PermissionsUtil.hasPermission(this, permissions)) {
+        EventBus.getDefault().post(new StartAutoLBSEvent());
+        JUtils.Toast("可以自动获取地理职位了");
+    }else if (requestCode == PermissionRequestCode.PERMISSION_REQUEST_CODE_STOPAUTO_LOCATION && PermissionsUtil.isGranted(grantResults)
+            && PermissionsUtil.hasPermission(this, permissions)) {
+        EventBus.getDefault().post(new StopAutoLBSEvent());
+        JUtils.Toast("可以停止自动获取地理职位了");
+    }else if (requestCode == PermissionRequestCode.PERMISSION_REQUEST_CODE_STORAGE_PREVIEWIMAGE && PermissionsUtil.isGranted(grantResults)
+            && PermissionsUtil.hasPermission(this, permissions)) {
+        EventBus.getDefault().post(new PreviewImageEvent());
+        JUtils.Toast("可以预览图片了");
+    }else if (requestCode == PermissionRequestCode.PERMISSION_REQUEST_CODE_STORAGE_GETIMAGEINFO && PermissionsUtil.isGranted(grantResults)
+            && PermissionsUtil.hasPermission(this, permissions)) {
+        EventBus.getDefault().post(new GetImageInfoEvent());
+        JUtils.Toast("可以获取图片信息了");
+    }else if (requestCode == PermissionRequestCode.PERMISSION_REQUEST_CODE_STORAGE_SAVEIMAGETOPHOTOSALBUM && PermissionsUtil.isGranted(grantResults)
+            && PermissionsUtil.hasPermission(this, permissions)) {
+        EventBus.getDefault().post(new SaveImageToPhotosAlbumEvent());
+        JUtils.Toast("可以保存图片到相册了");
+    }
+    else {
+      JUtils.Toast(this.getString(R.string.permissontip));
+    }
+
+   /*   //部分厂商手机系统返回授权成功时，厂商可以拒绝权限，所以要用PermissionChecker二次判断
+      if (requestCode == PERMISSION_REQUEST_CODE && PermissionsUtil.isGranted(grantResults)
+              && PermissionsUtil.hasPermission(this, permissions)) {
+        Log.i("tchl","PermissionActivity onRequestPermissionsResult 同意授权");
+        permissionsGranted();
+      } else if (showTip){
+        Log.i("tchl","PermissionActivity onRequestPermissionsResult 不同意授权，打开提示对话框，进入到app设置界面");
+        showMissingPermissionDialog();
+      } else { //不需要提示用户
+        Log.i("tchl","PermissionActivity onRequestPermissionsResult 不同意授权，permissonsDenied");
+        permissionsDenied();
+      }*/
+
+    /*Intent intent = new Intent("requestPermission");
     intent.putExtra("REQUEST_PERMISSION_CODE", requestCode);
     intent.putExtra("permissions", permissions);
     intent.putExtra("grantResults", grantResults);
-    LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    LocalBroadcastManager.getInstance(this).sendBroadcast(intent);*/
   }
 
 

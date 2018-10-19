@@ -16,4 +16,6 @@
     <string name="nickname">昵称</string>
     <string name="phone_number">手机号</string>
 
+    <string name="permissontip">"请点击 \"设置\"-\"应用管理\"-所在应用-\"应用权限\" 打开权限。"</string>
+
 </resources>

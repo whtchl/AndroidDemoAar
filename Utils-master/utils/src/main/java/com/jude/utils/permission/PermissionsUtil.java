@@ -124,7 +124,9 @@ public class PermissionsUtil {
         }
 
         for (String per : permissions ) {
+
             int result = PermissionChecker.checkSelfPermission(context, per);
+            JUtils.Log("hasPermission:"+ permissions+"  result:"+result );
             if ( result != PermissionChecker.PERMISSION_GRANTED) {
                 return false;
             }

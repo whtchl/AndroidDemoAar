@@ -132,7 +132,7 @@
   获取图片宽 高 路径<br>
   <input type="text" id="imgpath2" value="/sdcard/jpg.jpg" /><br><br>
 
-   <input type="button" id="id_reqgetimageinfo" value="保存图片到相册" onclick="reqGetImageInfo()"/>
+   <input type="button" id="id_reqgetimageinfo" value="获取图片宽 高 路径" onclick="reqGetImageInfo()"/>
 
 
 <hr style="height:1px;border:none;border-top:3px solid #FF4081;"/>
@@ -224,7 +224,7 @@
                    //send message to native
                    window.WebViewJavascriptBridge.callHandler(
                        'reqMakePhoneCall'
-                       , {'param':str1}
+                       , {'phone':str1}
                        , function(responseData) {
                            //document.getElementById("show").innerHTML = " reqMakePhoneCall:" + responseData
                            //alert(responseData);

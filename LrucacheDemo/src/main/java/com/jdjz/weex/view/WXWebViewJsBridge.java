@@ -1,6 +1,7 @@
 package com.jdjz.weex.view;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -9,8 +10,10 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.net.http.SslError;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.PermissionChecker;
 import android.text.TextUtils;
 import android.util.Log;
@@ -40,7 +43,6 @@ import com.jdjz.contact.ContactInfo;
 import com.jdjz.contacts.ContactEvent;
 import com.jdjz.contacts.ContactListActivity;
 import com.jdjz.date.DateDialog;
-import com.jdjz.lrucachedemo.MainActivity;
 import com.jdjz.testConfig.SealConst;
 import com.jdjz.weex.activity.UserProfileActivity;
 import com.jdjz.weex.jsbridge.BridgeHandler;
@@ -48,6 +50,15 @@ import com.jdjz.weex.jsbridge.BridgeWebView;
 import com.jdjz.weex.jsbridge.BridgeWebViewClient;
 import com.jdjz.weex.jsbridge.CallBackFunction;
 import com.jdjz.weex.jsbridge.DefaultHandler;
+import com.jdjz.weex.modle.Brand;
+import com.jdjz.weex.modle.Event.ContactsEvent;
+import com.jdjz.weex.modle.Event.GetImageInfoEvent;
+import com.jdjz.weex.modle.Event.LocationEvent;
+import com.jdjz.weex.modle.Event.PhoneEvent;
+import com.jdjz.weex.modle.Event.PreviewImageEvent;
+import com.jdjz.weex.modle.Event.SaveImageToPhotosAlbumEvent;
+import com.jdjz.weex.modle.Event.StartAutoLBSEvent;
+import com.jdjz.weex.modle.Event.StopAutoLBSEvent;
 import com.jdjz.weex.modle.ModleConfig;
 import com.jdjz.weex.modle.PreviewImagesData;
 import com.jdjz.weex.modle.RequestParams.RequestChooseImagesParams;
@@ -72,7 +83,7 @@ import com.jdjz.weex.modle.ResultSystemInfo;
 import com.jdjz.weex.modle.ResultTemp;
 import com.jdjz.weex.modle.ResultToken;
 import com.jdjz.weex.modle.RequestParams.ReuquestDateParams;
-import com.jdjz.weex.modle.RequestParams.RequestJSParams;
+import com.jdjz.weex.modle.RequestParams.RequestPhoneParams;
 import com.jdjz.weex.modle.entity.ChooseImagesFileInfoEntity;
 import com.jdjz.weex.modle.entity.GetImageInfoEntity;
 import com.jdjz.weex.modle.entity.LBSEntity;
@@ -86,6 +97,8 @@ import com.jdjz.weex.util.ImgUtil;
 import com.jdjz.weex.util.RequestPermissonType;
 import com.jude.utils.JUtils;
 import com.jude.utils.permission.PermissionListener;
+import com.jude.utils.permission.PermissionNameList;
+import com.jude.utils.permission.PermissionRequestCode;
 import com.jude.utils.permission.PermissionsUtil;
 import com.taobao.weex.ui.view.IWebView;
 import com.taobao.weex.utils.WXLogUtils;
@@ -99,7 +112,6 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.io.File;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.time.temporal.JulianFields;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -118,6 +130,7 @@ public class WXWebViewJsBridge implements IWebView {
 
 
     CallBackFunction callBackFunction;
+    String h5Data;  //来自网页端的数据
     //Context jsContext;
 
     String lbs_type ="0";//默认是0，获取经纬度。lbs_type>1 需要街道级别逆地理的才会有的字段，街道门牌信息：lbs_type>2,需要POI级别逆地理的才会有的字段，定位点附近的 POI 信息
@@ -530,30 +543,6 @@ public class WXWebViewJsBridge implements IWebView {
         });
 
         reqGetOpenId();
-
- /*       mWebView.registerHandler("reqGetOpenId", new BridgeHandler() {
-
-            @Override
-            public void handler(String data, CallBackFunction function) {
-                JUtils.Log("handler = reqGetOpenId, data from web = " + data);
-
-                String str = JUtils.getSharedPreference().getString("tokenMyServer", ModleConfig.RES404);
-                ResultToken resultToken = new ResultToken();
-                if (str.equals(ModleConfig.RES404)) {
-                    resultToken.setResponseCode(ModleConfig.RES404);
-                    resultToken.setResponseResult("");
-                } else {
-                    resultToken.setResponseCode(ModleConfig.RES200);
-                    resultToken.setResponseResult(str);
-                }
-                String str2 = new Gson().toJson(resultToken);
-
-                function.onCallBack(str2);
-            }
-
-        });*/
-
-
         mWebView.registerHandler("requestFromNativeTypeSetPrivateToken", new BridgeHandler() {
 
             @Override
@@ -567,63 +556,6 @@ public class WXWebViewJsBridge implements IWebView {
         });
 
         reqGetNetworkType();
-        //获取网络状态
-/*        mWebView.registerHandler("reqGetNetworkType", new BridgeHandler() {
-
-            @Override
-            public void handler(String data, CallBackFunction function) {
-                JUtils.Log("handler = reqGetNetworkType, data from web = " + data);
-                ResultNetworkStatus resultNetworkStatus = new ResultNetworkStatus();
-                NetworkStatusEntity networkStatusEntity = new NetworkStatusEntity();
-                boolean isNetWorkAvilable =  JUtils.isNetWorkAvilable();
-
-                resultNetworkStatus.setResponseCode(ModleConfig.RES200);
-                resultNetworkStatus.setResponseMsg(ModleConfig.RES_MSG_NETWORKSTATUS_SUC);
-
-                networkStatusEntity.setNetworkAvailable(isNetWorkAvilable);
-                String type  = "";
-                switch (JUtils.getNetworkState(mContext)){
-                    case 1:
-                        type = "WWAN";
-                        break;
-                    case 2:
-                        type = "2G";
-                        break;
-
-                    case 3:
-                        type = "3G";
-                        break;
-
-                    case 4:
-                        type = "4G";
-                        break;
-
-                    default:
-                        type = "UNKNOWN ";
-                        break;
-                }
-
-                if(TextUtils.isEmpty(isNetWorkReachable(mContext))){
-                    type = "NOTREACHABLE ";
-                }
-               *//* if(!JUtils.checkOnlineState(mContext)){
-                    type = "NOTREACHABLE";
-                }*//*
-
-                if(isNetWorkAvilable){
-                    networkStatusEntity.setType(type);
-                }else{
-                    networkStatusEntity.setType(type);
-                }
-                resultNetworkStatus.setNetworkStatusEntity(networkStatusEntity);
-
-                String str2 = new Gson().toJson(resultNetworkStatus);
-                JUtils.Log("call back");
-                function.onCallBack(str2);
-            }
-
-        });*/
-
         reqMakePhoneCall();
         reqGetSystemInfo();
         reqDatePicker();
@@ -649,11 +581,19 @@ public class WXWebViewJsBridge implements IWebView {
         //停止定位。 stopAutoLBS
         mWebView.registerHandler("reqStopAutoLBS", new BridgeHandler() {
 
-            ResultTemp resultTemp = new ResultTemp();
-            String str2 = "";
+
+
+
             @Override
             public void handler(String data, CallBackFunction function) {
                 JUtils.Log("handler = reqStopAutoLBS, data from web = " + data);
+
+                callBackFunction = function;
+                checkPermission((Activity)mContext, PermissionNameList.PERMISSIONS_LOCATION,PermissionRequestCode.PERMISSION_REQUEST_CODE_STOPAUTO_LOCATION);
+
+
+/*                ResultTemp resultTemp = new ResultTemp();
+                String str2 = "";
                 if(locationClient!=null){
                     stopLocation();
                     resultTemp.setResponseCode(ModleConfig.RES200);
@@ -665,7 +605,7 @@ public class WXWebViewJsBridge implements IWebView {
                     resultTemp.setResponseCode("停止定位前先开启定位");
                     str2 = new Gson().toJson(resultTemp);
                     function.onCallBack(str2);
-                }
+                }*/
             }
 
         });
@@ -681,24 +621,9 @@ public class WXWebViewJsBridge implements IWebView {
             @Override
             public void handler(String data, CallBackFunction function) {
                 JUtils.Log("handler = reqGetLocation, data from web = " + data);
-                RequestLBSParams requestLBSParams = new Gson().fromJson(data,RequestLBSParams.class);
-                ResultLBS resultLBS = new ResultLBS();
-                responseTypeLBS = 0;
-                lbs_type = requestLBSParams.getType();
-                if(lbs_type.equals("1") ||lbs_type.equals("2") ||lbs_type.equals("3")){
-                    ;
-                }else{
-                    lbs_type="0";
-                    /*resultLBS.setResponseCode(ModleConfig.RES404);
-                    resultLBS.setResponseMsg("输入type参数错误");
-                    resultLBS.setLbsEntity(null);
-                    String str3 = new Gson().toJson(resultLBS);
-                    function.onCallBack(str3);
-                    return;*/
-                }
-                resetOption(true);
-                startLocation();
+                h5Data=  data;
                 callBackFunction = function;
+                checkPermission((Activity)mContext, PermissionNameList.PERMISSIONS_LOCATION,PermissionRequestCode.PERMISSION_REQUEST_CODE_LOCATION);
             }
 
         });
@@ -841,17 +766,20 @@ public class WXWebViewJsBridge implements IWebView {
      * 打电话
      */
     private void reqMakePhoneCall() {
-
         mWebView.registerHandler("reqMakePhoneCall", new BridgeHandler() {
 
             @Override
             public void handler(String data, CallBackFunction function) {
                 JUtils.Log("handler = reqMakePhoneCall, data from web = " + data);
-                RequestJSParams jsParams = new Gson().fromJson(data,RequestJSParams.class);
-                Intent intent = new Intent();
-                intent.setAction("android.intent.action.CALL");
-                intent.setData(Uri.parse("tel:" + jsParams.getParam()));
-                mContext.startActivity(intent);
+
+                callBackFunction = function;
+                h5Data = data;
+                if(JUtils.getDeviceBrand().contains(Brand.HUAWEI)){
+                    startDialActivity();
+                }else{
+                    checkPermission((Activity)mContext,PermissionNameList.PERMISSIONS_PHONE,PermissionRequestCode.PERMISSION_REQUEST_CODE_PHONE);
+
+                }
             }
         });
     }
@@ -1080,7 +1008,71 @@ public class WXWebViewJsBridge implements IWebView {
 
     }
 
-    //判断网络是否可达
+    /**
+     * 申请地理位置权限，点击允许后，回调WXPageActivity onRequestPermissionsResult。 开始定位。
+     * @param locationEvent
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEventMainThread(LocationEvent locationEvent) {
+        handleGetLocation();
+    }
+
+    /**
+     * 申请联系人权限，点击允许后，回调WXPageActivity onRequestPermissionsResult。 开始获取联系人。
+     * @param contactsEvent
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEventMainThread(ContactsEvent contactsEvent) {
+        handleSelectEnterpriseContact();
+    }
+
+    /**
+     * 申请联系人权限，点击允许后，回调WXPageActivity onRequestPermissionsResult。 开始获取联系人。
+     * @param phoneEvent
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEventMainThread(PhoneEvent phoneEvent) {
+        handleMakePhoneCall();
+    }
+
+    /**
+     * 申请自动获取地理位置权限，点击允许后，回调WXPageActivity onRequestPermissionsResult。 开始获取自动获取地理位置。
+     * @param startAutoLBSEvent
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEventMainThread(StartAutoLBSEvent startAutoLBSEvent) {
+        handleStartAutoLBS();
+    }
+
+    /**
+     * 申请停止自动获取地理位置权限，点击允许后，回调WXPageActivity onRequestPermissionsResult。 开始停止自动获取地理位置。
+     * @param stopAutoLBSEvent
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEventMainThread(StopAutoLBSEvent stopAutoLBSEvent) {
+        handleStopAutoLBS();
+    }
+
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEventMainThread(PreviewImageEvent previewImageEvent) {
+        handlePreviewImage();
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEventMainThread(SaveImageToPhotosAlbumEvent saveImageToPhotosAlbumEvent) {
+        handleSaveImageToPhotosAblum();
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEventMainThread(GetImageInfoEvent getImageInfoEvent) {
+        handleGetImageInfo();
+    }
+    /**
+     * 判断网络是否可达
+     * @param context
+     * @return
+     */
     public  String  isNetWorkReachable(Context context) {
         String netAddress = null;
         try
@@ -1171,12 +1163,16 @@ public class WXWebViewJsBridge implements IWebView {
             @Override
             public void handler(String data, CallBackFunction function) {
                 JUtils.Log("handler = reqStartAutoLBS, data from web = " + data);
-                //NativeToJSstartAutoLBS(1);
-                //NativeToJSstartAutoLBS(2);
-                RequestLBSWGS84_GCJ02Params requestLBSWGS84_gcj02Params = new Gson().fromJson(data, RequestLBSWGS84_GCJ02Params.class);
+          /*      RequestLBSWGS84_GCJ02Params requestLBSWGS84_gcj02Params = new Gson().fromJson(data, RequestLBSWGS84_GCJ02Params.class);
                 responseTypeLBS = 1;
                 resetOption(false);
-                startLocation();
+                startLocation();*/
+
+
+
+                h5Data=  data;
+                callBackFunction = function;
+                checkPermission((Activity)mContext, PermissionNameList.PERMISSIONS_LOCATION,PermissionRequestCode.PERMISSION_REQUEST_CODE_STARTAUTO_LOCATION);
             }
 
         });
@@ -1235,39 +1231,9 @@ public class WXWebViewJsBridge implements IWebView {
             @Override
             public void handler(String data, CallBackFunction function) {
                 JUtils.Log("handler = reqSelectEnterpriseContact, data from web = " + data);
-                RequestContactsParams requestContactsParams = new RequestContactsParams();
-                requestContactsParams = new Gson().fromJson(data,RequestContactsParams.class);
-                String str2 ;//= new Gson().toJson(resultToken);
-                ResultContact resultContact = new ResultContact();
-                if(TextUtils.isEmpty(requestContactsParams.getContacts())){
-                    JUtils.Log("404");
-                    resultContact.setResponseCode(ModleConfig.RES404);
-                    resultContact.setResponseMsg("输入参数为空");
-                    resultContact.setResponseResult(null);
-                    str2 =  new Gson().toJson(resultContact);
-                    function.onCallBack(str2);
-                    return;
-                }else if(requestContactsParams.getContacts().equals(ModleConfig.RESMULIT)){
-                    JUtils.Log("RESMULIT");
-                    Intent intent = new Intent(mContext, ContactListActivity.class);
-                    intent.putExtra(ChooseModel.CHOOSEMODEL,ChooseModel.MODEL_MULTI);
-                    mContext.startActivity(intent);
-
-
-                }else if(requestContactsParams.getContacts().equals(ModleConfig.RESSINGLE)){
-                    JUtils.Log("RESSINGLE");
-                    Intent intent = new Intent(mContext, ContactListActivity.class);
-                    intent.putExtra(ChooseModel.CHOOSEMODEL,ChooseModel.MODEL_SINGLE);
-                    mContext.startActivity(intent);
-                }
-
-               /* JUtils.Log("RESMULIT");
-                Intent intent = new Intent(mContext, ContactListActivity.class);
-                Intent intent = new Intent(mContext, ContactListActivity.class);
-                intent.putExtra(ChooseModel.CHOOSEMODEL,ChooseModel.MODEL_MULTI);
-                mContext.startActivity(intent)*/;
-
+                h5Data=  data;
                 callBackFunction = function;
+                checkPermission((Activity)mContext, PermissionNameList.PERMISSIONS_CONTACTS,PermissionRequestCode.PERMISSION_REQUEST_CODE_CONTACTS);
             }
 
         });
@@ -1283,60 +1249,17 @@ public class WXWebViewJsBridge implements IWebView {
             @Override
             public void handler(String data, CallBackFunction function) {
                 JUtils.Log("handler = reqPreviewImage, data from web = " + data);
-                RequestPreviewImagesParams requestPreviewImagesParams = new RequestPreviewImagesParams();
-                requestPreviewImagesParams = new Gson().fromJson(data,RequestPreviewImagesParams.class);
+                h5Data = data;
+                callBackFunction = function;
+                checkPermission((Activity)mContext, PermissionNameList.PERMISSIONS_STORAGE,PermissionRequestCode.PERMISSION_REQUEST_CODE_STORAGE_PREVIEWIMAGE);
 
 
-
-                Gson gs = new GsonBuilder()
-                        .setPrettyPrinting()
-                        .disableHtmlEscaping()
-                        .create();
-
-                List<PreviewImagesData> datas = new ArrayList<>();
-
-                for(int i=0;i<requestPreviewImagesParams.getUrls().size();i++){
-                    PreviewImagesData previewImagesData = new PreviewImagesData();
-                    JUtils.Log(requestPreviewImagesParams.getUrls().get(i));
-
-                    previewImagesData.setOriginUrl(requestPreviewImagesParams.getUrls().get(i));
-                    previewImagesData.setThumbnailUrl(requestPreviewImagesParams.getUrls().get(i));
-                    datas.add(previewImagesData);
-                }
-                PreviewImagesData current = new PreviewImagesData();
-                current.setOriginUrl(requestPreviewImagesParams.getCurrent());
-                current.setThumbnailUrl(requestPreviewImagesParams.getCurrent());
-
-                int i=0;
-                int currentNumber=0;
-                List<Image> images = new ArrayList<>();
-                for (PreviewImagesData d : datas) {
-                    Image image = new Image();
-                    image.setOriginUrl(d.getOriginUrl());
-                    image.setThumbnailUrl(d.getThumbnailUrl());
-                    images.add(image);
-                    i++;
-                    if(d.getOriginUrl().equals(current.getOriginUrl())){
-                        JUtils.Log("*** list 中找到了这个current image：是第"+i+"个");
-                        currentNumber = i-1;
-                    }
-                }
-
-                Preview.with(mContext)
-                        .builder()
-                        .load(images)
-                        .displayCount(true)
-                        .markPosition(currentNumber)
-                        .showDownload(false)
-                        .showOriginImage(false)
-                        .downloadLocalPath("Preview")
-                        .show();
             }
 
         });
     }
 
-
+/*
     public  boolean hasPermission(@NonNull Context context, @NonNull String... permissions) {
 
         if (permissions.length == 0) {
@@ -1351,7 +1274,10 @@ public class WXWebViewJsBridge implements IWebView {
         }
 
         return true;
-    }
+    }*/
+
+
+
 
     /**
      * 选择照片
@@ -1365,14 +1291,12 @@ public class WXWebViewJsBridge implements IWebView {
                 RequestChooseImagesParams requestChooseImagesParams = new RequestChooseImagesParams();
                 requestChooseImagesParams = new Gson().fromJson(data,RequestChooseImagesParams.class);
 
-               if( hasPermission(mContext,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE})){
-                   JUtils.Log("have storage 权限");
+               if( PermissionsUtil.hasPermission(mContext,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE})){
+                   JUtils.Log("reqChooseImage have storage 权限");
 
                }else{
-                   JUtils.Log("do not have storage 权限");
+                   JUtils.Log("reqChooseImage do not have storage 权限");
                }
-
-
 
                 int mCompress = 2;//0->origin; 1->compressed; 2->两者都有
                 Boolean isCamera = true;
@@ -1423,14 +1347,12 @@ public class WXWebViewJsBridge implements IWebView {
             @Override
             public void handler(String data, CallBackFunction function) {
                 JUtils.Log("handler = reqSaveImageToPhotosAlbum, data from web = " + data);
-                RequestSaveImg requestSaveImg = new RequestSaveImg();
-                requestSaveImg = new Gson().fromJson(data,RequestSaveImg.class);
+                h5Data = data;
                 callBackFunction = function;
-                requestStorage(requestSaveImg.getFilePath(),RequestPermissonType.REQ_SAVE_IMAGE_TO_PHOTO_ALBUM);
+                checkPermission((Activity)mContext, PermissionNameList.PERMISSIONS_STORAGE,PermissionRequestCode.PERMISSION_REQUEST_CODE_STORAGE_SAVEIMAGETOPHOTOSALBUM);
             }
         });
     }
-
 
     /**
      * 获取图片信息
@@ -1442,10 +1364,9 @@ public class WXWebViewJsBridge implements IWebView {
             @Override
             public void handler(String data, CallBackFunction function) {
                 JUtils.Log("handler = reqGetImageInfo, data from web = " + data);
-                RequestGetImageInfoParams requestGetImageInfoParams = new RequestGetImageInfoParams();
-                requestGetImageInfoParams = new Gson().fromJson(data,RequestGetImageInfoParams.class);
                 callBackFunction = function;
-                requestStorage(requestGetImageInfoParams.getSrc(),RequestPermissonType.REQ_GET_IMAGE_INFO);
+                h5Data = data;
+                checkPermission((Activity)mContext, PermissionNameList.PERMISSIONS_STORAGE,PermissionRequestCode.PERMISSION_REQUEST_CODE_STORAGE_GETIMAGEINFO);
             }
         });
     }
@@ -1537,6 +1458,257 @@ public class WXWebViewJsBridge implements IWebView {
         return new int[]{options.outWidth,options.outHeight};
     }
 
+    private void requestPhoneCall(String phone, @NonNull String... permissions){
+
+        PermissionsUtil.TipInfo tip = new PermissionsUtil.TipInfo("注意:", "获取打电话权限", "禁止", "允许");
+        PermissionsUtil.requestPermission(mContext, new PermissionListener() {
+            @Override
+            public void permissionGranted(@NonNull String[] permissions) {
+                Intent intent = new Intent();
+                intent.setAction("android.intent.action.CALL");
+                intent.setData(Uri.parse("tel:152365"));
+                mContext.startActivity(intent);
+
+            }
+
+            @Override
+            public void permissionDenied(@NonNull String[] permissions) {
+                //Toast.makeText(, "用户拒绝使用读写存储权限", Toast.LENGTH_LONG).show();
+                JUtils.Toast("用户拒绝使用打电话权限");
+            }
+        }, new String[]{Manifest.permission.CALL_PHONE}, true, tip);
+
+    }
+
+
+    private void checkPermission(Activity activity, @NonNull String[] permissions, @NonNull int reqCode) {
+        //Build.VERSION_CODES.M
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            switch (reqCode) {
+                case PermissionRequestCode.PERMISSION_REQUEST_CODE_LOCATION:
+                    handleGetLocation();
+                    break;
+                case PermissionRequestCode.PERMISSION_REQUEST_CODE_CONTACTS:
+                    handleSelectEnterpriseContact();
+                    break;
+                case PermissionRequestCode.PERMISSION_REQUEST_CODE_PHONE:
+                    handleMakePhoneCall();
+                    break;
+                case PermissionRequestCode.PERMISSION_REQUEST_CODE_STARTAUTO_LOCATION:
+                    handleStartAutoLBS();
+                    break;
+                case PermissionRequestCode.PERMISSION_REQUEST_CODE_STOPAUTO_LOCATION:
+                    handleStopAutoLBS();
+                    break;
+                case PermissionRequestCode.PERMISSION_REQUEST_CODE_STORAGE_GETIMAGEINFO:
+                    handleGetImageInfo();
+                    break;
+                case PermissionRequestCode.PERMISSION_REQUEST_CODE_STORAGE_PREVIEWIMAGE:
+                    handlePreviewImage();
+                    break;
+                case PermissionRequestCode.PERMISSION_REQUEST_CODE_STORAGE_SAVEIMAGETOPHOTOSALBUM:
+                    handleSaveImageToPhotosAblum();
+                    break;
+                default:
+                    break;
+            }
+        } else {
+            if (PermissionsUtil.hasPermission(mContext, permissions)) {
+                JUtils.Log("checkPermission: have the permission");
+                switch (reqCode) {
+                    case PermissionRequestCode.PERMISSION_REQUEST_CODE_LOCATION:
+                        handleGetLocation();
+                        break;
+                    case PermissionRequestCode.PERMISSION_REQUEST_CODE_CONTACTS:
+                        handleSelectEnterpriseContact();
+                        break;
+                    case PermissionRequestCode.PERMISSION_REQUEST_CODE_PHONE:
+                        handleMakePhoneCall();
+                        break;
+                    case PermissionRequestCode.PERMISSION_REQUEST_CODE_STARTAUTO_LOCATION:
+                        handleStartAutoLBS();
+                        break;
+                    case PermissionRequestCode.PERMISSION_REQUEST_CODE_STOPAUTO_LOCATION:
+                        handleStopAutoLBS();
+                        break;
+                    case PermissionRequestCode.PERMISSION_REQUEST_CODE_STORAGE_GETIMAGEINFO:
+                        handleGetImageInfo();
+                        break;
+                    case PermissionRequestCode.PERMISSION_REQUEST_CODE_STORAGE_PREVIEWIMAGE:
+                        handlePreviewImage();
+                        break;
+                    case PermissionRequestCode.PERMISSION_REQUEST_CODE_STORAGE_SAVEIMAGETOPHOTOSALBUM:
+                        handleSaveImageToPhotosAblum();
+                        break;
+                    default:
+                        break;
+
+                }
+            } else {
+
+                ActivityCompat.requestPermissions((Activity) mContext, permissions, reqCode);
+                JUtils.Log("have no permissions");
+            }
+        }
+    }
+
+    private void handleSaveImageToPhotosAblum() {
+        RequestSaveImg requestSaveImg = new RequestSaveImg();
+        requestSaveImg = new Gson().fromJson(h5Data,RequestSaveImg.class);
+        saveImage(requestSaveImg.getFilePath());
+        //requestStorage(requestSaveImg.getFilePath(),RequestPermissonType.REQ_SAVE_IMAGE_TO_PHOTO_ALBUM);
+    }
+
+    private void handlePreviewImage() {
+
+        RequestPreviewImagesParams requestPreviewImagesParams = new RequestPreviewImagesParams();
+        requestPreviewImagesParams = new Gson().fromJson(h5Data,RequestPreviewImagesParams.class);
+        Gson gs = new GsonBuilder()
+                .setPrettyPrinting()
+                .disableHtmlEscaping()
+                .create();
+
+        List<PreviewImagesData> datas = new ArrayList<>();
+
+        for(int i=0;i<requestPreviewImagesParams.getUrls().size();i++){
+            PreviewImagesData previewImagesData = new PreviewImagesData();
+            JUtils.Log(requestPreviewImagesParams.getUrls().get(i));
+
+            previewImagesData.setOriginUrl(requestPreviewImagesParams.getUrls().get(i));
+            previewImagesData.setThumbnailUrl(requestPreviewImagesParams.getUrls().get(i));
+            datas.add(previewImagesData);
+        }
+        PreviewImagesData current = new PreviewImagesData();
+        current.setOriginUrl(requestPreviewImagesParams.getCurrent());
+        current.setThumbnailUrl(requestPreviewImagesParams.getCurrent());
+
+        int i=0;
+        int currentNumber=0;
+        List<Image> images = new ArrayList<>();
+        for (PreviewImagesData d : datas) {
+            Image image = new Image();
+            image.setOriginUrl(d.getOriginUrl());
+            image.setThumbnailUrl(d.getThumbnailUrl());
+            images.add(image);
+            i++;
+            if(d.getOriginUrl().equals(current.getOriginUrl())){
+                JUtils.Log("*** list 中找到了这个current image：是第"+i+"个");
+                currentNumber = i-1;
+            }
+        }
+
+        Preview.with(mContext)
+                .builder()
+                .load(images)
+                .displayCount(true)
+                .markPosition(currentNumber)
+                .showDownload(false)
+                .showOriginImage(false)
+                .downloadLocalPath("Preview")
+                .show();
+
+
+    }
+
+    private void handleGetImageInfo() {
+        RequestGetImageInfoParams requestGetImageInfoParams = new RequestGetImageInfoParams();
+        requestGetImageInfoParams = new Gson().fromJson(h5Data,RequestGetImageInfoParams.class);
+        //saveImage(requestGetImageInfoParams.getSrc());
+        getImageInfo(requestGetImageInfoParams.getSrc());
+        //requestStorage(requestGetImageInfoParams.getSrc(),RequestPermissonType.REQ_GET_IMAGE_INFO);
+    }
+
+    private void handleStopAutoLBS() {
+        ResultTemp resultTemp = new ResultTemp();
+        String str2 = "";
+        if(locationClient!=null){
+            stopLocation();
+            resultTemp.setResponseCode(ModleConfig.RES200);
+            resultTemp.setResponseMsg("停止定位成功");
+            str2 = new Gson().toJson(resultTemp);
+            callBackFunction.onCallBack(str2);
+        }else{
+            resultTemp.setResponseCode(ModleConfig.RES404);
+            resultTemp.setResponseMsg("停止定位前先开启定位");
+            str2 = new Gson().toJson(resultTemp);
+            callBackFunction.onCallBack(str2);
+        }
+    }
+
+    private void handleStartAutoLBS() {
+        RequestLBSWGS84_GCJ02Params requestLBSWGS84_gcj02Params = new Gson().fromJson(h5Data, RequestLBSWGS84_GCJ02Params.class);
+        responseTypeLBS = 1;
+        resetOption(false);
+        startLocation();
+    }
+
+    /**
+     * 直接打电话
+     */
+    private void handleMakePhoneCall() {
+        RequestPhoneParams jsParams = new Gson().fromJson(h5Data,RequestPhoneParams.class);
+        Intent intent = new Intent();
+        intent.setAction("android.intent.action.CALL");
+        intent.setData(Uri.parse("tel:"+jsParams.getPhone()));
+        mContext.startActivity(intent);
+    }
+
+    /**
+     * 跳到拨号界面
+     */
+    private void startDialActivity(){
+        RequestPhoneParams jsParams = new Gson().fromJson(h5Data,RequestPhoneParams.class);
+        JUtils.Log("phone:"+jsParams.getPhone());
+        Intent intentNO = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:"+jsParams.getPhone()));
+        mContext.startActivity(intentNO);
+    }
+
+    private void handleSelectEnterpriseContact() {
+
+
+        RequestContactsParams requestContactsParams = new RequestContactsParams();
+        requestContactsParams = new Gson().fromJson(h5Data,RequestContactsParams.class);
+        String str2 ;//= new Gson().toJson(resultToken);
+        ResultContact resultContact = new ResultContact();
+        if(TextUtils.isEmpty(requestContactsParams.getContacts())){
+            JUtils.Log("404");
+            resultContact.setResponseCode(ModleConfig.RES404);
+            resultContact.setResponseMsg("输入参数为空");
+            resultContact.setResponseResult(null);
+            str2 =  new Gson().toJson(resultContact);
+            callBackFunction.onCallBack(str2);
+            return;
+        }else if(requestContactsParams.getContacts().equals(ModleConfig.RESMULIT)){
+            JUtils.Log("RESMULIT");
+            Intent intent = new Intent(mContext, ContactListActivity.class);
+            intent.putExtra(ChooseModel.CHOOSEMODEL,ChooseModel.MODEL_MULTI);
+            mContext.startActivity(intent);
+
+
+        }else if(requestContactsParams.getContacts().equals(ModleConfig.RESSINGLE)){
+            JUtils.Log("RESSINGLE");
+            Intent intent = new Intent(mContext, ContactListActivity.class);
+            intent.putExtra(ChooseModel.CHOOSEMODEL,ChooseModel.MODEL_SINGLE);
+            mContext.startActivity(intent);
+        }
+
+    }
+
+    private void handleGetLocation() {
+        RequestLBSParams requestLBSParams = new Gson().fromJson(h5Data,RequestLBSParams.class);
+        ResultLBS resultLBS = new ResultLBS();
+        responseTypeLBS = 0;
+        lbs_type = requestLBSParams.getType();
+        if(lbs_type.equals("1") ||lbs_type.equals("2") ||lbs_type.equals("3")){
+            ;
+        }else{
+            lbs_type="0";
+        }
+        resetOption(true);
+        startLocation();
+    }
+
     private void requestStorage(final String path, final int type) {
         PermissionsUtil.TipInfo tip = new PermissionsUtil.TipInfo("注意:", "获取SD卡读写权限", "禁止", "允许");
         PermissionsUtil.requestPermission(mContext, new PermissionListener() {
@@ -1562,5 +1734,7 @@ public class WXWebViewJsBridge implements IWebView {
             }
         }, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, true, tip);
     }
+
+
 
 }

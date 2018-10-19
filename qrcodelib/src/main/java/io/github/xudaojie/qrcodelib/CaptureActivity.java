@@ -232,6 +232,9 @@ public class CaptureActivity extends Activity implements Callback {
             } else {
                 ActionUtils.startActivityForGallery(mActivity, ActionUtils.PHOTO_REQUEST_GALLERY);
             }
+        }else{
+            Toast.makeText(mActivity,"请在系统设置中为App中开启摄像头和文件权限后重试",Toast.LENGTH_LONG).show();
+
         }
     }
 

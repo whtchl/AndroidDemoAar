@@ -3,7 +3,9 @@ package me.iwf.photopicker.fragment;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -20,6 +22,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestManager;
@@ -183,11 +186,25 @@ public class PhotoPickerFragment extends Fragment {
     });
 
     photoGridAdapter.setOnCameraClickListener(new OnClickListener() {
-      @Override public void onClick(View view) {
-        if (!PermissionsUtils.checkCameraPermission(PhotoPickerFragment.this)) return;
-        if (!PermissionsUtils.checkWriteStoragePermission(PhotoPickerFragment.this)) return;
-        openCamera();
-      }
+        @Override
+        public void onClick(View view) {
+            if (!PermissionsUtils.checkCameraPermission(PhotoPickerFragment.this)) {
+                //请点击 "设置"-"权限"-打开所需权限。
+                Toast.makeText(getContext(), "请点击 \"设置\"-\"应用管理\"-\"所在应用\"-\"应用权限\" 打开摄像机权限。", Toast.LENGTH_LONG).show();
+
+               /* Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                intent.setData(Uri.parse("package:" + getContext().getPackageName()));
+                getContext().startActivity(intent);*/
+
+                return;
+            }
+            if (!PermissionsUtils.checkWriteStoragePermission(PhotoPickerFragment.this)) {
+                //Toast.makeText(getContext(),"请点击 \"设置\"-\"应用管理\"-\"所在应用\"-\"应用权限\" 打开存储权限。",Toast.LENGTH_LONG).show();
+                return;
+            }
+
+            openCamera();
+        }
     });
 
     btSwitchDirectory.setOnClickListener(new OnClickListener() {
@@ -263,7 +280,15 @@ public class PhotoPickerFragment extends Fragment {
           if (PermissionsUtils.checkWriteStoragePermission(this) &&
                   PermissionsUtils.checkCameraPermission(this)) {
             openCamera();
+          } else {
+            //请点击 "设置"-"权限"-打开所需权限。
+            Toast.makeText(getContext(), "请点击 \"设置\"-\"  应用管理\"-\"所在应用\"-\"应用权限\" 打开摄像机权限。", Toast.LENGTH_LONG).show();
+
+            /*Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+            intent.setData(Uri.parse("package:" + getContext().getPackageName()));
+            getContext().startActivity(intent);*/
           }
+
           break;
       }
     }

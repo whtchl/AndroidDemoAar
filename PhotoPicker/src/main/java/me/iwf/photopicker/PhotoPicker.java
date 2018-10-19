@@ -3,9 +3,13 @@ package me.iwf.photopicker;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.PowerManager;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.widget.Toast;
+
 import java.util.ArrayList;
 
 import me.iwf.photopicker.utils.PermissionsUtils;
@@ -54,6 +58,13 @@ public class PhotoPicker {
       if (PermissionsUtils.checkReadStoragePermission((Activity) context)) {
         //activity.startActivityForResult(getIntent(activity), requestCode);
           context.startActivity(getIntent(context));
+      }else{
+        //请点击 "设置"-"权限"-打开所需权限。
+        Toast.makeText(context,"请点击 \"设置\"-\"应用管理\"-\"所在应用\"-\"应用权限\" 打开存储权限。",Toast.LENGTH_LONG).show();
+
+          /*Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+          intent.setData(Uri.parse("package:" + context.getPackageName()));
+          context.startActivity(intent);*/
       }
       //activity.startActivity(getIntent(activity));
     }
