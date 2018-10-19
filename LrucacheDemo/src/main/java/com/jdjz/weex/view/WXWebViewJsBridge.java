@@ -774,7 +774,8 @@ public class WXWebViewJsBridge implements IWebView {
 
                 callBackFunction = function;
                 h5Data = data;
-                if(JUtils.getDeviceBrand().contains(Brand.HUAWEI)){
+                //华为手机在禁止拨打电话权限后，拨打电话时，有拨打电话的系统权限，但是不让打电话，log显示not startActivity****。 所以对华为手机改为跳转到拨号界面
+                if(JUtils.getDeviceBrand().contains(Brand.HUAWEI) || JUtils.getDeviceBrand().contains(Brand.HUAWEI.toLowerCase())){
                     startDialActivity();
                 }else{
                     checkPermission((Activity)mContext,PermissionNameList.PERMISSIONS_PHONE,PermissionRequestCode.PERMISSION_REQUEST_CODE_PHONE);

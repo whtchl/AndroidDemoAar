@@ -9,10 +9,12 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/LrucacheDemo" />
+            <option value="$PROJECT_DIR$/PhotoPicker" />
             <option value="$PROJECT_DIR$/Utils-master/utils" />
+            <option value="$PROJECT_DIR$/common" />
             <option value="$PROJECT_DIR$/contact" />
-            <option value="$PROJECT_DIR$/myapplication" />
-            <option value="$PROJECT_DIR$/mylibrary" />
+            <option value="$PROJECT_DIR$/library" />
+            <option value="$PROJECT_DIR$/qrcodelib" />
             <option value="$PROJECT_DIR$/sdk" />
           </set>
         </option>
