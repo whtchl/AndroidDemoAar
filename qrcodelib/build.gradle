@@ -1,20 +1,17 @@
 apply plugin: 'com.android.library'
 //apply plugin: 'com.github.dcendents.android-maven'
 
-//group = 'com.example'
-//version = '1.0'
-
 android {
-    compileSdkVersion 24
-    buildToolsVersion "24.0.3"
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
 
     resourcePrefix "qr"
 
     defaultConfig {
-        minSdkVersion 11
-        targetSdkVersion 24
-        versionCode 7
-        versionName "0.4.1"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion  rootProject.ext.targetSdkVersion
+        versionCode rootProject.ext.versionCode
+        versionName rootProject.ext.qrversionName
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -32,8 +29,8 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.google.zxing:core:3.2.1'
+    compile "com.google.zxing:core:${project.eventbusLibVersion}"
     testCompile 'junit:junit:4.12'
-    implementation 'org.greenrobot:eventbus:3.0.0'
+    implementation "org.greenrobot:eventbus:${project.eventbusLibVersion}"
     implementation project(':common')
 }

@@ -1,0 +1,38 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion rootProject.ext.compileSdkVersion
+
+    defaultConfig {
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion  rootProject.ext.targetSdkVersion
+        versionCode rootProject.ext.versionCode
+        versionName "1.0"
+
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+//ext.supportLibVersion = '27.1.1'
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    //implementation fileTree(dir: 'libs', include: ['*.jar','*.aar'])
+    implementation "com.android.support:appcompat-v7:${supportLibVersion}"
+    implementation "com.android.support:support-v4:${supportLibVersion}"
+
+
+    implementation "com.github.bumptech.glide:glide:${project.glideLibVersion}"
+    implementation "com.github.bumptech.glide:okhttp3-integration:${project.glideLibVersion}"
+    implementation "com.github.bumptech.glide:annotations:${project.glideLibVersion}"
+    implementation 'com.davemorrissey.labs:subsampling-scale-image-view:3.10.0'
+   // implementation (name: 'subsampling-scale-image-view-3.10.0', ext: 'aar')
+    annotationProcessor "com.github.bumptech.glide:compiler:${project.glideLibVersion}"
+
+}

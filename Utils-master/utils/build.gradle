@@ -1,14 +1,14 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion "26.0.0"
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
-        minSdkVersion 15
-        targetSdkVersion 26
-        versionCode 1
-        versionName "1.0"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode  rootProject.ext.versionCode
+        versionName  rootProject.ext.utils_versionName
     }
     buildTypes {
         release {
@@ -25,7 +25,7 @@ android {
 dependencies {
     implementation "com.android.support:appcompat-v7:${project.supportLibVersion}"
 }
-
+/*
 ext {
     package_repo = 'maven' // bintray上的仓库名，一般为maven
     package_type = 'aar'  // 输出类型
@@ -48,5 +48,4 @@ ext {
     licenseName = 'The Apache Software License, Version 2.0'
     licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
     allLicenses = ["Apache-2.0"]
-}
-//apply from:'https://cdn.rawgit.com/Jude95/JCenter/v2/bintray.gradle'
+}*/
