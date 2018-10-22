@@ -8,7 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
-import android.net.http.SslError;
+/*import android.net.http.SslError;*/
 import android.os.AsyncTask;
 import android.os.Build;
 import android.support.annotation.NonNull;
@@ -20,13 +20,13 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
-import android.webkit.SslErrorHandler;
+/*import android.webkit.SslErrorHandler;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
-import android.webkit.WebView;
+import android.webkit.WebView;*/
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -102,6 +102,14 @@ import com.jude.utils.permission.PermissionRequestCode;
 import com.jude.utils.permission.PermissionsUtil;
 import com.taobao.weex.ui.view.IWebView;
 import com.taobao.weex.utils.WXLogUtils;
+import com.tencent.smtt.export.external.interfaces.SslError;
+import com.tencent.smtt.export.external.interfaces.SslErrorHandler;
+import com.tencent.smtt.export.external.interfaces.WebResourceError;
+import com.tencent.smtt.export.external.interfaces.WebResourceRequest;
+import com.tencent.smtt.export.external.interfaces.WebResourceResponse;
+import com.tencent.smtt.sdk.WebChromeClient;
+import com.tencent.smtt.sdk.WebSettings;
+import com.tencent.smtt.sdk.WebView;
 import com.whamu2.previewimage.Preview;
 import com.whamu2.previewimage.entity.Image;
 
@@ -476,7 +484,8 @@ public class WXWebViewJsBridge implements IWebView {
         mWebView.setVisibility(shown ? View.VISIBLE : View.INVISIBLE);
     }
 
-    private @Nullable WebView getWebView() {
+    private @Nullable
+    WebView getWebView() {
         //TODO: remove this, duplicate with getView semantically.
         return mWebView;
     }

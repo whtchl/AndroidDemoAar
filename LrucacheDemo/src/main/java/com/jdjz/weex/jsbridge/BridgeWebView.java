@@ -7,7 +7,9 @@ import android.os.Looper;
 import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.webkit.WebView;
+//import android.webkit.WebView;
+
+import com.tencent.smtt.sdk.WebView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -68,6 +70,7 @@ public class BridgeWebView extends WebView implements WebViewJavascriptBridge {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             WebView.setWebContentsDebuggingEnabled(true);
         }
+        //this.setWebViewClientExtension(generateBridgeWebViewClient);
 		this.setWebViewClient(generateBridgeWebViewClient());
 	}
 

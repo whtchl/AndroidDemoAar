@@ -3,9 +3,13 @@ package com.jdjz.weex.jsbridge;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.util.Log;
-import android.webkit.WebResourceRequest;
+/*import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
+import android.webkit.WebViewClient;*/
+
+import com.tencent.smtt.export.external.interfaces.WebResourceRequest;
+import com.tencent.smtt.sdk.WebView;
+import com.tencent.smtt.sdk.WebViewClient;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -42,7 +46,7 @@ public class BridgeWebViewClient extends WebViewClient {
     }
 
     // 增加shouldOverrideUrlLoading在api》=24时
-    @Override
+    /*@Override
     public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -66,7 +70,7 @@ public class BridgeWebViewClient extends WebViewClient {
             Log.i("tchl","url23:"+request.toString());
             return super.shouldOverrideUrlLoading(view, request);
         }
-    }
+    }*/
 
     @Override
     public void onPageStarted(WebView view, String url, Bitmap favicon) {

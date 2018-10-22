@@ -4,8 +4,8 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.net.Uri;
-import android.net.http.SslError;
+//import android.net.Uri;
+//import android.net.http.SslError;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
@@ -14,32 +14,32 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
-import android.webkit.JavascriptInterface;
+/*import android.webkit.JavascriptInterface;
 import android.webkit.JsPromptResult;
-import android.webkit.JsResult;
-import android.webkit.SslErrorHandler;
-import android.webkit.WebChromeClient;
-import android.webkit.WebResourceError;
-import android.webkit.WebResourceRequest;
-import android.webkit.WebResourceResponse;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
+import android.webkit.JsResult;*/
+//mport android.webkit.SslErrorHandler;
+import com.tencent.smtt.export.external.interfaces.SslError;
+import com.tencent.smtt.export.external.interfaces.SslErrorHandler;
+//import android.webkit.WebChromeClient;
+import com.tencent.smtt.export.external.interfaces.WebResourceError;
+import com.tencent.smtt.export.external.interfaces.WebResourceRequest;
+import com.tencent.smtt.sdk.WebChromeClient;
+/*import android.webkit.WebResourceError;
+import android.webkit.WebResourceRequest;*/
+//import android.webkit.WebResourceResponse;
+import com.tencent.smtt.export.external.interfaces.WebResourceResponse;
+//import android.webkit.WebSettings;
+import com.tencent.smtt.sdk.WebSettings;
+/*import android.webkit.WebView;
+import android.webkit.WebViewClient;*/
+import com.tencent.smtt.sdk.WebViewClient;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONException;
-import com.alibaba.fastjson.JSONObject;
-import com.jdjz.weex.interf.IWebViewJS;
 import com.jude.utils.JUtils;
 import com.taobao.weex.ui.view.IWebView;
-import com.taobao.weex.ui.view.WXWebView;
 import com.taobao.weex.utils.WXLogUtils;
-
-import java.lang.ref.WeakReference;
-import java.util.HashMap;
-import java.util.Map;
+import com.tencent.smtt.sdk.WebView;
 
 public class WXWebViewJS implements IWebView { //BridgeView   WXWebView
 
