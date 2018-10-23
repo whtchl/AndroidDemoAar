@@ -1,2 +1,2 @@
-include ':LrucacheDemo',':contact', ':sdk', ':qrcodelib', ':utils', ':common', ':previewimage','PhotoPicker'
+include ':LrucacheDemo',':contact', ':sdk', ':qrcodelib', ':utils', ':common', ':previewimage', ':weexlib','PhotoPicker'
 project(':utils').projectDir = new File('Utils-master/utils')
