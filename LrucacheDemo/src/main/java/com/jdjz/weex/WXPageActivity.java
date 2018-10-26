@@ -1,11 +1,13 @@
 package com.jdjz.weex;
 
-import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.Uri;
+import android.os.BatteryManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
@@ -16,22 +18,24 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.jdjz.weex.hotreload.HotReloadManager;
-import com.jdjz.weex.modle.Event.ContactsEvent;
-import com.jdjz.weex.modle.Event.GetImageInfoEvent;
-import com.jdjz.weex.modle.Event.LocationEvent;
-import com.jdjz.weex.modle.Event.PhoneEvent;
-import com.jdjz.weex.modle.Event.PreviewImageEvent;
-import com.jdjz.weex.modle.Event.SaveImageToPhotosAlbumEvent;
-import com.jdjz.weex.modle.Event.StartAutoLBSEvent;
-import com.jdjz.weex.modle.Event.StopAutoLBSEvent;
-import com.jdjz.weex.util.Constants;
-import com.jdjz.weex.util.AppConfig;
+import com.jdjz.weexlib.R;
+import com.jdjz.weexlib.weex.AbsWeexActivity;
+import com.jdjz.weexlib.weex.hotreload.HotReloadManager;
+import com.jdjz.weexlib.weex.modle.Event.ContactsEvent;
+import com.jdjz.weexlib.weex.modle.Event.GetImageInfoEvent;
+import com.jdjz.weexlib.weex.modle.Event.LocationEvent;
+import com.jdjz.weexlib.weex.modle.Event.PhoneEvent;
+import com.jdjz.weexlib.weex.modle.Event.PreviewImageEvent;
+import com.jdjz.weexlib.weex.modle.Event.SaveImageToPhotosAlbumEvent;
+import com.jdjz.weexlib.weex.modle.Event.StartAutoLBSEvent;
+import com.jdjz.weexlib.weex.modle.Event.StopAutoLBSEvent;
+import com.jdjz.weexlib.weex.util.AppConfig;
+import com.jdjz.weexlib.weex.util.Constants;
+import com.jdjz.weexlib.weex.util.StrUtil;
 import com.jude.utils.JUtils;
 import com.jude.utils.permission.PermissionRequestCode;
 import com.jude.utils.permission.PermissionsUtil;
 import com.taobao.weex.WXEnvironment;
-
 import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.ui.component.NestedContainer;
@@ -41,9 +45,6 @@ import com.taobao.weex.utils.WXSoInstallMgrSdk;
 import org.greenrobot.eventbus.EventBus;
 import org.json.JSONException;
 import org.json.JSONObject;
-import com.jdjz.lrucachedemo.R;
-
-import java.time.temporal.JulianFields;
 
 public class WXPageActivity extends AbsWeexActivity implements
     WXSDKInstance.NestedInstanceInterceptor {
@@ -54,6 +55,8 @@ public class WXPageActivity extends AbsWeexActivity implements
   private boolean mFromSplash = false;
   private HotReloadManager mHotReloadManager;
 
+  private BroadcastReceiver batteryLevelRcvr;
+  private IntentFilter batteryLevelFilter;
   @Override
   public void onCreateNestInstance(WXSDKInstance instance, NestedContainer container) {
     Log.d(TAG, "Nested Instance created.");
@@ -169,7 +172,7 @@ public class WXPageActivity extends AbsWeexActivity implements
         JUtils.Log("permission name:"+permissions[i]+"  grantResults:"+grantResults[i]);
     }
 
-    JUtils.Log("PermissionsUtil.isGranted:"+ PermissionsUtil.isGranted(grantResults)+"  "+PermissionsUtil.hasPermission(this, permissions));
+    JUtils.Log("PermissionsUtil.isGranted:"+ PermissionsUtil.isGranted(grantResults)+"  "+ PermissionsUtil.hasPermission(this, permissions));
 
     if (requestCode == PermissionRequestCode.PERMISSION_REQUEST_CODE_PHONE && PermissionsUtil.isGranted(grantResults)
             && PermissionsUtil.hasPermission(this, permissions)) {
@@ -207,25 +210,6 @@ public class WXPageActivity extends AbsWeexActivity implements
     else {
       JUtils.Toast(this.getString(R.string.permissontip));
     }
-
-   /*   //部分厂商手机系统返回授权成功时，厂商可以拒绝权限，所以要用PermissionChecker二次判断
-      if (requestCode == PERMISSION_REQUEST_CODE && PermissionsUtil.isGranted(grantResults)
-              && PermissionsUtil.hasPermission(this, permissions)) {
-        Log.i("tchl","PermissionActivity onRequestPermissionsResult 同意授权");
-        permissionsGranted();
-      } else if (showTip){
-        Log.i("tchl","PermissionActivity onRequestPermissionsResult 不同意授权，打开提示对话框，进入到app设置界面");
-        showMissingPermissionDialog();
-      } else { //不需要提示用户
-        Log.i("tchl","PermissionActivity onRequestPermissionsResult 不同意授权，permissonsDenied");
-        permissionsDenied();
-      }*/
-
-    /*Intent intent = new Intent("requestPermission");
-    intent.putExtra("REQUEST_PERMISSION_CODE", requestCode);
-    intent.putExtra("permissions", permissions);
-    intent.putExtra("grantResults", grantResults);
-    LocalBroadcastManager.getInstance(this).sendBroadcast(intent);*/
   }
 
 
@@ -336,5 +320,61 @@ public class WXPageActivity extends AbsWeexActivity implements
     if (mHotReloadManager != null) {
       mHotReloadManager.destroy();
     }
+    unregisterReceiver(batteryLevelRcvr);
+
+  }
+
+  private void monitorBatteryState() {
+    batteryLevelRcvr = new BroadcastReceiver() {
+      public void onReceive(Context context, Intent intent) {
+        StringBuilder sb = new StringBuilder();
+        int rawlevel = intent.getIntExtra("level", -1);
+        int scale = intent.getIntExtra("scale", -1);
+        int status = intent.getIntExtra("status", -1);
+        int health = intent.getIntExtra("health", -1);
+        int level = -1; // percentage, or -1 for unknown
+        if (rawlevel >= 0 && scale > 0) {
+          level = (rawlevel * 100) / scale;
+        }
+        JUtils.getSharedPreference().edit().putString(StrUtil.BATTYER_LEVEL,String.valueOf(level)+"%").apply();
+        sb.append("The phone");
+        if (BatteryManager.BATTERY_HEALTH_OVERHEAT == health) {
+          sb.append("'s battery feels very hot!");
+        } else {
+          switch (status) {
+            case BatteryManager.BATTERY_STATUS_UNKNOWN:
+              sb.append("no battery.");
+              break;
+            case BatteryManager.BATTERY_STATUS_CHARGING:
+              sb.append("'s battery");
+              if (level <= 33)
+                sb.append(" is charging, battery level is low" + "[" + level + "]");
+              else if (level <= 84) sb.append(" is charging." + "[" + level + "]");
+              else sb.append(" will be fully charged.");
+              break;
+            case BatteryManager.BATTERY_STATUS_DISCHARGING:
+            case BatteryManager.BATTERY_STATUS_NOT_CHARGING:
+              if (level == 0) sb.append(" needs charging right away.");
+              else if (level > 0 && level <= 33)
+                sb.append(" is about ready to be recharged, battery level is low" + "[" + level + "]");
+              else sb.append("'s battery level is" + "[" + level + "]");
+              break;
+            case BatteryManager.BATTERY_STATUS_FULL:
+              sb.append(" is fully charged.");
+              break;
+            default:
+              sb.append("'s battery is indescribable!");
+              break;
+          }
+        }
+        sb.append(' ');
+        JUtils.Log(sb.toString());
+        //batterLevel.setText(sb.toString());
+
+
+      }
+    };
+    batteryLevelFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+    registerReceiver(batteryLevelRcvr, batteryLevelFilter);
   }
 }

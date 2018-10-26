@@ -26,7 +26,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
+    repositories {
+        flatDir {
+            dirs 'libs'
+        }
+    }
 
 }
 
@@ -46,68 +50,24 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-
     compile "com.android.support.constraint:constraint-layout:${project.constraintLibVersion}"
     testCompile "junit:junit:${project.junitLibVersion}"
     compile "com.jakewharton:butterknife:${project.butterKnifeLibVersion}"
     annotationProcessor "com.jakewharton:butterknife-compiler:${project.butterKnifeLibVersion}"
-
     //联系人
     implementation "com.android.support:recyclerview-v7:${project.supportLibVersion}"
     implementation "com.github.promeg:tinypinyin:${project.tinypinyinLibVersion}"
-
     compile "org.greenrobot:eventbus:${project.eventbusLibVersion}"
     implementation project(':contact')
-
     //app.java ： 为了解决 “65535 方法数超标” 以及 “INSTALL_FAILED_DEXOPT”
     compile 'com.android.support:multidex:1.0.2'
-
-
     //greendao
     compile "org.greenrobot:greendao:${project.greenDaoLibVersion}"
     compile 'net.zetetic:android-database-sqlcipher:3.5.4@aar'
-
-
-    compile "com.taobao.android:weex_sdk:${project.weexSdkLibVersion}"
-    compile "com.google.code.findbugs:jsr305:${project.findbugsLibVersion}"
-    compile "com.squareup.okhttp:okhttp:${project.okhttpLibVersion}"
-    compile "com.squareup.okhttp:okhttp-ws:${project.okhttpLibVersion}"
-    compile "com.squareup.okio:okio:${project.okioLibVersion}"
-    compile "com.squareup.picasso:picasso:${project.picassoLibVersion}"
-    compile "com.alibaba:fastjson:${project.fastjsonLibVersion}"
-    compile "com.android.support:support-v4:${project.supportLibVersion}"
-    compile "com.android.support:appcompat-v7:${project.supportLibVersion}"
-    compile "com.android.support:design:${project.supportLibVersion}"
-    compile "com.android.support:support-annotations:${project.supportLibVersion}"
-    compile "com.taobao.android:weex_inspector:${project.weexInspectorLibVersion}"
-
-
-    // PLUGIN GRADLE EXTENSIONS START
-    compile "com.taobao.android:weexplugin-loader:${project.weexpluginLibVersion}"
-    compile "com.taobao.android:weexplugin-processor:${project.weexpluginLibVersion}"
-    compile "com.taobao.android:weexplugin-annotation:${project.weexpluginLibVersion}"
-
-    // PLUGIN GRADLE EXTENSIONS END
-    implementation files('libs/tbs_sdk_thirdapp_v3.2.0.1104_43200_sharewithdownload_withfilereader_withoutGame_obfs_20170609_115346.jar')
-
-    //jsBridge
-
-    compile "com.google.code.gson:gson:${project.googleGsonLibVersion}"
     implementation project(':utils')
-    implementation project(':qrcodelib')
-    implementation project(':common')
-    implementation files('libs/AMap_Location_V4.2.0_20180809.jar')
-    implementation project(':previewimage')
-
-    //图片预览
+    compile project(path: ':weexlib')
     implementation "com.github.bumptech.glide:glide:${project.glideLibVersion}"
     implementation "com.github.bumptech.glide:okhttp3-integration:${project.glideLibVersion}"
     implementation "com.github.bumptech.glide:annotations:${project.glideLibVersion}"
-    implementation 'com.davemorrissey.labs:subsampling-scale-image-view:3.10.0'
-    //compile(name: 'subsampling-scale-image-view-3.10.0.aar', ext: 'aar')
-    //implementation (name: 'subsampling-scale-image-view-3.10.0', ext: 'aar')
     annotationProcessor "com.github.bumptech.glide:compiler:${project.glideLibVersion}"
-    implementation project(':PhotoPicker')
-
-
 }

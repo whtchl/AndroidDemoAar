@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">weexlib</string>
+    <string name="portrait">头像</string>
+    <string name="cpu_not_support_tip" translatable="false">Sorry, your current device is x86 architecture.\n We only
+        support arm architecture devices!
+    </string>
+    <string name="permissontip">"请点击 \"设置\"-\"应用管理\"-所在应用-\"应用权限\" 打开权限。"</string>
 </resources>

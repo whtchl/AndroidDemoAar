@@ -8,12 +8,11 @@ import android.util.Log;
 
 import com.alibaba.weex.plugin.loader.WeexPluginContainer;
 import com.jdjz.testConfig.SealConst;
-import com.jdjz.weex.Component.RichText;
-import com.jdjz.weex.Component.WXWebJS;
-import com.jdjz.weex.Component.WXWebJsBridge;
-import com.jdjz.weex.ImageAdapter;
-import com.jdjz.weex.extend.WXEventModule;
-import com.jdjz.weex.util.AppConfig;
+import com.jdjz.weexlib.weex.Component.RichText;
+import com.jdjz.weexlib.weex.Component.WXWebJS;
+import com.jdjz.weexlib.weex.Component.WXWebJsBridge;
+import com.jdjz.weexlib.weex.ImageAdapter;
+import com.jdjz.weexlib.weex.util.AppConfig;
 import com.jude.utils.JUtils;
 import com.taobao.weex.InitConfig;
 import com.taobao.weex.WXSDKEngine;
@@ -46,7 +45,7 @@ public class App extends MultiDexApplication {
                     new InitConfig.Builder().setImgAdapter(new ImageAdapter()).build()
             );
             try {
-                WXSDKEngine.registerModule("event", WXEventModule.class);
+                //WXSDKEngine.registerModule("event", WXEventModule.class);
                 WXSDKEngine.registerComponent("richText", RichText.class);
                 WXSDKEngine.registerComponent("wXWebJS", WXWebJS.class);
                 WXSDKEngine.registerComponent("wXWebJsBridge", WXWebJsBridge.class);
@@ -60,7 +59,7 @@ public class App extends MultiDexApplication {
 
 
             //tbs x5
-            QbSdk.PreInitCallback cb = new QbSdk.PreInitCallback() {
+/*            QbSdk.PreInitCallback cb = new QbSdk.PreInitCallback() {
 
                 @Override
                 public void onViewInitFinished(boolean b) {
@@ -75,7 +74,7 @@ public class App extends MultiDexApplication {
             };
 
             //x5内核初始化接口
-            QbSdk.initX5Environment(getApplicationContext(), cb);
+            QbSdk.initX5Environment(getApplicationContext(), cb);*/
         }
 
     }

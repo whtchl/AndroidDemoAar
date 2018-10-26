@@ -39,6 +39,7 @@ task clean(type: Delete) {
         utils_versionName = "utils 1.0"
         qrversionName="qr 1.0"
         contactversionName="contact 1.0"
+        weexlib_versionName="weexlib 1.0"
         fastjsonLibVersion="1.1.46.android"
         glideLibVersion="4.7.1"
         eventbusLibVersion="3.0.0"

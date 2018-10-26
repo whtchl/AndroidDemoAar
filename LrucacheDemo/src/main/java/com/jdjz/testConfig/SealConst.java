@@ -20,7 +20,7 @@ public class SealConst {
     public static final String SEALTALK_LOGING_PASSWORD = "loginpassword";
 
 
-    public static final String BATTYER_LEVEL = "batterylevel";
+
     public static void setSharepreferenct(){
         JUtils.getSharedPreference().edit().putString("loginToken","loginToken123").apply();
         JUtils.getSharedPreference().edit().putString(SealConst.SEALTALK_LOGIN_ID,"loginid123").apply();

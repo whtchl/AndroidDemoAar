@@ -14,7 +14,6 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.jdjz.contact.ContactInfo;
 import com.jdjz.contact.ContactsUtils;
-import com.jdjz.contact.GlideCircleTransform;
 import com.jdjz.lrucachedemo.R;
 
 import java.util.ArrayList;
