@@ -29,6 +29,7 @@ import android.widget.TimePicker;
 
 
 import com.jdjz.weexlib.R;
+import com.nineoldandroids.view.ViewHelper;
 
 import org.json.JSONException;
 
@@ -44,16 +45,18 @@ import java.util.List;
  * @date: 2018/10/08  15:29
  */
 public class DateDialog extends Dialog {
-    public static final int MODE_1 = 001; // 日期 时间
-    public static final int MODE_2 = 002;// 日期
-    public static final int MODE_3 = 003;// 时间
-    public static final int MODE_4 = 004; // 年月
+    public static final int MODE_1 = 001; // 日期 时间 yyyy-MM-dd HH:mm
+    public static final int MODE_2 = 002;// 日期 yyyy-MM-dd
+    public static final int MODE_3 = 003;// 时间  HH:mm
+    public static final int MODE_4 = 004; // 年月  yyyy-MM
+    public static final int MODE_5=005;// yyyy-MM-dd HH:mm:ss
     private int mMode = MODE_1;
     private String mTitle = "初始时间";
     private String mCurrentDate = "1970-01-01 23:59";
     private String mStartDate ="";
     private String mEnzzate="";
-
+    View ll_picker;
+    private int minNum = 0, maxNum = 59, currentNum = 10;
     InterfaceDateDialog interfaceDateDialog;
 
     public DateDialog(Context context, InterfaceDateDialog interfaceDateDialog) {
@@ -68,7 +71,7 @@ public class DateDialog extends Dialog {
         mTitle = title;
     }
 
-    public DateDialog(Context context, String title, int mode, String currentDate, String startDate,String enzzate,InterfaceDateDialog interfaceDateDialog) {
+    public DateDialog(Context context, String title, int mode, String currentDate, String startDate,String enzzate,InterfaceDateDialog interfaceDateDialog,int type) {
         super(context);
         this.interfaceDateDialog = interfaceDateDialog;
         mMode = mode;
@@ -78,6 +81,17 @@ public class DateDialog extends Dialog {
         mEnzzate = enzzate;
     }
 
+    public DateDialog(Context context, String title, int mode, String currentDate, String startDate,String enzzate,InterfaceDateDialog interfaceDateDialog) {
+        super(context);
+        this.interfaceDateDialog = interfaceDateDialog;
+        mMode = mode;
+        mTitle = title;
+        mCurrentDate = DateConfig.stampToDate(currentDate);
+        mStartDate =  DateConfig.stampToDate(startDate);
+        mEnzzate = DateConfig.stampToDate(enzzate);
+    }
+
+
     public DateDialog(Context context, int theme) {
         super(context, theme);
     }
@@ -85,6 +99,7 @@ public class DateDialog extends Dialog {
     private DatePicker mDp_datePicker; //
     private TimePicker mTp_timePicker;
     private TextView mTv_title;
+    private NumberPicker numberPicker1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,10 +107,17 @@ public class DateDialog extends Dialog {
         setContentView(R.layout.dialog_date);
         mDp_datePicker = (DatePicker) findViewById(R.id.dp_datePicker);
         mTp_timePicker = (TimePicker) findViewById(R.id.tp_timePicker);
+        numberPicker1 = (NumberPicker) findViewById(R.id.numberPicker);
         mTv_title = (TextView) findViewById(R.id.tv_title);
         mTv_title.setText(mTitle);
         mTp_timePicker.setIs24HourView(true);
         setCanceledOnTouchOutside(true);
+        ll_picker = findViewById(R.id.ll_picker);
+        // 设置NumberPicker属性
+        numberPicker1.setMinValue(minNum);
+        numberPicker1.setMaxValue(maxNum);
+        numberPicker1.setValue(currentNum);
+
 
       /*  mDp_datePicker.init(1988,12-1,15,null);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -126,6 +148,7 @@ public class DateDialog extends Dialog {
             case MODE_1:
 
                 if(!TextUtils.isEmpty(mCurrentDate)){
+                   // timestamptoStringDate()
                     String [] time = DateConfig.string2YMDHM(mCurrentDate);
                     mDp_datePicker.init(Integer.parseInt(time[0]),Integer.parseInt(time[1])-1,Integer.parseInt(time[2]),null);
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -133,9 +156,10 @@ public class DateDialog extends Dialog {
                         mTp_timePicker.setMinute(Integer.parseInt(time[4]));
                     }
                 }
-
+                numberPicker1.setVisibility(View.GONE);
                 resizePikcer(mDp_datePicker);//调整datepicker大小
                 resizePikcer(mTp_timePicker);//调整timepicker大小
+
                 findViewById(R.id.btn_succes).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -158,7 +182,7 @@ public class DateDialog extends Dialog {
                     String [] time = DateConfig.string2YMD(mCurrentDate);
                     mDp_datePicker.init(Integer.parseInt(time[0]),Integer.parseInt(time[1])-1,Integer.parseInt(time[2]),null);
                 }
-
+                numberPicker1.setVisibility(View.GONE);
                 mTp_timePicker.setVisibility(View.GONE);
                 findViewById(R.id.btn_succes).setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -182,9 +206,11 @@ public class DateDialog extends Dialog {
                         mTp_timePicker.setHour(Integer.parseInt(times[0]));
                         mTp_timePicker.setMinute(Integer.parseInt(times[1]));
                     }
-
                 }
+                numberPicker1.setVisibility(View.GONE);
                 mDp_datePicker.setVisibility(View.GONE);
+                resizeNumberPicker(numberPicker1);//调整datepicker大小
+                resizePikcer(mTp_timePicker);//调整timepicker大小
                 findViewById(R.id.btn_succes).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -201,6 +227,7 @@ public class DateDialog extends Dialog {
                 });
                 break;
             case MODE_4:
+                numberPicker1.setVisibility(View.GONE);
                 mTp_timePicker.setVisibility(View.GONE);
                 hideDay( mDp_datePicker);
                 findViewById(R.id.btn_succes).setOnClickListener(new View.OnClickListener() {
@@ -214,6 +241,38 @@ public class DateDialog extends Dialog {
                             e.printStackTrace();
                         }
                         dismiss();
+                    }
+                });
+                break;
+            case MODE_5:
+
+                if(!TextUtils.isEmpty(mCurrentDate)){
+                    String [] time = DateConfig.string2YMDHM(mCurrentDate);
+                    mDp_datePicker.init(Integer.parseInt(time[0]),Integer.parseInt(time[1])-1,Integer.parseInt(time[2]),null);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        mTp_timePicker.setHour(Integer.parseInt(time[3]));
+                        mTp_timePicker.setMinute(Integer.parseInt(time[4]));
+                    }
+                }
+                ViewHelper.setScaleX(ll_picker,0.8f);//可以随意指定缩小百分比
+                ViewHelper.setScaleY(ll_picker,0.8f);
+                resizePikcer(mDp_datePicker);//调整datepicker大小
+                resizePikcer(mTp_timePicker);//调整timepicker大小
+                resizeNumberPicker(numberPicker1);//调整大小
+                findViewById(R.id.btn_succes).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        String date = "";
+                        date = String.format("%d-%02d-%02d", mDp_datePicker.getYear(), mDp_datePicker.getMonth() + 1, mDp_datePicker.getDayOfMonth())
+                                + " " + String.format("%02d:%02d:%02d", mTp_timePicker.getCurrentHour(), mTp_timePicker.getCurrentMinute(),numberPicker1.getValue());
+
+                        try {
+                            interfaceDateDialog.getTime(date);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        dismiss();
+
                     }
                 });
                 break;
@@ -234,6 +293,9 @@ public class DateDialog extends Dialog {
         }
     }
 
+    private void resizeNumberPicker(LinearLayout tp){
+        resizeNumberPicker(tp);
+    }
     /**
      * 得到viewGroup里面的numberpicker组件
      *

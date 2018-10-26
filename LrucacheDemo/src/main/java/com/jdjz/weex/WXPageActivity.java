@@ -71,7 +71,7 @@ public class WXPageActivity extends AbsWeexActivity implements
     mProgressBar = (ProgressBar) findViewById(R.id.progress);
     mTipView = (TextView) findViewById(R.id.index_tip);
 
-
+    monitorBatteryState();
 
 
     Intent intent = getIntent();

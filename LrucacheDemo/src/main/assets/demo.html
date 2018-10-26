@@ -40,21 +40,21 @@
 <hr style="height:1px;border:none;border-top:3px solid #FF4081;"/>
 <br>
 <p>
-    输入日期格式：1. yyyy-MM-zz（默认） 2. HH:mm 3. yyyy-MM-zz HH:mm<br>
-    <input type="text" id="format" hint="输入日期格式：1.	yyyy-MM-zz（默认） 2. HH:mm 3. yyyy-MM-zz HH:mm"
+    输入日期格式：1. yyyy-MM-dd（默认） 2. HH:mm 3. yyyy-MM-dd HH:mm  4 yyyy-MM-dd HH:mm:ss<br>
+    <input type="text" id="format" hint="输入日期格式：1.	yyyy-MM-dd（默认） 2. HH:mm 3. yyyy-MM-zz HH:mm 4 yyyy-MM-dd HH:mm:ss"
            value=""/>
 </p>
 <p>
-    初始选择的日期时间（输入日期格式同“第一个的text一样”），默认当前时间<br>
-    <input type="text" id="currentDate"/>
+    初始选择的日期时间（时间戳)，默认当前时间<br>
+    <input type="text" id="currentDate" value="1540541310000"/>
 </p>
 <p>
-    最小日期时间（只输入年月日，输入日期格式同“第一个的text一样”）<br>
-    <input type="text" id="startDate"/>
+    最小日期时间（时间戳）<br>
+    <input type="text" id="startDate"  value="1445846910000"/>
 </p>
 <p>
-    最大日期时间（只输入年月日，输入日期格式同“第一个的text一样”）<br>
-    <input type="text" id="enzzate"/>
+    最大日期时间（时间戳）<br>
+    <input type="text" id="enzzate"   value="1761466110000"/>
 </p>
 <p>
     <input type="button" id="id_datepicker" value="选择日期时间" onclick="reqDatePicker()"/>

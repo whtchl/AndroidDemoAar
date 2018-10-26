@@ -31,6 +31,7 @@ import com.google.gson.GsonBuilder;
 import com.jdjz.common.TransScanEntity;
 import com.jdjz.contact.ChooseModel;
 import com.jdjz.contact.ContactInfo;
+import com.jdjz.weexlib.date.DateConfig;
 import com.jdjz.weexlib.date.DateDialog;
 import com.jdjz.weexlib.weex.activity.ContactListActivity;
 import com.jdjz.weexlib.weex.activity.UserProfileActivity;
@@ -63,6 +64,7 @@ import com.jdjz.weexlib.weex.modle.RequestParams.RequestSaveImg;
 import com.jdjz.weexlib.weex.modle.RequestParams.RequestScanParams;
 import com.jdjz.weexlib.weex.modle.RequestParams.RequestUserProfileParams;
 import com.jdjz.weexlib.weex.modle.RequestParams.ReuquestDateParams;
+import com.jdjz.weexlib.weex.modle.RequestParams.ReuquestDateParams2;
 import com.jdjz.weexlib.weex.modle.ResultChooseImages;
 import com.jdjz.weexlib.weex.modle.ResultContact;
 import com.jdjz.weexlib.weex.modle.ResultContacts;
@@ -682,7 +684,7 @@ public class WXWebViewJsBridge implements IWebView {
     /**
      * 获取日期时间
      */
-    private void reqDatePicker() {
+    private void reqDatePicker2() {
         mWebView.registerHandler("reqDatePicker", new BridgeHandler() {
 
             @Override
@@ -728,6 +730,65 @@ public class WXWebViewJsBridge implements IWebView {
                 dateDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                 dateDialog.show();
                 //function.onCallBack("datapicker");
+            }
+        });
+    }
+
+
+    private void reqDatePicker() {
+        mWebView.registerHandler("reqDatePicker", new BridgeHandler() {
+
+            @Override
+            public void handler(String data, CallBackFunction function) {
+                JUtils.Log("handler = reqDatePicker, data from web = " + data);
+                ReuquestDateParams dateEntity = new Gson().fromJson(data,ReuquestDateParams.class);
+
+                //final CallBackFunction f = function;
+                int mode=DateDialog.MODE_2;
+                if(dateEntity.getFormat().equalsIgnoreCase("yyyy-MM-dd")){
+                    mode = DateDialog.MODE_2;
+                }else if(dateEntity.getFormat().equalsIgnoreCase("HH:mm")){
+                    mode = DateDialog.MODE_3;
+                }else if(dateEntity.getFormat().equalsIgnoreCase("yyyy-MM-dd HH:mm")){
+                    mode = DateDialog.MODE_1;
+                }else if(dateEntity.getFormat().equalsIgnoreCase("yyyy-MM-dd HH:mm:ss")) {
+                    mode = DateDialog.MODE_5;
+                }
+                else{
+                    mode = DateDialog.MODE_2;
+                }
+                JUtils.Log("currentDate2:"+dateEntity.getCurrentDate());
+                final CallBackFunction f = function;
+                final  ResultDate resultDate = new ResultDate();
+                final int finalMode = mode;
+                DateDialog dateDialog = new DateDialog(mContext, "时间日期", mode, dateEntity.getCurrentDate(), dateEntity.getStartDate(), dateEntity.getEnzzate(),
+                        new DateDialog.InterfaceDateDialog() {
+                            @Override
+                            public void getTime(String dateTime)  {
+                                if (TextUtils.isEmpty(dateTime)) {
+                                    resultDate.setResponseCode(ModleConfig.RES404);
+
+                                    resultDate.setResponseMsg(ModleConfig.RES_FAIL);
+                                    resultDate.setResponseResult("");
+                                } else {
+
+                                    resultDate.setResponseCode(ModleConfig.RES200);
+
+                                    resultDate.setResponseMsg(ModleConfig.RES_SUCCESS);
+
+                                    if(DateDialog.MODE_3 == finalMode){
+                                        resultDate.setResponseResult(dateTime);
+                                    }else{
+                                        resultDate.setResponseResult( Long.toString(DateConfig.convertTimeToLong2(dateTime, finalMode)));
+                                    }
+                                }
+                                String str2 = new Gson().toJson(resultDate);
+                                // final JSONObject jsresult = new JSONObject(new Gson().toJson(result));
+                                f.onCallBack(str2);
+                            }
+                        });
+                dateDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                dateDialog.show();
             }
         });
     }

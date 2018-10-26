@@ -56,8 +56,8 @@ dependencies {
     compile "com.taobao.android:weexplugin-annotation:${project.weexpluginLibVersion}"
 
     /*compile 'com.taobao.android:weexplugin-loader:1.3'
-        compile 'com.taobao.android:weexplugin-processor:1.3'
-        compile 'com.taobao.android:weexplugin-annotation:1.3'*/
+            compile 'com.taobao.android:weexplugin-processor:1.3'
+            compile 'com.taobao.android:weexplugin-annotation:1.3'*/
 
     // PLUGIN GRADLE EXTENSIONS END
 
@@ -81,4 +81,5 @@ dependencies {
     annotationProcessor "com.github.bumptech.glide:compiler:${project.glideLibVersion}"
     implementation project(':PhotoPicker')
     implementation project(':contact')
+    implementation files('libs/nineoldandroids-2.4.0.jar')
 }

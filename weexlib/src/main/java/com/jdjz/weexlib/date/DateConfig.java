@@ -1,7 +1,10 @@
 package com.jdjz.weexlib.date;
 
+import com.jude.utils.JUtils;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.temporal.JulianFields;
 import java.util.Date;
 
 public class DateConfig {
@@ -107,10 +110,10 @@ public class DateConfig {
     /**
      * 转换时间日期格式字串为long型
      *
-     * @param time 格式为：yyyy-MM-dd  HH:mm:ss的时间日期类型
+     * @param time 格式为：yyyy-MM-dd 的时间日期类型
      */
     public static Long convertTimeToLong(String time) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");//"yyyy-MM-dd"
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd ");//"yyyy-MM-dd"
         Date date = new Date();
         try {
             date = sdf.parse(time);
@@ -121,6 +124,37 @@ public class DateConfig {
         }
     }
 
+    /**
+     * 转换时间日期格式字串为long型
+     *
+     * @param time 格式为：yyyy-MM-dd  HH:mm:ss的时间日期类型
+     */
+    public static Long convertTimeToLong2(String time, int mode) {
+        SimpleDateFormat sdf;
+        switch (mode) {
+            case DateDialog.MODE_1:
+                sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+                break;
+            case DateDialog.MODE_2:
+                sdf = new SimpleDateFormat("yyyy-MM-dd");
+                break;
+            case DateDialog.MODE_5:
+                sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                break;
+            default:
+                sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                break;
+        }
+
+        Date date = new Date();
+        try {
+            date = sdf.parse(time);
+            return date.getTime();
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return 0L;
+        }
+    }
 
     public static boolean isValidDateYMDHM(String str) {
         boolean convertSuccess = true;
@@ -170,6 +204,55 @@ public class DateConfig {
         return convertSuccess;
     }
 
+    /**
+     * 时间戳转成时间string
+     *
+     * @param dateLong
+     * @return
+     */
+    public static String timestamptoStringDate(Long dateLong) {
+        //Long dateLong = Long.valueOf(str);
+        String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(dateLong));
+        JUtils.Log("longToDate：" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(dateLong)));
+        System.out.println("longToDate：" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(dateLong)));
+        return date;
+    }
+
+
+    /**
+     * 时间戳转换成字符窜
+     *
+     * @param milSecond 毫秒
+     * @return
+     */
+    public static String getDateToStringM(long milSecond) {
+        Date date = new Date(milSecond);
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return format.format(date);
+    }
+
+    /**
+     * 时间戳转换成字符窜
+     *
+     * @param milSecond 毫秒
+     * @return
+     */
+    public static String getDateToString(long Second) {
+        Date date = new Date(Second);
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return format.format(date);
+    }
+
+
+    public static String stampToDate(String s) {
+        String res;
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        long lt = new Long(s);
+        Date date = new Date(lt);
+        res = simpleDateFormat.format(date);
+        return res;
+    }
+
     public static void main(String[] args) {
         /*String[] strNow2 = string2YMD("2017-14-19");
         Integer year = Integer.parseInt(strNow2[0]);
@@ -183,6 +266,8 @@ public class DateConfig {
         /*String[] strNow4 = string2YMDHM("1970-10-01 15:52");
         System.out.print(" @@@@"+ strNow4[0]+" "+strNow4[1]+" "+strNow4[2]+"  "+strNow4[3]+" "+strNow4[4]);*/
         // System.out.print(convertTimeToLong("1986-12-16 23:59:59"));
+
+        System.out.println(stampToDate("1540541310000"));
 
 
         long longTime = new Date().getTime();

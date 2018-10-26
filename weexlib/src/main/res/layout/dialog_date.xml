@@ -3,64 +3,84 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:orientation="vertical">
+
     <TextView
         android:id="@+id/tv_title"
         android:layout_width="match_parent"
-        android:text="初始时间"
-        android:textSize="19sp"
-        android:textColor="@android:color/white"
-        android:padding="10dp"
+        android:layout_height="wrap_content"
         android:background="#0075C2"
         android:gravity="center"
-        android:layout_height="wrap_content" />
+        android:padding="10dp"
+        android:text="初始时间"
+        android:textColor="@android:color/white"
+        android:textSize="19sp" />
 
-    <LinearLayout
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
+    <!--//此处必需设置居中,外层是Relativelayout就用centerinparent,是LinearLayout便用layoutgravity-->
+    <com.jdjz.weexlib.date.MyWrapContentView
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_gravity="center">
+        >
 
-        <DatePicker
-            android:id="@+id/dp_datePicker"
+        <LinearLayout
+            android:id="@+id/ll_picker"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:calendarViewShown="false"
-            android:datePickerMode="spinner"
-            />
+            android:orientation="horizontal"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp">
 
-        <TimePicker
-            android:timePickerMode="spinner"
-            android:id="@+id/tp_timePicker"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-        </TimePicker>
-    </LinearLayout>
+            <DatePicker
+                android:id="@+id/dp_datePicker"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:calendarViewShown="false"
+                android:datePickerMode="spinner" />
+
+            <TimePicker
+                android:id="@+id/tp_timePicker"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:timePickerMode="spinner"></TimePicker>
+
+            <NumberPicker
+                android:id="@+id/numberPicker"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+
+        </LinearLayout>
+    </com.jdjz.weexlib.date.MyWrapContentView>
+
     <View
         android:layout_width="match_parent"
-        android:background="@android:color/darker_gray"
-        android:layout_height="1dp"/>
+        android:layout_height="1dp"
+        android:background="@android:color/darker_gray" />
+
     <LinearLayout
-        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
         <Button
             android:id="@+id/btn_cancel"
-            android:background="@null"
-            android:layout_weight="1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@null"
             android:text="取消" />
+
         <View
             android:layout_width="1dp"
-            android:background="@android:color/darker_gray"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            android:background="@android:color/darker_gray" />
+
         <Button
-            android:background="@null"
-            android:layout_weight="1"
             android:id="@+id/btn_succes"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@null"
             android:text="完成" />
 
     </LinearLayout>
