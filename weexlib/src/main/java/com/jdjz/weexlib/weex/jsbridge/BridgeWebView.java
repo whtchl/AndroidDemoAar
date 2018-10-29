@@ -7,15 +7,14 @@ import android.os.Looper;
 import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+//import android.webkit.WebView;
 
-//import com.tencent.smtt.sdk.WebView;
+import com.tencent.smtt.sdk.WebView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import android.webkit.WebView;
 
 @SuppressLint("SetJavaScriptEnabled")
 public class BridgeWebView extends WebView implements WebViewJavascriptBridge {
@@ -65,8 +64,10 @@ public class BridgeWebView extends WebView implements WebViewJavascriptBridge {
 	}
 
     private void init() {
-		this.setVerticalScrollBarEnabled(false);
-		this.setHorizontalScrollBarEnabled(false);
+		this.setVerticalScrollBarEnabled(false);  //tchl 1029
+		this.setHorizontalScrollBarEnabled(false);//tchl 1029
+
+
 		this.getSettings().setJavaScriptEnabled(true);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             WebView.setWebContentsDebuggingEnabled(true);

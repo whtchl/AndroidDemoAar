@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.Bundle;
@@ -64,7 +65,7 @@ public class WXPageActivity extends AbsWeexActivity implements
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
-
+    JUtils.Log("WXPageActivity  onCreate");
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_wxpage);
     mContainer = (ViewGroup) findViewById(R.id.container);
@@ -314,8 +315,54 @@ public class WXPageActivity extends AbsWeexActivity implements
     }
   }
 
+  //屏幕方向发生改变的回调方法
+  @Override
+  public void onConfigurationChanged(Configuration newConfig) {
+
+    if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+      JUtils.Log("WXPageActivity  onConfigurationChanged  当前屏幕为横屏");
+    } else {
+      JUtils.Log("WXPageActivity   onConfigurationChanged 当前屏幕为竖屏");
+    }
+    super.onConfigurationChanged(newConfig);
+    //  setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);  //设置横屏
+  }
+
+  @Override
+  public void onResume(){
+    super.onResume();
+    JUtils.Log("WXPageActivity  onResume");
+
+  }
+
+  @Override
+  public void onStart() {
+    super.onStart();
+    JUtils.Log("WXPageActivity  onStart");
+  }
+
+/*  @Override
+  public void onRestart() {
+    super.onRes();
+    JUtils.Log("WXPageActivity  onRestart");
+  }*/
+
+
+  @Override
+  public void onPause() {
+    super.onPause();
+    JUtils.Log("WXPageActivity  onPause");
+  }
+
+  @Override
+  public void onStop() {
+    super.onStop();
+    JUtils.Log("WXPageActivity  onStop");
+  }
+
   @Override
   public void onDestroy() {
+    JUtils.Log("WXPageActivity  onDestroy");
     super.onDestroy();
     if (mHotReloadManager != null) {
       mHotReloadManager.destroy();

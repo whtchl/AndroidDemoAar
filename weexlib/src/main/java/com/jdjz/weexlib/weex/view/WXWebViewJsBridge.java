@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -95,14 +96,15 @@ import com.jude.utils.permission.PermissionRequestCode;
 import com.jude.utils.permission.PermissionsUtil;
 import com.taobao.weex.ui.view.IWebView;
 import com.taobao.weex.utils.WXLogUtils;
-/*import com.tencent.smtt.export.external.interfaces.SslError;
+import com.tencent.smtt.export.external.interfaces.SslError;
 import com.tencent.smtt.export.external.interfaces.SslErrorHandler;
 import com.tencent.smtt.export.external.interfaces.WebResourceError;
 import com.tencent.smtt.export.external.interfaces.WebResourceRequest;
 import com.tencent.smtt.export.external.interfaces.WebResourceResponse;
+import com.tencent.smtt.sdk.QbSdk;
 import com.tencent.smtt.sdk.WebChromeClient;
 import com.tencent.smtt.sdk.WebSettings;
-import com.tencent.smtt.sdk.WebView;*/
+import com.tencent.smtt.sdk.WebView;
 import com.whamu2.previewimage.Preview;
 import com.whamu2.previewimage.entity.Image;
 
@@ -118,6 +120,7 @@ import java.util.List;
 
 import io.github.xudaojie.qrcodelib.CaptureActivity;
 import me.iwf.photopicker.PhotoPicker;
+/*
 
 import android.net.http.SslError;
 import android.webkit.SslErrorHandler;
@@ -127,6 +130,7 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+*/
 
 public class WXWebViewJsBridge implements IWebView {
 
@@ -159,6 +163,27 @@ public class WXWebViewJsBridge implements IWebView {
 
     @Override
     public View getView() {
+
+        //tbs x5
+        QbSdk.PreInitCallback cb = new QbSdk.PreInitCallback() {
+
+            @Override
+            public void onViewInitFinished(boolean b) {
+                //x5內核初始化完成的回调，为true表示x5内核加载成功，否则表示x5内核加载失败，会自动切换到系统内核。
+                Log.d("app", " onViewInitFinished is " + b);
+            }
+
+            @Override
+            public void onCoreInitFinished() {
+                // TODO Auto-generated method stub
+            }
+        };
+
+        //x5内核初始化接口
+        QbSdk.initX5Environment(mContext.getApplicationContext(), cb);
+
+
+
         EventBus.getDefault().register(this);
         FrameLayout root = new FrameLayout(mContext);
         root.setBackgroundColor(Color.WHITE);
@@ -498,8 +523,23 @@ public class WXWebViewJsBridge implements IWebView {
         settings.setAppCacheEnabled(true);
         settings.setUseWideViewPort(true);
         settings.setDomStorageEnabled(true);
-        settings.setSupportZoom(false);
-        settings.setBuiltInZoomControls(false);
+        //settings.setSupportZoom(true);
+        //settings.setBuiltInZoomControls(true);
+
+
+        /**
+         * LOAD_CACHE_ONLY: 不使用网络，只读取本地缓存数据
+         * LOAD_DEFAULT: （默认）根据cache-control决定是否从网络上取数据。
+         * LOAD_NO_CACHE: 不使用缓存，只从网络获取数据.
+         * LOAD_CACHE_ELSE_NETWORK，只要本地有，无论是否过期，或者no-cache，都使用缓存中的数据。
+         */
+        settings.setCacheMode(WebSettings.LOAD_NO_CACHE);//不使用缓存，只从网络获取数据.
+
+        //支持屏幕缩放
+        settings.setSupportZoom(true);
+        settings.setBuiltInZoomControls(true);
+
+
         wv.setWebViewClient(new MyWebViewClient(mWebView));
         // set HadlerCallBack
         mWebView.setDefaultHandler(new myHadlerCallBack());
@@ -521,21 +561,6 @@ public class WXWebViewJsBridge implements IWebView {
             }
         });
 
-
-
-        //模拟用户信息 获取本地位置，用户名返回给html
-       /* User user = new User();
-        user.setLocation("上海");
-        user.setName("Bruce");
-        // 回调 "functionInJs"
-        mWebView.callHandler("functionInJs", new Gson().toJson(user), new CallBackFunction() {
-            @Override
-            public void onCallBack(String data) {
-
-                Toast.makeText(mContext, "网页在获取你的位置!!!，"+ data, Toast.LENGTH_SHORT).show();
-
-            }
-        });*/
 
         //NativeToJSstartAutoLBS(10);
 
@@ -581,6 +606,7 @@ public class WXWebViewJsBridge implements IWebView {
         reqChooseImage();
         reqSaveImageToPhotosAlbum();
         reqGetImageInfo();
+        reqChangeScreen();
         mWebView.send("hello");
     }
 
@@ -1426,6 +1452,32 @@ public class WXWebViewJsBridge implements IWebView {
                 callBackFunction = function;
                 h5Data = data;
                 checkPermission((Activity)mContext, PermissionNameList.PERMISSIONS_STORAGE,PermissionRequestCode.PERMISSION_REQUEST_CODE_STORAGE_GETIMAGEINFO);
+            }
+        });
+    }
+
+    /**
+     * 横竖屏幕切换
+     */
+    private void reqChangeScreen(){
+        mWebView.registerHandler("reqChangeScreen", new BridgeHandler() {
+
+            @Override
+            public void handler(String data, CallBackFunction function) {
+                JUtils.Log("handler = reqChangeScreen, data from web = " + data);
+                /**
+                 * int ORIENTATION_PORTRAIT = 1;  竖屏
+                 * int ORIENTATION_LANDSCAPE = 2; 横屏
+                 */
+                //获取屏幕的方向  ,数值1表示竖屏，数值2表示横屏
+                int screenNum = mContext.getResources().getConfiguration().orientation;
+                //（如果竖屏）设置屏幕为横屏
+                if (screenNum == 1) {
+                    ( (Activity)mContext).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+                    //设置为置屏幕为竖屏
+                } else {
+                    ( (Activity)mContext).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                }
             }
         });
     }

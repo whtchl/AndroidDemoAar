@@ -2,17 +2,16 @@ package com.jdjz.weexlib.weex.jsbridge;
 
 import android.graphics.Bitmap;
 import android.util.Log;
+/*import android.webkit.WebResourceRequest;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;*/
 
-
-//import com.tencent.smtt.sdk.WebView;
-//import com.tencent.smtt.sdk.WebViewClient;
+import com.tencent.smtt.export.external.interfaces.WebResourceRequest;
+import com.tencent.smtt.sdk.WebView;
+import com.tencent.smtt.sdk.WebViewClient;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-
-import android.webkit.WebResourceRequest;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
 
 /**
  * 如果要自定义WebViewClient必须要集成此类

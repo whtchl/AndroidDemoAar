@@ -96,7 +96,9 @@
         <activity
             android:name="com.jdjz.weex.WXPageActivity"
             android:label="@string/app_name"
-            android:screenOrientation="portrait"></activity>
+            android:windowSoftInputMode="adjustResize"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            ></activity>
         <activity android:name="io.github.xudaojie.qrcodelib.CaptureActivity" />
         <activity android:name="com.jdjz.weexlib.weex.activity.UserProfileActivity"></activity>
         <activity

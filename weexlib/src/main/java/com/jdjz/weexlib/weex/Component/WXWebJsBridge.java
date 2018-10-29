@@ -81,7 +81,6 @@ public class WXWebJsBridge extends WXComponent {  //activity  WXWeb
                 }
             }
         });
-        Log.i("tchl","3333");
         return mWebView.getView();
     }
 

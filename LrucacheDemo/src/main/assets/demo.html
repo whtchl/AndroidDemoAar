@@ -16,7 +16,7 @@
     </xmp>
 </p>
 <p>
-    <input type="button" id="id_gettoken" value="获取token" onclick="reqGetOpenId()"/>
+    <input type="button" id="id_gettoken" value="获取token!" onclick="reqGetOpenId()"/>
 </p>
 <p>
     <input type="text" id="token" value="token"/>
@@ -147,8 +147,9 @@
 </p>
 
 <hr style="height:1px;border:none;border-top:3px solid #FF4081;"/>
-
-
+<br>
+    横竖屏手动切换<br>
+    <input type="button" id="id_changeScreen" value="横竖屏手动切换" onclick="reqChangeScreen();"/>
 <p>
     <input type="hidden" id="text1" value="用户名(username)"/>
 </p>
@@ -463,6 +464,18 @@
                 , {'param':str}
                 , function(responseData) {
                     document.getElementById("show").innerHTML = " getSingleContacts:" + responseData
+                    //alert(responseData);
+                }
+            );
+        }
+
+
+        function reqChangeScreen() {
+             window.WebViewJavascriptBridge.callHandler(
+                'reqChangeScreen'
+                , {}
+                , function(responseData) {
+                    document.getElementById("show").innerHTML = " reqChangeScreen:" + responseData
                     //alert(responseData);
                 }
             );

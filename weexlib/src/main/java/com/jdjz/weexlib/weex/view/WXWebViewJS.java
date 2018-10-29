@@ -176,8 +176,8 @@ public class WXWebViewJS implements IWebView { //BridgeView   WXWebView
         settings.setAppCacheEnabled(true);
         settings.setUseWideViewPort(true);
         settings.setDomStorageEnabled(true);
-        settings.setSupportZoom(false);
-        settings.setBuiltInZoomControls(false);
+        settings.setSupportZoom(true);  //tchl1029
+        settings.setBuiltInZoomControls(true);//tchl1029
         wv.setWebViewClient(new WebViewClient() {
 
             @Override

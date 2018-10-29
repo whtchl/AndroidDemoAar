@@ -17,7 +17,7 @@ import com.jude.utils.JUtils;
 import com.taobao.weex.InitConfig;
 import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.common.WXException;
-import com.tencent.smtt.sdk.QbSdk;
+//import com.tencent.smtt.sdk.QbSdk;
 
 
 public class App extends MultiDexApplication {
@@ -58,8 +58,8 @@ public class App extends MultiDexApplication {
             WeexPluginContainer.loadAll(this);
 
 
-            //tbs x5
-/*            QbSdk.PreInitCallback cb = new QbSdk.PreInitCallback() {
+/*            //tbs x5
+            QbSdk.PreInitCallback cb = new QbSdk.PreInitCallback() {
 
                 @Override
                 public void onViewInitFinished(boolean b) {

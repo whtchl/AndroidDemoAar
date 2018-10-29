@@ -2,14 +2,14 @@ package com.jdjz.weexlib.weex.jsbridge;
 
 import android.content.Context;
 
-//import com.tencent.smtt.sdk.WebView;
+import com.tencent.smtt.sdk.WebView;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import android.webkit.WebView;
+//import android.webkit.WebView;
 
 public class BridgeUtil {
 	final static String YY_OVERRIDE_SCHEMA = "yy://";
