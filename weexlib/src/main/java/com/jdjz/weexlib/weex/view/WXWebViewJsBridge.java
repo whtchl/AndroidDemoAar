@@ -1031,6 +1031,9 @@ public class WXWebViewJsBridge implements IWebView {
     }
 
 
+
+
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(TransScanEntity transScanEntity) {
         ResultScan resultScan = new ResultScan();
@@ -1153,6 +1156,13 @@ public class WXWebViewJsBridge implements IWebView {
     public void onEventMainThread(GetImageInfoEvent getImageInfoEvent) {
         handleGetImageInfo();
     }
+
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEventMainThread(ChooseImagesFileInfoEntity event) {
+        handleChooseImage();
+    }
+
     /**
      * 判断网络是否可达
      * @param context
@@ -1373,10 +1383,15 @@ public class WXWebViewJsBridge implements IWebView {
             @Override
             public void handler(String data, CallBackFunction function) {
                 JUtils.Log("handler = reqChooseImage, data from web = " + data);
-                RequestChooseImagesParams requestChooseImagesParams = new RequestChooseImagesParams();
-                requestChooseImagesParams = new Gson().fromJson(data,RequestChooseImagesParams.class);
 
-               if( PermissionsUtil.hasPermission(mContext,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE})){
+
+                h5Data=  data;
+                callBackFunction = function;
+                checkPermission((Activity)mContext, PermissionNameList.PERMISSIONS_STORAGE,PermissionRequestCode.PERMISSION_REQUEST_CODE_STORAGE_CHOOSEIMAGE);
+
+
+
+ /*              if( PermissionsUtil.hasPermission(mContext,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE})){
                    JUtils.Log("reqChooseImage have storage 权限");
 
                }else{
@@ -1418,7 +1433,7 @@ public class WXWebViewJsBridge implements IWebView {
                         .setShowCamera(isCamera)
                         .start(mContext);
 
-                callBackFunction = function;
+                callBackFunction = function;*/
             }
         });
     }
@@ -1627,6 +1642,9 @@ public class WXWebViewJsBridge implements IWebView {
                 case PermissionRequestCode.PERMISSION_REQUEST_CODE_STORAGE_SAVEIMAGETOPHOTOSALBUM:
                     handleSaveImageToPhotosAblum();
                     break;
+                case PermissionRequestCode.PERMISSION_REQUEST_CODE_STORAGE_CHOOSEIMAGE:
+                    handleChooseImage();
+                    break;
                 default:
                     break;
             }
@@ -1658,6 +1676,9 @@ public class WXWebViewJsBridge implements IWebView {
                     case PermissionRequestCode.PERMISSION_REQUEST_CODE_STORAGE_SAVEIMAGETOPHOTOSALBUM:
                         handleSaveImageToPhotosAblum();
                         break;
+                    case PermissionRequestCode.PERMISSION_REQUEST_CODE_STORAGE_CHOOSEIMAGE:
+                        handleChooseImage();
+                        break;
                     default:
                         break;
 
@@ -1668,6 +1689,48 @@ public class WXWebViewJsBridge implements IWebView {
                 JUtils.Log("have no permissions");
             }
         }
+    }
+
+
+
+    private void handleChooseImage(){
+        RequestChooseImagesParams requestChooseImagesParams = new RequestChooseImagesParams();
+        requestChooseImagesParams = new Gson().fromJson(h5Data,RequestChooseImagesParams.class);
+
+        int mCompress = 2;//0->origin; 1->compressed; 2->两者都有
+        Boolean isCamera = true;
+        if(requestChooseImagesParams.getSourceType().size()==2){
+            mCompress = 2;
+            JUtils.Log("mCompress = 2");
+        }else if(requestChooseImagesParams.getSourceType().size()==1){
+            if(requestChooseImagesParams.getSourceType().get(0).equals("original")){
+                mCompress = 0;
+                JUtils.Log(" mCompress = 0");
+            }else if(requestChooseImagesParams.getSourceType().get(0).equals("compressed")){
+                mCompress = 1;
+                JUtils.Log("mCompress = 1");
+            }
+        }
+
+        if(requestChooseImagesParams.getSizeType().size()==2){
+            isCamera = true;
+            JUtils.Log("isCamera is true 2");
+        }else if(requestChooseImagesParams.getSizeType().size()==1){
+            if(requestChooseImagesParams.getSizeType().get(0).equals("album")){
+                isCamera = false;
+                JUtils.Log("isCamera is false");
+            }else if(requestChooseImagesParams.getSizeType().get(0).equals("camera")){
+                isCamera = true;
+                JUtils.Log("isCamera is true");
+            }
+        }
+
+        PhotoPicker.builder()
+                .setPhotoCount(requestChooseImagesParams.getCount())
+                .setGridColumnCount(4)
+                .setCompress(mCompress)
+                .setShowCamera(isCamera)
+                .start(mContext);
     }
 
     private void handleSaveImageToPhotosAblum() {

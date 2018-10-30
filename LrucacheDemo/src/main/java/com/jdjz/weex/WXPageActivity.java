@@ -30,6 +30,7 @@ import com.jdjz.weexlib.weex.modle.Event.PreviewImageEvent;
 import com.jdjz.weexlib.weex.modle.Event.SaveImageToPhotosAlbumEvent;
 import com.jdjz.weexlib.weex.modle.Event.StartAutoLBSEvent;
 import com.jdjz.weexlib.weex.modle.Event.StopAutoLBSEvent;
+import com.jdjz.weexlib.weex.modle.entity.ChooseImagesFileInfoEntity;
 import com.jdjz.weexlib.weex.util.AppConfig;
 import com.jdjz.weexlib.weex.util.Constants;
 import com.jdjz.weexlib.weex.util.StrUtil;
@@ -207,6 +208,10 @@ public class WXPageActivity extends AbsWeexActivity implements
             && PermissionsUtil.hasPermission(this, permissions)) {
         EventBus.getDefault().post(new SaveImageToPhotosAlbumEvent());
         JUtils.Toast("可以保存图片到相册了");
+    }else if (requestCode == PermissionRequestCode.PERMISSION_REQUEST_CODE_STORAGE_CHOOSEIMAGE && PermissionsUtil.isGranted(grantResults)
+            && PermissionsUtil.hasPermission(this, permissions)) {
+      EventBus.getDefault().post(new ChooseImagesFileInfoEntity());
+      JUtils.Toast("可以保存图片到相册了");
     }
     else {
       JUtils.Toast(this.getString(R.string.permissontip));
@@ -341,11 +346,6 @@ public class WXPageActivity extends AbsWeexActivity implements
     JUtils.Log("WXPageActivity  onStart");
   }
 
-/*  @Override
-  public void onRestart() {
-    super.onRes();
-    JUtils.Log("WXPageActivity  onRestart");
-  }*/
 
 
   @Override

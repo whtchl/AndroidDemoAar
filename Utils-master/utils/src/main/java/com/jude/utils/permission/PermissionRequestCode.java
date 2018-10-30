@@ -18,6 +18,8 @@ public class PermissionRequestCode {
     public static final int PERMISSION_REQUEST_CODE_STORAGE_SAVEIMAGETOPHOTOSALBUM = 1011;
     public static final int PERMISSION_REQUEST_CODE_STORAGE_GETIMAGEINFO = 1012;
 
+    public static final int PERMISSION_REQUEST_CODE_STORAGE_CHOOSEIMAGE = 1013;
+
 
 
 }
