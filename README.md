@@ -1,7 +1,7 @@
 =====
 这是一个用weex的webView的， h5和native交互的demo。 点击"WEEX DEMO"进去查看
 
-将weex的webView做成module
+将weex的webView做成了module
 ============
 
 
